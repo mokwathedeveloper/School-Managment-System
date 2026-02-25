@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import apiClient from '@/lib/api-client';
+import Cookies from 'js-cookie';
 
 interface AuthContextType {
   user: any;
@@ -32,7 +33,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const response = await apiClient.post('/auth/login', credentials);
       const { access_token, user } = response.data;
       
-      localStorage.setItem('access_token', access_token);
+      // Store token in secure cookie
+      Cookies.set('access_token', access_token, { 
+        expires: 7, 
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict'
+      });
+      
       localStorage.setItem('user', JSON.stringify(user));
       setUser(user);
       
@@ -44,7 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = () => {
-    localStorage.removeItem('access_token');
+    Cookies.remove('access_token');
     localStorage.removeItem('user');
     setUser(null);
     router.push('/login');
