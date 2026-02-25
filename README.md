@@ -56,6 +56,18 @@ npm run seed
 npm run dev
 ```
 
+## 🔐 Quick Access & Test Credentials
+
+Once the system is running, access the login portal at: **`http://localhost:3000/login`**
+
+The following accounts are available via the default seed script (`npx prisma db seed`):
+
+| Role | Email | Password |
+| :--- | :--- | :--- |
+| **School Admin** | `admin@school.com` | `password123` |
+| **Parent** | `parent@test.com` | `password123` |
+| **Student** | `student@test.com` | `password123` |
+
 ## 📂 Folder Structure
 - `apps/api`: NestJS backend source, Prisma schema, and seed scripts.
 - `apps/web`: Next.js frontend application, dashboards, and landing page.
