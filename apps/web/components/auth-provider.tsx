@@ -28,6 +28,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (credentials: any) => {
     try {
+      console.log('Attempting login to:', apiClient.defaults.baseURL + '/auth/login');
       const response = await apiClient.post('/auth/login', credentials);
       const { access_token, user } = response.data;
       
