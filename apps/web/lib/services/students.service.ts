@@ -1,5 +1,5 @@
 import prisma from '../db/prisma';
-import { Student, Prisma } from '@prisma/client';
+import { Student, Prisma, Role } from '@prisma/client';
 import * as argon2 from 'argon2';
 
 export const StudentsService = {
@@ -22,7 +22,7 @@ export const StudentsService = {
           password: passwordHash,
           first_name: data.first_name,
           last_name: data.last_name,
-          role: 'STUDENT',
+          role: Role.STUDENT,
           school_id: schoolId,
         },
       });

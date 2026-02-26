@@ -1,5 +1,5 @@
 import prisma from '../db/prisma';
-import { Invoice, Payment } from '@prisma/client';
+import { Invoice, Payment, PaymentMethod, PaymentStatus } from '@prisma/client';
 import axios from 'axios';
 
 export const FinanceService = {
@@ -23,7 +23,7 @@ export const FinanceService = {
           title: data.title,
           amount: data.amount,
           due_date: data.due_date,
-          items: data.items ? JSON.stringify(data.items) : null,
+          items: data.items || null,
           status: 'UNPAID',
         },
       });

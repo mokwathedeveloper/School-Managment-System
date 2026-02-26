@@ -1,5 +1,6 @@
 import prisma from '../db/prisma';
 import { MessagingService } from './messaging.service';
+import { AttendanceStatus } from '@prisma/client';
 
 export const AttendanceService = {
   async markAttendance(data: {
@@ -19,7 +20,7 @@ export const AttendanceService = {
           },
         },
         update: {
-          status: record.status,
+          status: record.status as AttendanceStatus,
           remarks: record.remarks,
         },
         create: {
@@ -27,7 +28,7 @@ export const AttendanceService = {
           student_id: record.student_id,
           class_id: data.class_id,
           date: data.date,
-          status: record.status,
+          status: record.status as AttendanceStatus,
           remarks: record.remarks,
         },
       });
