@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/server/auth';
 import { StudentsService } from '@/lib/services/students.service';
+import { handleApiError, ApiError } from '@/lib/server/api-utils';
 import { z } from 'zod';
 
 const createStudentSchema = z.object({
@@ -15,41 +16,44 @@ const createStudentSchema = z.object({
 });
 
 export async function GET(req: NextRequest) {
-  const session = await getSession(req);
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  try {
+    const session = await getSession(req);
+    if (!session) throw new ApiError('Unauthorized', 401);
 
-  const { searchParams } = new URL(req.url);
-  const search = searchParams.get('search') || undefined;
-  const classId = searchParams.get('classId') || undefined;
-  const skip = parseInt(searchParams.get('skip') || '0');
-  const take = parseInt(searchParams.get('take') || '10');
+    const { searchParams } = new URL(req.url);
+    const search = searchParams.get('search') || undefined;
+    const classId = searchParams.get('classId') || undefined;
+    const skip = parseInt(searchParams.get('skip') || '0');
+    const take = parseInt(searchParams.get('take') || '10');
 
-  const result = await StudentsService.findAll(session.schoolId, {
-    search,
-    classId,
-    skip,
-    take,
-  });
+    const result = await StudentsService.findAll(session.schoolId, {
+      search,
+      classId,
+      skip,
+      take,
+    });
 
-  return NextResponse.json(result);
+    return NextResponse.json(result);
+  } catch (error) {
+    return handleApiError(error);
+  }
 }
 
 export async function POST(req: NextRequest) {
-  const session = await getSession(req);
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
   try {
+    const session = await getSession(req);
+    if (!session) throw new ApiError('Unauthorized', 401);
+
     const body = await req.json();
     const validated = createStudentSchema.safeParse(body);
 
     if (!validated.success) {
-      return NextResponse.json({ error: 'Invalid input', details: validated.error.format() }, { status: 400 });
+      throw new ApiError('Invalid input', 400);
     }
 
     const student = await StudentsService.create(session.schoolId, validated.data);
     return NextResponse.json(student, { status: 201 });
   } catch (error) {
-    console.error('Create student error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return handleApiError(error);
   }
 }

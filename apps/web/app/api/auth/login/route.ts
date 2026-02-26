@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { AuthService } from '@/lib/services/auth.service';
+import { handleApiError, ApiError } from '@/lib/server/api-utils';
 import { z } from 'zod';
 
 const loginSchema = z.object({
@@ -13,20 +14,19 @@ export async function POST(req: NextRequest) {
     const validated = loginSchema.safeParse(body);
 
     if (!validated.success) {
-      return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
+      throw new ApiError('Invalid input', 400);
     }
 
     const { email, password } = validated.data;
     const user = await AuthService.validateUser(email, password);
 
     if (!user) {
-      return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
+      throw new ApiError('Invalid credentials', 401);
     }
 
     const result = await AuthService.login(user);
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Login error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return handleApiError(error);
   }
 }
