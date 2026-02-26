@@ -1,6 +1,6 @@
 import { Injectable, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Role } from '@prisma/client';
+import {  } from '@prisma/client';
 
 @Injectable()
 export class SuperAdminService {
@@ -51,7 +51,7 @@ export class SuperAdminService {
           password: passwordHash,
           first_name: data.adminFirstName,
           last_name: data.adminLastName,
-          role: Role.SCHOOL_ADMIN,
+          role: "SCHOOL_ADMIN",
           school_id: school.id
         }
       });

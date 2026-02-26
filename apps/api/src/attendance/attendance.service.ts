@@ -1,95 +1,67 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { AttendanceStatus } from '@prisma/client';
 import { MessagingService } from '../messaging/messaging.service';
 
 @Injectable()
 export class AttendanceService {
   constructor(
     private prisma: PrismaService,
-    private messaging: MessagingService
+    private messaging: MessagingService,
   ) {}
 
   async markAttendance(data: {
     school_id: string;
     class_id: string;
     date: Date;
-    records: { student_id: string; status: AttendanceStatus; remarks?: string }[];
+    records: { student_id: string; status: string; remarks?: string }[];
   }) {
-    const { school_id, class_id, date, records } = data;
+    const savedRecords = [];
 
-    // Use a transaction to ensure all records are saved
-    const results = await this.prisma.$transaction(
-      records.map((record) =>
-        this.prisma.attendance.upsert({
-          where: {
-            student_id_date: {
-              student_id: record.student_id,
-              date: new Date(date.setHours(0, 0, 0, 0)),
-            },
-          },
-          update: {
-            status: record.status,
-            remarks: record.remarks,
-          },
-          create: {
-            school_id,
-            class_id,
+    for (const record of data.records) {
+      const attendance = await this.prisma.attendance.upsert({
+        where: {
+          student_id_date: {
             student_id: record.student_id,
-            date: new Date(date.setHours(0, 0, 0, 0)),
-            status: record.status,
-            remarks: record.remarks,
+            date: data.date,
           },
-        })
-      )
-    );
+        },
+        update: {
+          status: record.status,
+          remarks: record.remarks,
+        },
+        create: {
+          school_id: data.school_id,
+          student_id: record.student_id,
+          class_id: data.class_id,
+          date: data.date,
+          status: record.status,
+          remarks: record.remarks,
+        },
+      });
 
-    // Trigger Notifications for ABSENT students
-    for (const record of records) {
-      if (record.status === AttendanceStatus.ABSENT) {
-        this.messaging.notifyParentOfAbsence(record.student_id, date.toDateString());
+      // Notify parent if student is absent
+      if (record.status === 'ABSENT') {
+        this.messaging.notifyAbsence(record.student_id, data.date);
       }
+
+      savedRecords.push(attendance);
     }
 
-    return results;
+    return savedRecords;
   }
 
-  async getClassAttendance(class_id: string, date: Date) {
+  async getAttendance(schoolId: string, classId: string, date: Date) {
     return this.prisma.attendance.findMany({
       where: {
-        class_id,
-        date: new Date(date.setHours(0, 0, 0, 0)),
+        school_id: schoolId,
+        class_id: classId,
+        date: date,
       },
       include: {
         student: {
-          include: {
-            user: true,
-          },
+          include: { user: true },
         },
       },
     });
-  }
-
-  async getStudentAttendanceSummary(student_id: string, startDate: Date, endDate: Date) {
-    const records = await this.prisma.attendance.findMany({
-      where: {
-        student_id,
-        date: {
-          gte: startDate,
-          lte: endDate,
-        },
-      },
-    });
-
-    const summary = records.reduce(
-      (acc, curr) => {
-        acc[curr.status]++;
-        acc.total++;
-        return acc;
-      },
-      { PRESENT: 0, ABSENT: 0, LATE: 0, EXCUSED: 0, total: 0 }
-    );
-
-    return summary;
   }
 }

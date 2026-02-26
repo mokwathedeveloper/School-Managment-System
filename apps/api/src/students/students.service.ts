@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Student, Prisma, Role } from '@prisma/client';
+import { Student, Prisma } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 import * as argon2 from 'argon2';
 
@@ -32,7 +32,7 @@ export class StudentsService {
           password: passwordHash,
           first_name: data.first_name,
           last_name: data.last_name,
-          role: Role.STUDENT,
+          role: 'STUDENT',
           school_id: schoolId,
         },
       });
@@ -75,7 +75,7 @@ export class StudentsService {
               password: passwordHash,
               first_name: data.first_name,
               last_name: data.last_name,
-              role: Role.STUDENT,
+              role: 'STUDENT',
               school_id: schoolId,
             },
           });
@@ -108,9 +108,9 @@ export class StudentsService {
       ...(classId && { class_id: classId }),
       ...(search && {
         OR: [
-          { admission_no: { contains: search, mode: 'insensitive' } },
-          { user: { first_name: { contains: search, mode: 'insensitive' } } },
-          { user: { last_name: { contains: search, mode: 'insensitive' } } },
+          { admission_no: { contains: search } },
+          { user: { first_name: { contains: search } } },
+          { user: { last_name: { contains: search } } },
         ]
       })
     };

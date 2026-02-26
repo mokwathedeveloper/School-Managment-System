@@ -1,7 +1,7 @@
-import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, UseGuards, Request } from '@nestjs/common';
+import { AdmissionsModule } from './admissions.module';
 import { AdmissionsService } from './admissions.service';
 import { AuthGuard } from '@nestjs/passport';
-import { AdmissionStatus } from '@prisma/client';
 
 @Controller('admissions')
 export class AdmissionsController {
@@ -9,19 +9,18 @@ export class AdmissionsController {
 
   @Post('apply')
   async apply(@Body() body: any) {
-    // Public endpoint (logic to determine schoolId via slug or body)
-    return this.admissionsService.createApplication(body.school_id, body);
+    return this.admissionsService.apply(body);
   }
 
-  @Get('applications')
   @UseGuards(AuthGuard('jwt'))
-  async getApplications(@Request() req, @Query('status') status?: AdmissionStatus) {
-    return this.admissionsService.getApplications(req.user.schoolId, status);
+  @Get()
+  async findAll(@Request() req) {
+    return this.admissionsService.findAll(req.user.schoolId);
   }
 
-  @Patch('applications/:id/status')
   @UseGuards(AuthGuard('jwt'))
-  async updateStatus(@Param('id') id: string, @Body() body: { status: AdmissionStatus, notes?: string }) {
+  @Post(':id/status')
+  async updateStatus(@Param('id') id: string, @Body() body: { status: string; notes?: string }) {
     return this.admissionsService.updateStatus(id, body.status, body.notes);
   }
 }

@@ -21,14 +21,14 @@ export class MessagingService {
 
   // Automated Triggers
   
-  async notifyParentOfAbsence(studentId: string, date: string) {
+  async notifyAbsence(studentId: string, date: Date) {
     const student = await this.prisma.student.findUnique({
       where: { id: studentId },
       include: { user: true, parent: { include: { user: true } } }
     });
 
     if (student?.parent?.user?.phone) {
-      const message = `Dear Parent, ${student.user.first_name} was marked ABSENT today (${date}). Please contact the school for any clarification.`;
+      const message = `Dear Parent, ${student.user.first_name} was marked ABSENT today (${date.toLocaleDateString()}). Please contact the school for any clarification.`;
       await this.sendSMS(student.parent.user.phone, message);
     }
   }
@@ -56,7 +56,7 @@ export class MessagingService {
     const users = await this.prisma.user.findMany({
       where: {
         school_id: schoolId,
-        ...(data.targetRole && { role: data.targetRole as any }),
+        ...(data.targetRole && { role: data.targetRole }),
         ...(data.gradeId && {
           student: {
             class: { grade_id: data.gradeId }

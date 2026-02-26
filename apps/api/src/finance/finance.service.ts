@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
-import { Invoice, Payment, PaymentStatus, PaymentMethod } from '@prisma/client';
+import { Invoice, Payment,  } from '@prisma/client';
 import { MessagingService } from '../messaging/messaging.service';
 import axios from 'axios';
 
@@ -238,8 +238,8 @@ export class FinanceService {
         school_id: invoice.school_id,
         invoice_id: invoice.id,
         amount: invoice.amount,
-        method: PaymentMethod.MPESA,
-        status: PaymentStatus.PENDING,
+        method: "MPESA",
+        status: "PENDING",
         phone_number: phoneNumber,
       },
     });
@@ -281,7 +281,7 @@ export class FinanceService {
     if (body.ResultCode !== 0) {
       await this.prisma.payment.update({
         where: { id: paymentId },
-        data: { status: PaymentStatus.FAILED },
+        data: { status: "FAILED" },
       });
       return { success: false, message: body.ResultDesc };
     }
@@ -299,7 +299,7 @@ export class FinanceService {
         where: { mpesa_receipt: receipt }
       });
 
-      if (existingPayment && existingPayment.status === PaymentStatus.COMPLETED) {
+      if (existingPayment && existingPayment.status === "COMPLETED") {
         this.logger.warn(`Duplicate M-Pesa callback received for receipt: ${receipt}`);
         return { success: true, message: 'Already processed' };
       }
@@ -307,7 +307,7 @@ export class FinanceService {
       const payment = await tx.payment.update({
         where: { id: paymentId },
         data: {
-          status: PaymentStatus.COMPLETED,
+          status: "COMPLETED",
           mpesa_receipt: receipt,
           amount: amount ? Number(amount) : undefined,
           phone_number: phoneNumber ? phoneNumber.toString() : undefined,
@@ -323,7 +323,7 @@ export class FinanceService {
 
         if (invoice) {
           const totalPaid = invoice.payments
-            .filter(p => p.status === PaymentStatus.COMPLETED)
+            .filter(p => p.status === "COMPLETED")
             .reduce((sum, p) => sum + Number(p.amount), 0) + Number(amount);
 
           await tx.invoice.update({

@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
 import { SuperAdminService } from './super-admin.service';
 import { AuthGuard } from '@nestjs/passport';
-import { Role } from '@prisma/client';
+import {  } from '@prisma/client';
 import { SetMetadata } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
-// Simple Roles Guard for Super Admin
+// Simple s Guard for Super Admin
 @UseGuards(AuthGuard('jwt'))
 @Controller('super-admin')
 export class SuperAdminController {
