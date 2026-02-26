@@ -24,6 +24,10 @@ export default function LMSDashboard() {
   const [selectedClassId, setSelectedClassId] = useState('');
   const [view, setView] = useState<'assignments' | 'resources'>('assignments');
 
+  const handleAction = (action: string) => {
+    alert(`${action} functionality coming soon! Our engineers are polishing the final workflow.`);
+  };
+
   const { data: classes } = useQuery({
     queryKey: ['classes'],
     queryFn: async () => {
@@ -60,7 +64,10 @@ export default function LMSDashboard() {
           </h1>
           <p className="text-muted-foreground mt-1 text-lg">Distribute assignments, share notes, and manage digital courseware.</p>
         </div>
-        <Button className="shadow-md">
+        <Button 
+          className="shadow-md" 
+          onClick={() => handleAction(view === 'assignments' ? 'Post Assignment' : 'Upload Resource')}
+        >
           <Plus className="mr-2 h-4 w-4" />
           {view === 'assignments' ? 'Post Assignment' : 'Upload Resource'}
         </Button>
@@ -126,6 +133,9 @@ export default function LMSDashboard() {
                 <Card className="h-64 flex flex-col items-center justify-center border-dashed text-muted-foreground text-center p-8">
                   <p className="font-bold text-slate-900 mb-1">No active assignments</p>
                   <p className="text-sm">Great job! All students are up to date with their coursework.</p>
+                  <Button variant="outline" size="sm" className="mt-4" onClick={() => handleAction('Post Assignment')}>
+                    Post First Assignment
+                  </Button>
                 </Card>
               ) : (
                 assignments?.map((assignment: any) => (
@@ -142,31 +152,47 @@ export default function LMSDashboard() {
                         <h3 className="text-lg font-black">{assignment.title}</h3>
                         <p className="text-sm text-muted-foreground line-clamp-1">{assignment.description}</p>
                       </div>
-                      <Button variant="outline" size="sm" className="font-bold">Manage Submissions</Button>
+                      <Button variant="outline" size="sm" className="font-bold" onClick={() => handleAction('Manage Submissions')}>
+                        Manage Submissions
+                      </Button>
                     </CardContent>
                   </Card>
                 ))
               )}
             </div>
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2">
-              {resources?.map((resource: any) => (
-                <Card key={resource.id} className="shadow-sm border-muted/50 hover:shadow-md transition-shadow group">
-                  <CardContent className="p-4 flex items-start gap-4">
-                    <div className="h-12 w-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
-                      {resource.category === 'VIDEO' ? <Video className="h-6 w-6" /> : <FileText className="h-6 w-6" />}
-                    </div>
-                    <div className="flex-1 space-y-1">
-                      <div className="flex justify-between items-start">
-                        <Badge variant="secondary" className="text-[9px] font-bold h-4">{resource.category}</Badge>
-                        <ExternalLink className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </div>
-                      <h4 className="font-bold text-sm leading-tight">{resource.title}</h4>
-                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">{resource.subject?.name || 'General'}</p>
-                    </div>
-                  </CardContent>
+            <div className="space-y-4">
+              {loadingResources ? (
+                <div className="h-64 flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+              ) : resources?.length === 0 ? (
+                <Card className="h-64 flex flex-col items-center justify-center border-dashed text-muted-foreground">
+                  <FileText className="h-12 w-12 opacity-10 mb-4" />
+                  <p>No course materials uploaded yet.</p>
+                  <Button variant="outline" size="sm" className="mt-4" onClick={() => handleAction('Upload Resource')}>
+                    Upload Your First Resource
+                  </Button>
                 </Card>
-              ))}
+              ) : (
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {resources?.map((resource: any) => (
+                    <Card key={resource.id} className="shadow-sm border-muted/50 hover:shadow-md transition-shadow group cursor-pointer" onClick={() => handleAction('View Resource')}>
+                      <CardContent className="p-4 flex items-start gap-4">
+                        <div className="h-12 w-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
+                          {resource.category === 'VIDEO' ? <Video className="h-6 w-6" /> : <FileText className="h-6 w-6" />}
+                        </div>
+                        <div className="flex-1 space-y-1">
+                          <div className="flex justify-between items-start">
+                            <Badge variant="secondary" className="text-[9px] font-bold h-4">{resource.category}</Badge>
+                            <ExternalLink className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                          </div>
+                          <h4 className="font-bold text-sm leading-tight">{resource.title}</h4>
+                          <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">{resource.subject?.name || 'General'}</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
