@@ -22,5 +22,23 @@ export const ClassesService = {
         subjects: true
       }
     });
+  },
+
+  async create(schoolId: string, data: {
+    name: string;
+    grade_id: string;
+    term_id?: string;
+    form_teacher_id?: string;
+  }) {
+    return prisma.class.create({
+      data: {
+        ...data,
+        school_id: schoolId
+      },
+      include: {
+        grade: true,
+        form_teacher: { include: { user: true } }
+      }
+    });
   }
 };

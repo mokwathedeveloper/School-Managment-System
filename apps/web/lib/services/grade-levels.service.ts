@@ -19,5 +19,17 @@ export const GradeLevelsService = {
         classes: true
       }
     });
+  },
+
+  async create(schoolId: string, data: {
+    name: string;
+    level: number;
+  }) {
+    return prisma.gradeLevel.create({
+      data: {
+        ...data,
+        school_id: schoolId
+      }
+    });
   }
 };
