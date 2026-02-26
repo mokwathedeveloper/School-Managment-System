@@ -1,4 +1,4 @@
-import { PrismaClient, Role, AttendanceStatus } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import * as argon2 from 'argon2';
 
 const prisma = new PrismaClient();
@@ -77,7 +77,7 @@ async function main() {
       password: passwordHash,
       first_name: 'Super',
       last_name: 'Admin',
-      role: Role.SCHOOL_ADMIN,
+      role: 'SCHOOL_ADMIN',
       school_id: school.id,
     },
   });
@@ -91,7 +91,7 @@ async function main() {
       password: passwordHash,
       first_name: 'John',
       last_name: 'Doe',
-      role: Role.PARENT,
+      role: 'PARENT',
       school_id: school.id,
     },
   });
@@ -109,7 +109,7 @@ async function main() {
       password: passwordHash,
       first_name: 'Jane',
       last_name: 'Doe',
-      role: Role.STUDENT,
+      role: 'STUDENT',
       school_id: school.id,
     },
   });
@@ -151,11 +151,11 @@ async function main() {
       amount: 50000,
       due_date: term1.end_date,
       status: 'UNPAID',
-      items: [
+      items: JSON.stringify([
         { name: 'Tuition Fee', amount: 40000 },
         { name: 'Lunch', amount: 5000 },
         { name: 'Activity Fee', amount: 5000 },
-      ],
+      ]),
     },
   });
 

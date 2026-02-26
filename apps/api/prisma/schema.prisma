@@ -3,9 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 // --------------------------------------------------------
@@ -140,19 +139,6 @@ model GradeBoundary {
   @@map("grade_boundaries")
 }
 
-// --------------------------------------------------------
-// IDENTITY & RBAC
-// --------------------------------------------------------
-
-enum Role {
-  SUPER_ADMIN // Platform owner
-  SCHOOL_ADMIN // Principal/Admin
-  TEACHER
-  PARENT
-  STUDENT
-  ACCOUNTANT
-}
-
 model User {
   id          String   @id @default(uuid())
   email       String   @unique
@@ -160,7 +146,7 @@ model User {
   first_name  String
   last_name   String
   phone       String?
-  role        Role     @default(STUDENT)
+  role        String   @default("STUDENT")
   is_active   Boolean  @default(true)
   
   school_id   String?
@@ -177,10 +163,6 @@ model User {
   @@index([school_id])
   @@map("users")
 }
-
-// --------------------------------------------------------
-// PROFILES
-// --------------------------------------------------------
 
 model Student {
   id              String   @id @default(uuid())
@@ -245,7 +227,7 @@ model Staff {
 
   department  String?
   designation String?
-  base_salary Decimal? @db.Decimal(10, 2)
+  base_salary Float? 
   id_number   String?  @unique
   joining_date DateTime @default(now())
 
@@ -275,9 +257,9 @@ model PayrollRecord {
 
   month       Int      // 1-12
   year        Int
-  base_pay    Decimal  @db.Decimal(10, 2)
-  deductions  Decimal  @db.Decimal(10, 2) @default(0)
-  net_pay     Decimal  @db.Decimal(10, 2)
+  base_pay    Float  
+  deductions  Float   @default(0)
+  net_pay     Float  
   status      String   @default("DRAFT") // DRAFT, PAID
   paid_at     DateTime?
 
@@ -300,13 +282,6 @@ model LeaveRequest {
   @@map("leave_requests")
 }
 
-enum AssetStatus {
-  OPERATIONAL
-  UNDER_REPAIR
-  RETIRED
-  LOST
-}
-
 model Asset {
   id          String   @id @default(uuid())
   school_id   String
@@ -316,8 +291,8 @@ model Asset {
   category    String   // e.g. "ELECTRONICS", "FURNITURE"
   serial_no   String?  @unique
   purchase_date DateTime?
-  cost        Decimal? @db.Decimal(10, 2)
-  status      AssetStatus @default(OPERATIONAL)
+  cost        Float? 
+  status      String @default("OPERATIONAL")
   location    String?  // e.g. "Lab 1", "Office"
 
   created_at  DateTime @default(now())
@@ -396,7 +371,7 @@ model TransportRoute {
   school      School   @relation(fields: [school_id], references: [id])
   
   name        String   // e.g. "Westlands - Route A"
-  cost        Decimal  @db.Decimal(10, 2)
+  cost        Float  
   stops       String?  // Comma-separated stops
 
   vehicles    Vehicle[]
@@ -452,13 +427,6 @@ model DormRoom {
   @@map("dorm_rooms")
 }
 
-enum IncidentSeverity {
-  LOW
-  MEDIUM
-  HIGH
-  CRITICAL
-}
-
 model DisciplineRecord {
   id          String   @id @default(uuid())
   school_id   String
@@ -469,7 +437,7 @@ model DisciplineRecord {
   
   title       String   // e.g. "Late for class", "Fighting"
   description String?
-  severity    IncidentSeverity @default(LOW)
+  severity    String @default("LOW")
   action_taken String? // e.g. "Verbal warning", "Suspension"
   
   reported_by_id String?
@@ -620,7 +588,7 @@ model Expense {
   
   title       String   // e.g. "Electricity Bill - March"
   category    String   // UTILITIES, MAINTENANCE, SUPPLIES, SALARY
-  amount      Decimal  @db.Decimal(10, 2)
+  amount      Float  
   date        DateTime @default(now())
   
   recorded_by_id String?
@@ -634,14 +602,6 @@ model Expense {
   @@map("expenses")
 }
 
-enum EventCategory {
-  ACADEMIC
-  HOLIDAY
-  SPORTS
-  EXAM
-  OTHER
-}
-
 model CalendarEvent {
   id          String   @id @default(uuid())
   school_id   String
@@ -651,7 +611,7 @@ model CalendarEvent {
   description String?
   start_date  DateTime
   end_date    DateTime
-  category    EventCategory @default(OTHER)
+  category    String @default("OTHER")
   is_all_day  Boolean  @default(false)
 
   created_at  DateTime @default(now())
@@ -789,26 +749,6 @@ model Result {
   @@map("results")
 }
 
-// --------------------------------------------------------
-// ATTENDANCE
-// --------------------------------------------------------
-
-enum AttendanceStatus {
-  PRESENT
-  ABSENT
-  LATE
-  EXCUSED
-}
-
-enum AdmissionStatus {
-  PENDING
-  REVIEWING
-  INTERVIEW_SCHEDULED
-  ACCEPTED
-  REJECTED
-  ENROLLED
-}
-
 model AdmissionApplication {
   id              String   @id @default(uuid())
   school_id       String
@@ -822,7 +762,7 @@ model AdmissionApplication {
   applied_grade_id String
   applied_grade    GradeLevel @relation(fields: [applied_grade_id], references: [id])
   
-  status          AdmissionStatus @default(PENDING)
+  status          String @default("PENDING")
   notes           String?
   
   created_at      DateTime @default(now())
@@ -835,7 +775,7 @@ model AdmissionApplication {
 model Attendance {
   id          String   @id @default(uuid())
   school_id   String // Denormalized for easier querying
-  date        DateTime @db.Date
+  date        DateTime 
   
   student_id  String
   student     Student  @relation(fields: [student_id], references: [id])
@@ -843,7 +783,7 @@ model Attendance {
   class_id    String
   class       Class    @relation(fields: [class_id], references: [id])
   
-  status      AttendanceStatus
+  status      String
   remarks     String?
 
   @@unique([student_id, date]) // One record per student per day
@@ -854,19 +794,6 @@ model Attendance {
 // --------------------------------------------------------
 // FINANCE (FEE STRUCTURES & LEDGER)
 // --------------------------------------------------------
-
-enum PaymentMethod {
-  MPESA
-  CASH
-  BANK_TRANSFER
-  CHEQUE
-}
-
-enum PaymentStatus {
-  PENDING
-  COMPLETED
-  FAILED
-}
 
 model FeeStructure {
   id          String   @id @default(uuid())
@@ -879,7 +806,7 @@ model FeeStructure {
   
   items       FeeItem[]
   
-  total_amount Decimal @db.Decimal(10, 2)
+  total_amount Float 
   
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
@@ -894,7 +821,7 @@ model FeeItem {
   fee_structure    FeeStructure @relation(fields: [fee_structure_id], references: [id])
   
   name        String   // e.g., "Tuition", "Transport", "Activity"
-  amount      Decimal  @db.Decimal(10, 2)
+  amount      Float  
   is_optional Boolean  @default(false)
 
   @@map("fee_items")
@@ -908,11 +835,11 @@ model Invoice {
   student     Student  @relation(fields: [student_id], references: [id])
 
   title       String   // e.g. "Term 1 Tuition"
-  amount      Decimal  @db.Decimal(10, 2)
+  amount      Float  
   due_date    DateTime
   status      String   @default("UNPAID") // UNPAID, PARTIAL, PAID
 
-  items       Json?    // Snapshot of FeeItems applied
+  items       String?    // Snapshot of FeeItems applied - stored as stringified JSON in SQLite
   
   payments    Payment[] // Payments linked to this invoice
   
@@ -928,10 +855,10 @@ model Payment {
   school_id   String
   school      School   @relation(fields: [school_id], references: [id])
   
-  amount      Decimal  @db.Decimal(10, 2)
-  method      PaymentMethod
+  amount      Float  
+  method      String
   reference   String?  // M-Pesa Receipt Number or Cheque No
-  status      PaymentStatus @default(PENDING)
+  status      String @default("PENDING")
   
   // M-Pesa specific fields
   mpesa_receipt String? @unique
@@ -952,7 +879,7 @@ model LedgerEntry {
   school      School   @relation(fields: [school_id], references: [id])
 
   description String
-  amount      Decimal  @db.Decimal(10, 2)
+  amount      Float  
   type        String   // DEBIT or CREDIT
   category    String   // TUITION, EXAM_FEE, TRANSPORT, PAYMENT
   
