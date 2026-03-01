@@ -196,5 +196,101 @@ export const FinanceService = {
       where: { school_id: schoolId },
       orderBy: { start_date: 'desc' }
     });
+  },
+
+  async initiateStkPush(schoolId: string, data: { invoice_id: string, phone_number: string }) {
+    const school = await prisma.school.findUnique({ where: { id: schoolId } });
+    const invoice = await prisma.invoice.findUnique({ where: { id: data.invoice_id } });
+    
+    if (!invoice || invoice.school_id !== schoolId) throw new Error('Invoice not found');
+
+    const token = await this.getMpesaToken();
+    const timestamp = new Date().toISOString().replace(/[^0-9]/g, '').slice(0, 14);
+    const password = Buffer.from(`${process.env.MPESA_SHORTCODE}${process.env.MPESA_PASSKEY}${timestamp}`).toString('base64');
+
+    try {
+      const response = await axios.post(
+        'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest',
+        {
+          BusinessShortCode: process.env.MPESA_SHORTCODE,
+          Password: password,
+          Timestamp: timestamp,
+          TransactionType: 'CustomerPayBillOnline',
+          Amount: Math.round(Number(invoice.amount)),
+          PartyA: data.phone_number.replace('+', ''),
+          PartyB: process.env.MPESA_SHORTCODE,
+          PhoneNumber: data.phone_number.replace('+', ''),
+          CallBackURL: process.env.MPESA_CALLBACK_URL,
+          AccountReference: invoice.id.slice(0, 12),
+          TransactionDesc: `Fees Payment ${invoice.title}`
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      // Create a pending payment record
+      await prisma.payment.create({
+        data: {
+          school_id: schoolId,
+          invoice_id: invoice.id,
+          amount: invoice.amount,
+          method: 'MPESA',
+          status: 'PENDING',
+          reference: response.data.CheckoutRequestID,
+          phone_number: data.phone_number
+        }
+      });
+
+      return response.data;
+    } catch (error: any) {
+      console.error('STK Push Error:', error.response?.data || error.message);
+      throw new Error('Failed to initiate M-Pesa payment');
+    }
+  },
+
+  async handleMpesaCallback(body: any) {
+    const { Body } = body;
+    const stkCallback = Body.stkCallback;
+    const checkoutRequestID = stkCallback.CheckoutRequestID;
+    const resultCode = stkCallback.ResultCode;
+
+    if (resultCode === 0) {
+      // Success
+      const meta = stkCallback.CallbackMetadata.Item;
+      const amount = meta.find((i: any) => i.Name === 'Amount').Value;
+      const receipt = meta.find((i: any) => i.Name === 'MpesaReceiptNumber').Value;
+
+      const payment = await prisma.payment.findFirst({
+        where: { reference: checkoutRequestID }
+      });
+
+      if (payment) {
+        await prisma.$transaction([
+          prisma.payment.update({
+            where: { id: payment.id },
+            data: { status: 'COMPLETED', mpesa_receipt: receipt }
+          }),
+          prisma.invoice.update({
+            where: { id: payment.invoice_id! },
+            data: { status: 'PAID' }
+          }),
+          prisma.ledgerEntry.create({
+            data: {
+              school_id: payment.school_id,
+              description: `M-Pesa Payment Recv: ${receipt}`,
+              amount: payment.amount,
+              type: 'CREDIT',
+              category: 'PAYMENT',
+              reference_id: payment.id
+            }
+          })
+        ]);
+      }
+    } else {
+      // Failed or Cancelled
+      await prisma.payment.updateMany({
+        where: { reference: checkoutRequestID },
+        data: { status: 'FAILED' }
+      });
+    }
   }
 };
