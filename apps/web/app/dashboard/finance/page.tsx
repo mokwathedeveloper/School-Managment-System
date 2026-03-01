@@ -83,11 +83,11 @@ export default function FinancePage() {
           <p className="text-muted-foreground mt-1">Track fee collection, invoices, and M-Pesa payments.</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={() => alert('Transaction Logs feature coming soon!')}>
             <History className="mr-2 h-4 w-4" />
             Transaction Logs
           </Button>
-          <Button size="sm" className="shadow-md">
+          <Button size="sm" className="shadow-md" onClick={() => alert('Invoice creation feature coming soon!')}>
             <Plus className="mr-2 h-4 w-4" />
             Create Invoice
           </Button>
@@ -124,7 +124,7 @@ export default function FinancePage() {
         <Card className="lg:col-span-2 shadow-sm border-none bg-card/50 backdrop-blur">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-xl">Recent Invoices</CardTitle>
-            <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80">View All</Button>
+            <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80" onClick={() => alert('Viewing all invoices... Feature coming soon!')}>View All</Button>
           </CardHeader>
           <CardContent className="p-0">
             <Table>
