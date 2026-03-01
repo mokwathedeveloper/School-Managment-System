@@ -54,16 +54,7 @@ export default function PublicApplicationPage() {
     enabled: !!slug
   });
 
-  // 2. Fetch Grades (We need a public endpoint for this, or we mock it for now since grade-levels is protected)
-  // NOTE: For a real app, we'd need a public /schools/:id/grades endpoint. 
-  // I will assume for this implementation we simulate grades or add a public endpoint. 
-  // Let's create a public grades fetcher or just generic options for the demo.
-  const grades = [
-    { id: 'grade-1', name: 'Grade 1' },
-    { id: 'grade-2', name: 'Grade 2' },
-    { id: 'form-1', name: 'Form 1 (High School)' },
-    { id: 'kindergarten', name: 'Kindergarten' },
-  ];
+  const grades = school?.grades || [];
 
   const submitMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -182,7 +173,7 @@ export default function PublicApplicationPage() {
                     onChange={(e) => setFormData({...formData, applied_grade_id: e.target.value})}
                   >
                     <option value="">Select a Grade Level...</option>
-                    {grades.map(g => (
+                    {grades.map((g: any) => (
                       <option key={g.id} value={g.id}>{g.name}</option>
                     ))}
                   </select>

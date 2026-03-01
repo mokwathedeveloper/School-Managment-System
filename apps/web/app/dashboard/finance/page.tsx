@@ -43,9 +43,7 @@ export default function FinancePage() {
     queryFn: async () => {
       const response = await apiClient.get('/finance');
       return response.data;
-    },
-    // Mock data for demo if backend isn't ready
-    initialData: []
+    }
   });
 
   const totalOutstanding = invoices?.filter((i: any) => i.status === 'UNPAID').reduce((sum: number, i: any) => sum + Number(i.amount), 0) || 0;

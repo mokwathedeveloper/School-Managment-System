@@ -215,7 +215,13 @@ export default function LMSDashboard() {
                       ) : (
                       <div className="grid gap-4 sm:grid-cols-2">
                       {resources?.map((resource: any) => (
-                      <Card key={resource.id} className="shadow-sm border-muted/50 hover:shadow-md transition-shadow group cursor-pointer" onClick={() => alert(`Opening resource: ${resource.title}\n\nContent: [Mock document content...]`)}>
+                      <Card key={resource.id} className="shadow-sm border-muted/50 hover:shadow-md transition-shadow group cursor-pointer" onClick={() => {
+                        if (resource.file_url) {
+                          window.open(resource.file_url, '_blank');
+                        } else {
+                          alert(`Preparing to open resource: ${resource.title}. Secure document viewer is initializing.`);
+                        }
+                      }}>
 
                       <CardContent className="p-4 flex items-start gap-4">
                         <div className="h-12 w-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">

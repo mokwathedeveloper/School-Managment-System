@@ -16,8 +16,40 @@ export const AnalyticsService = {
     const paidInvoices = invoices.filter(inv => inv.status === 'PAID').length;
     const collectionRate = invoices.length > 0 ? (paidInvoices / invoices.length) * 100 : 0;
 
-    // Mock trend data for now, in real app would query by month
-    const enrollmentTrend = [studentCount - 20, studentCount - 15, studentCount - 10, studentCount - 5, studentCount - 2, studentCount];
+    // Real trend data based on student created_at dates for the last 6 months
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
+    sixMonthsAgo.setDate(1);
+
+    const recentStudents = await prisma.student.findMany({
+      where: { 
+        school_id: schoolId,
+        created_at: { gte: sixMonthsAgo }
+      },
+      select: { created_at: true }
+    });
+
+    const monthlyCounts = Array(6).fill(0);
+    const currentMonth = new Date().getMonth();
+    
+    recentStudents.forEach(student => {
+      const studentMonth = student.created_at.getMonth();
+      // Calculate index relative to current month (0 is 5 months ago, 5 is current month)
+      let monthDiff = currentMonth - studentMonth;
+      if (monthDiff < 0) monthDiff += 12; // Handle year wrap-around
+      
+      const index = 5 - monthDiff;
+      if (index >= 0 && index < 6) {
+        monthlyCounts[index]++;
+      }
+    });
+
+    // Convert monthly additions to cumulative trend (simplified)
+    let cumulative = studentCount - recentStudents.length;
+    const enrollmentTrend = monthlyCounts.map(count => {
+      cumulative += count;
+      return cumulative;
+    });
 
     // Grade distribution
     const distribution = [

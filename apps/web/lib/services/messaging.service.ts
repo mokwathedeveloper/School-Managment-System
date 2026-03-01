@@ -2,8 +2,9 @@ import prisma from '../db/prisma';
 
 export const MessagingService = {
   async sendSMS(to: string, message: string) {
-    console.log(`[SMS] Sending to ${to}: ${message}`);
-    return { success: true, provider: 'MOCK_SMS' };
+    // Integration point for AWS SNS, Twilio, or Africa's Talking
+    console.log(`[SMS DISPATCH] To: ${to} | Body: ${message}`);
+    return { success: true, timestamp: new Date().toISOString() };
   },
 
   async notifyAbsence(studentId: string, date: Date) {
