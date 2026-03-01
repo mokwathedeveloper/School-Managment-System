@@ -68,7 +68,7 @@ export default function ExamsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['results', selectedExamId] });
-      alert('Results saved and graded successfully!');
+      alert('Academic results have been processed and grades generated successfully.');
     }
   });
 

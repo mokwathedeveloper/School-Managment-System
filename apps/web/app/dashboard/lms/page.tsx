@@ -29,7 +29,7 @@ export default function LMSDashboard() {
     mutationFn: async (data: any) => api.post('/lms/assignments', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['assignments'] });
-      alert('Assignment posted successfully!');
+      alert('Academic assignment has been successfully published to the classroom.');
     }
   });
 
@@ -37,7 +37,7 @@ export default function LMSDashboard() {
     mutationFn: async (data: any) => api.post('/lms/resources', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['resources'] });
-      alert('Resource uploaded successfully!');
+      alert('Learning resource has been successfully uploaded and synchronized.');
     }
   });
 

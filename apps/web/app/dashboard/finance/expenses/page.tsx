@@ -37,7 +37,7 @@ export default function ExpensesPage() {
     mutationFn: async (data: any) => api.post('/finance', data, { params: { type: 'expense' } }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['finance-expenses'] });
-      alert('Expense recorded successfully!');
+      alert('Institutional expense has been successfully recorded and logged.');
     },
     onError: (error: any) => {
       alert(`Failed to record expense: ${error.response?.data?.message || error.message}`);

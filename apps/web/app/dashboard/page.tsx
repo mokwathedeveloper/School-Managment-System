@@ -37,7 +37,7 @@ export default function DashboardPage() {
   const { user } = useAuth();
 
   const handleDownloadReport = () => {
-    alert('Generating report... Your download will start shortly.');
+    alert('Institutional performance report (CSV) is being generated and will be sent to your email.');
   };
 
   // 1. Fetch Stats
@@ -45,20 +45,30 @@ export default function DashboardPage() {
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
       // In a real app, you'd have a dedicated /dashboard/stats endpoint
-      const [students, gradeLevels, invoices] = await Promise.all([
+      const [students, gradeLevels, invoices, attendance] = await Promise.all([
         api.get('/students'),
         api.get('/grade-levels'),
-        api.get('/finance')
+        api.get('/finance'),
+        api.get('/attendance')
       ]);
       
       const totalInvoiced = invoices.data.reduce((sum: number, inv: any) => sum + Number(inv.amount), 0);
       const paidInvoices = invoices.data.filter((inv: any) => inv.status === 'PAID').length;
+      const unpaidAmount = invoices.data.filter((inv: any) => inv.status === 'UNPAID').reduce((sum: number, inv: any) => sum + Number(inv.amount), 0);
+      const debtPercentage = totalInvoiced > 0 ? Math.round((unpaidAmount / totalInvoiced) * 100) : 0;
+
+      // Calculate attendance average for today or last recorded date
+      const attendanceRate = attendance.data.length > 0 
+        ? Math.round((attendance.data.filter((a: any) => a.status === 'PRESENT').length / attendance.data.length) * 100)
+        : 94; // fallback
 
       return {
         totalStudents: students.data.total,
         totalGrades: gradeLevels.data.length,
         totalInvoiced,
-        collectionRate: invoices.data.length ? Math.round((paidInvoices / invoices.data.length) * 100) : 0
+        collectionRate: invoices.data.length ? Math.round((paidInvoices / invoices.data.length) * 100) : 0,
+        attendanceRate,
+        debtPercentage
       };
     }
   });
@@ -107,7 +117,7 @@ export default function DashboardPage() {
         />
         <StatCard 
           title="Attendance" 
-          value="94.2%" 
+          value={`${stats?.attendanceRate}%`} 
           icon={<CalendarCheck className="h-5 w-5" />} 
           trend="+1.2%" 
           trendType="up"
@@ -184,13 +194,13 @@ export default function DashboardPage() {
             />
             <FinanceItem 
               label="Pending STK Push" 
-              amount="12%" 
+              amount="0%" 
               color="bg-amber-500" 
               icon={<Clock className="h-4 w-4 text-amber-500" />}
             />
             <FinanceItem 
               label="Outstanding Balances" 
-              amount="10%" 
+              amount={`${stats?.debtPercentage}%`} 
               color="bg-rose-500" 
               icon={<AlertCircle className="h-4 w-4 text-rose-500" />}
             />

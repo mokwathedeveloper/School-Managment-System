@@ -42,7 +42,7 @@ export default function StaffDirectoryPage() {
       });
     },
     onSuccess: (res) => {
-      alert(`Payroll processed! ${res.data.processed} new records created.`);
+      alert(`Payroll disbursement completed successfully. ${res.data.processed} staff records were processed for this period.`);
     }
   });
 

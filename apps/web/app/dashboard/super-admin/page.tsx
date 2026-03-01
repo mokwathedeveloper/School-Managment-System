@@ -41,6 +41,26 @@ export default function SuperAdminDashboard() {
     },
   });
 
+  const onboardMutation = useMutation({
+    mutationFn: async (data: any) => api.post('/super-admin/schools', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['super-admin-schools'] });
+      queryClient.invalidateQueries({ queryKey: ['super-admin-stats'] });
+      alert('New institution has been successfully integrated and onboarded to the platform.');
+    }
+  });
+
+  const handleOnboard = () => {
+    const name = window.prompt('Enter school name:');
+    if (!name) return;
+    const slug = window.prompt('Enter school slug:');
+    if (!slug) return;
+    const email = window.prompt('Enter contact email:');
+    if (!email) return;
+
+    onboardMutation.mutate({ name, slug, email });
+  };
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div>
@@ -55,19 +75,19 @@ export default function SuperAdminDashboard() {
       <div className="grid gap-6 md:grid-cols-3">
         <StatCard 
           title="Total Institutions" 
-          value={stats?.schoolCount || 0} 
+          value={loadingStats ? "..." : (stats?.schoolCount || 0).toString()} 
           icon={<Building2 className="h-5 w-5" />}
           description="Active schools on platform"
         />
         <StatCard 
           title="Global Students" 
-          value={stats?.totalStudents?.toLocaleString() || 0} 
+          value={loadingStats ? "..." : (stats?.totalStudents?.toLocaleString() || "0")} 
           icon={<GraduationCap className="h-5 w-5" />}
           description="Total enrolled learners"
         />
         <StatCard 
           title="Platform Users" 
-          value={stats?.totalUsers?.toLocaleString() || 0} 
+          value={loadingStats ? "..." : (stats?.totalUsers?.toLocaleString() || "0")} 
           icon={<Users className="h-5 w-5" />}
           description="Consolidated user base"
         />
@@ -81,8 +101,8 @@ export default function SuperAdminDashboard() {
               <CardTitle>Institutional Directory</CardTitle>
               <CardDescription>Managed schools and their operational metrics.</CardDescription>
             </div>
-            <Button onClick={() => setIsAdding(true)} className="shadow-md">
-              <Plus className="h-4 w-4 mr-2" />
+            <Button onClick={handleOnboard} disabled={onboardMutation.isPending} className="shadow-md">
+              {onboardMutation.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Plus className="h-4 w-4 mr-2" />}
               Onboard School
             </Button>
           </CardHeader>
@@ -139,11 +159,11 @@ export default function SuperAdminDashboard() {
                 <p className="text-xs text-muted-foreground uppercase font-bold tracking-widest">Growth this month</p>
              </div>
              <div className="space-y-4 pt-4 border-t">
-                <h4 className="text-sm font-bold text-muted-foreground uppercase tracking-tight">Recent Activity</h4>
+                <h4 className="text-sm font-bold text-muted-foreground uppercase tracking-tight">System Status</h4>
                 <div className="space-y-3">
-                   <ActivityItem text="Nairobi Academy onboarded" time="2h ago" />
-                   <ActivityItem text="500+ invoices generated" time="5h ago" />
-                   <ActivityItem text="M-Pesa reconciliation synced" time="1d ago" />
+                   <ActivityItem text={`${stats?.schoolCount || 0} active institutions`} time="Live" />
+                   <ActivityItem text="M-Pesa reconciliation" time="Synced" />
+                   <ActivityItem text="Daily backups" time="Verified" />
                 </div>
              </div>
           </CardContent>

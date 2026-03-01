@@ -109,5 +109,92 @@ export const FinanceService = {
       console.error('Failed to get M-Pesa token', error.response?.data || error.message);
       throw new Error('M-Pesa authentication failed');
     }
+  },
+
+  // --------------------------------------------------------
+  // FEE STRUCTURES & BULK BILLING
+  // --------------------------------------------------------
+
+  async getFeeStructures(schoolId: string) {
+    return prisma.feeStructure.findMany({
+      where: { school_id: schoolId },
+      include: {
+        grade: true,
+        term: true,
+        items: true
+      },
+      orderBy: { created_at: 'desc' }
+    });
+  },
+
+  async createFeeStructure(schoolId: string, data: {
+    grade_id: string;
+    term_id: string;
+    items: { name: string, amount: number }[];
+  }) {
+    const totalAmount = data.items.reduce((sum, item) => sum + item.amount, 0);
+
+    return prisma.feeStructure.create({
+      data: {
+        school_id: schoolId,
+        grade_id: data.grade_id,
+        term_id: data.term_id,
+        total_amount: totalAmount,
+        items: {
+          create: data.items
+        }
+      },
+      include: {
+        items: true
+      }
+    });
+  },
+
+  async generateBulkInvoices(schoolId: string, gradeId: string, termId: string) {
+    const feeStructure = await prisma.feeStructure.findFirst({
+      where: { school_id: schoolId, grade_id: gradeId, term_id: termId },
+      include: { items: true, term: true }
+    });
+
+    if (!feeStructure) throw new Error('No fee structure defined for this grade and term');
+
+    const students = await prisma.student.findMany({
+      where: { school_id: schoolId, class: { grade_id: gradeId } }
+    });
+
+    let created = 0;
+    let skipped = 0;
+
+    for (const student of students) {
+      // Check if invoice already exists for this student/term/title
+      const title = `${feeStructure.term.name} Fees`;
+      const existing = await prisma.invoice.findFirst({
+        where: { student_id: student.id, title, school_id: schoolId }
+      });
+
+      if (existing) {
+        skipped++;
+        continue;
+      }
+
+      await this.createInvoice({
+        school_id: schoolId,
+        student_id: student.id,
+        title,
+        amount: Number(feeStructure.total_amount),
+        due_date: feeStructure.term.end_date,
+        items: feeStructure.items
+      });
+      created++;
+    }
+
+    return { created, skipped };
+  },
+
+  async getTerms(schoolId: string) {
+    return prisma.term.findMany({
+      where: { school_id: schoolId },
+      orderBy: { start_date: 'desc' }
+    });
   }
 };

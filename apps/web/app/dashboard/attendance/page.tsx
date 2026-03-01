@@ -92,7 +92,7 @@ export default function AttendancePage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['attendance', selectedClassId, selectedDate] });
-      alert('Attendance saved successfully!');
+      alert('Institutional attendance records have been updated and synchronized successfully.');
     },
   });
 

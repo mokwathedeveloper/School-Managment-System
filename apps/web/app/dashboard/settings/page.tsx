@@ -45,7 +45,7 @@ export default function SettingsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['school-settings'] });
-      alert('Settings updated successfully!');
+      alert('Institutional configurations have been updated and saved successfully.');
     }
   });
 

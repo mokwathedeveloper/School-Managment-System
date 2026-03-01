@@ -51,8 +51,13 @@ export default function FeeStructuresPage() {
     },
   });
 
-  // Simplified for this context: usually you'd have a terms query too
-  const terms = [{ id: 'term-1', name: 'Term 1 2024' }]; 
+  const { data: terms } = useQuery({
+    queryKey: ['terms'],
+    queryFn: async () => {
+      const res = await api.get('/finance/terms');
+      return res.data;
+    },
+  });
 
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -72,7 +77,8 @@ export default function FeeStructuresPage() {
       return api.post('/finance/generate-bulk-invoices', { grade_id: gradeId, term_id: termId });
     },
     onSuccess: (res) => {
-      alert(`Successfully created ${res.data.created} invoices. ${res.data.skipped} were skipped (already exist).`);
+      alert(`Institutional billing initialized. ${res.data.created} invoices were generated. ${res.data.skipped} existing records were preserved.`);
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
     }
   });
 
@@ -131,7 +137,7 @@ export default function FeeStructuresPage() {
                   onChange={(e) => setNewStructure({ ...newStructure, term_id: e.target.value })}
                 >
                   <option value="">Select Term</option>
-                  {terms.map((t: any) => <option key={t.id} value={t.id}>{t.name}</option>)}
+                  {terms?.map((t: any) => <option key={t.id} value={t.id}>{t.name}</option>)}
                 </select>
               </div>
             </div>

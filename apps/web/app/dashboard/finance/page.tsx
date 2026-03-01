@@ -48,11 +48,16 @@ export default function FinancePage() {
     initialData: []
   });
 
+  const totalOutstanding = invoices?.filter((i: any) => i.status === 'UNPAID').reduce((sum: number, i: any) => sum + Number(i.amount), 0) || 0;
+  const totalCollected = invoices?.filter((i: any) => i.status === 'PAID').reduce((sum: number, i: any) => sum + Number(i.amount), 0) || 0;
+  const mpesaVolume = invoices?.filter((i: any) => i.status === 'PAID' && i.payment_method === 'MPESA').reduce((sum: number, i: any) => sum + Number(i.amount), 0) || 0;
+  const totalStudentsWithDebt = new Set(invoices?.filter((i: any) => i.status === 'UNPAID').map((i: any) => i.student_id)).size;
+
   const createInvoiceMutation = useMutation({
     mutationFn: async (data: any) => apiClient.post('/finance', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
-      alert('Invoice created successfully!');
+      alert('Invoice has been successfully generated and queued for student billing.');
     },
     onError: (error: any) => {
       alert(`Failed to create invoice: ${error.response?.data?.message || error.message}`);
@@ -128,21 +133,21 @@ export default function FinancePage() {
       <div className="grid gap-6 md:grid-cols-3">
         <FinanceStatCard 
           title="Total Outstanding" 
-          value="KES 1.4M" 
-          description="Across 124 students" 
+          value={`KES ${totalOutstanding.toLocaleString()}`} 
+          description={`Across ${totalStudentsWithDebt} students`} 
           icon={<AlertCircle className="h-5 w-5 text-destructive" />} 
         />
         <StatCard 
           title="Total Collected" 
-          value="KES 8.2M" 
-          description="This term (92%)" 
+          value={`KES ${totalCollected.toLocaleString()}`} 
+          description="Consolidated revenue" 
           icon={<CheckCircle2 className="h-5 w-5 text-green-500" />} 
           trend="+14%"
           trendType="up"
         />
         <StatCard 
           title="M-Pesa Volume" 
-          value="KES 5.8M" 
+          value={`KES ${mpesaVolume.toLocaleString()}`} 
           description="Automated collection" 
           icon={<Phone className="h-5 w-5 text-primary" />} 
           trend="+22%"

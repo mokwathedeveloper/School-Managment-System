@@ -36,7 +36,7 @@ export default function StudentsPage() {
     mutationFn: async (data: any) => apiClient.post('/students', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['students'] });
-      alert('Student added successfully!');
+      alert('Student record has been successfully initialized and saved.');
     },
     onError: (error: any) => {
       alert(`Failed to add student: ${error.response?.data?.message || error.message}`);
