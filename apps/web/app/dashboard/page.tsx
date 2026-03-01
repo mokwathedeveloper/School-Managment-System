@@ -31,9 +31,14 @@ import {
   AreaChart,
   Area 
 } from 'recharts';
+import Link from 'next/link';
 
 export default function DashboardPage() {
   const { user } = useAuth();
+
+  const handleDownloadReport = () => {
+    alert('Generating report... Your download will start shortly.');
+  };
 
   // 1. Fetch Stats
   const { data: stats, isLoading: loadingStats } = useQuery({
@@ -83,8 +88,10 @@ export default function DashboardPage() {
           <p className="text-muted-foreground mt-1 text-lg">Your institution is running smoothly today.</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" className="shadow-sm border-primary/20 hover:bg-primary/5">Download Report</Button>
-          <Button className="shadow-lg bg-primary hover:bg-primary/90">Add New Admission</Button>
+          <Button variant="outline" className="shadow-sm border-primary/20 hover:bg-primary/5" onClick={handleDownloadReport}>Download Report</Button>
+          <Link href="/dashboard/admissions">
+            <Button className="shadow-lg bg-primary hover:bg-primary/90">Add New Admission</Button>
+          </Link>
         </div>
       </div>
 
@@ -193,9 +200,11 @@ export default function DashboardPage() {
                 <span className="text-sm font-bold text-slate-500 uppercase tracking-widest">Total Term Revenue</span>
                 <span className="text-2xl font-black text-slate-900">KES {(stats?.totalInvoiced || 0).toLocaleString()}</span>
               </div>
-              <Button className="w-full shadow-md font-bold" variant="outline">
-                Financial Report Hub
-              </Button>
+              <Link href="/dashboard/finance">
+                <Button className="w-full shadow-md font-bold" variant="outline">
+                  Financial Report Hub
+                </Button>
+              </Link>
             </div>
           </CardContent>
         </Card>
