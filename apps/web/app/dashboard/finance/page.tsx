@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import Link from 'next/link';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/lib/api-client';
 import { useAuth } from '@/components/auth-provider';
 import { 
@@ -30,6 +31,7 @@ import {
 
 export default function FinancePage() {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isPaying, setIsPaying] = useState(false);
@@ -45,6 +47,33 @@ export default function FinancePage() {
     // Mock data for demo if backend isn't ready
     initialData: []
   });
+
+  const createInvoiceMutation = useMutation({
+    mutationFn: async (data: any) => apiClient.post('/finance', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
+      alert('Invoice created successfully!');
+    },
+    onError: (error: any) => {
+      alert(`Failed to create invoice: ${error.response?.data?.message || error.message}`);
+    }
+  });
+
+  const handleCreateInvoice = async () => {
+    const student_id = window.prompt('Enter student UUID:');
+    if (!student_id) return;
+    const title = window.prompt('Enter invoice title (e.g. Term 1 Tuition):');
+    if (!title) return;
+    const amountStr = window.prompt('Enter amount (KES):');
+    if (!amountStr) return;
+    
+    createInvoiceMutation.mutate({
+      student_id,
+      title,
+      amount: parseFloat(amountStr),
+      due_date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+    });
+  };
 
   const mpesaMutation = useMutation({
     mutationFn: async (data: { invoice_id: string, phone_number: string }) => {
@@ -83,12 +112,14 @@ export default function FinancePage() {
           <p className="text-muted-foreground mt-1">Track fee collection, invoices, and M-Pesa payments.</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm" onClick={() => alert('Transaction Logs feature coming soon!')}>
-            <History className="mr-2 h-4 w-4" />
-            Transaction Logs
-          </Button>
-          <Button size="sm" className="shadow-md" onClick={() => alert('Invoice creation feature coming soon!')}>
-            <Plus className="mr-2 h-4 w-4" />
+          <Link href="/dashboard/finance/expenses">
+            <Button variant="outline" size="sm">
+              <History className="mr-2 h-4 w-4" />
+              Transaction Logs
+            </Button>
+          </Link>
+          <Button size="sm" className="shadow-md" onClick={handleCreateInvoice} disabled={createInvoiceMutation.isPending}>
+            {createInvoiceMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
             Create Invoice
           </Button>
         </div>

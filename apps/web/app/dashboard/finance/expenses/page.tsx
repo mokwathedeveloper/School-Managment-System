@@ -28,10 +28,37 @@ export default function ExpensesPage() {
   const { data: expenses, isLoading } = useQuery({
     queryKey: ['finance-expenses'],
     queryFn: async () => {
-      const res = await api.get('/finance/expenses');
+      const res = await api.get('/finance', { params: { type: 'expenses' } });
       return res.data;
     },
   });
+
+  const recordExpenseMutation = useMutation({
+    mutationFn: async (data: any) => api.post('/finance', data, { params: { type: 'expense' } }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['finance-expenses'] });
+      alert('Expense recorded successfully!');
+    },
+    onError: (error: any) => {
+      alert(`Failed to record expense: ${error.response?.data?.message || error.message}`);
+    }
+  });
+
+  const handleRecordExpense = () => {
+    const title = window.prompt('Enter expense title:');
+    if (!title) return;
+    const category = window.prompt('Enter category (e.g. UTILITIES, SALARIES, SUPPLIES):');
+    if (!category) return;
+    const amountStr = window.prompt('Enter amount (KES):');
+    if (!amountStr) return;
+
+    recordExpenseMutation.mutate({
+      title,
+      category,
+      amount: parseFloat(amountStr),
+      date: new Date().toISOString(),
+    });
+  };
 
   const totalSpent = expenses?.reduce((sum: number, exp: any) => sum + parseFloat(exp.amount), 0) || 0;
 
@@ -45,7 +72,7 @@ export default function ExpensesPage() {
           </h1>
           <p className="text-muted-foreground mt-1 text-lg">Track institutional spending and manage overhead costs.</p>
         </div>
-        <Button className="shadow-md bg-rose-600 hover:bg-rose-700 text-white" onClick={() => setIsAdding(true)}>
+        <Button className="shadow-md bg-rose-600 hover:bg-rose-700 text-white" onClick={handleRecordExpense}>
           <Plus className="mr-2 h-4 w-4" />
           Record New Expense
         </Button>
@@ -100,7 +127,7 @@ export default function ExpensesPage() {
                       <Banknote className="h-12 w-12 opacity-20 mb-4" />
                       <p className="font-bold text-lg text-slate-900">No expenses recorded yet.</p>
                       <p className="text-sm max-w-sm mx-auto mb-4">Start tracking your institutional spending to gain insights into operational costs.</p>
-                      <Button variant="outline" onClick={() => setIsAdding(true)}>Record First Expense</Button>
+                      <Button variant="outline" onClick={handleRecordExpense}>Record First Expense</Button>
                     </div>
                   </TableCell>
                 </TableRow>

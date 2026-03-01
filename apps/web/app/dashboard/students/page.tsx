@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/lib/api-client';
 import Link from 'next/link';
 import { 
@@ -22,13 +22,44 @@ import {
   MoreVertical, 
   Filter, 
   Download,
-  GraduationCap
+  GraduationCap,
+  Loader2
 } from 'lucide-react';
 
 export default function StudentsPage() {
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [skip, setSkip] = useState(0);
   const take = 10;
+
+  const createStudentMutation = useMutation({
+    mutationFn: async (data: any) => apiClient.post('/students', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['students'] });
+      alert('Student added successfully!');
+    },
+    onError: (error: any) => {
+      alert(`Failed to add student: ${error.response?.data?.message || error.message}`);
+    }
+  });
+
+  const handleAddStudent = () => {
+    const first_name = window.prompt('Enter student first name:');
+    if (!first_name) return;
+    const last_name = window.prompt('Enter student last name:');
+    if (!last_name) return;
+    const email = window.prompt('Enter student email:');
+    if (!email) return;
+    const admission_no = window.prompt('Enter admission number:');
+    if (!admission_no) return;
+
+    createStudentMutation.mutate({
+      first_name,
+      last_name,
+      email,
+      admission_no,
+    });
+  };
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['students', search, skip],
@@ -52,8 +83,8 @@ export default function StudentsPage() {
         </div>
         <div className="flex items-center gap-3">
           <BulkImportDialog />
-          <Button size="sm" className="shadow-md" onClick={() => alert('Add Student feature coming soon!')}>
-            <Plus className="mr-2 h-4 w-4" />
+          <Button size="sm" className="shadow-md" onClick={handleAddStudent} disabled={createStudentMutation.isPending}>
+            {createStudentMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
             Add New Student
           </Button>
         </div>
