@@ -22,5 +22,47 @@ export const ExamsService = {
         results: { include: { student: { include: { user: true } } } }
       }
     });
+  },
+
+  async saveResults(schoolId: string, examId: string, records: { student_id: string, marks: number, remarks?: string }[]) {
+    const exam = await prisma.exam.findFirst({
+      where: { id: examId, school_id: schoolId }
+    });
+    if (!exam) throw new Error('Exam not found');
+
+    const results = [];
+    for (const record of records) {
+      // Auto-grading logic (can be made dynamic based on GradingSystem later)
+      let grade = 'E';
+      const percentage = (record.marks / exam.max_marks) * 100;
+      
+      if (percentage >= 80) grade = 'A';
+      else if (percentage >= 70) grade = 'B';
+      else if (percentage >= 60) grade = 'C';
+      else if (percentage >= 50) grade = 'D';
+
+      const result = await prisma.result.upsert({
+        where: {
+          exam_id_student_id: {
+            exam_id: examId,
+            student_id: record.student_id
+          }
+        },
+        update: {
+          marks_obtained: record.marks,
+          grade,
+          remarks: record.remarks
+        },
+        create: {
+          exam_id: examId,
+          student_id: record.student_id,
+          marks_obtained: record.marks,
+          grade,
+          remarks: record.remarks
+        }
+      });
+      results.push(result);
+    }
+    return results;
   }
 };
