@@ -118,6 +118,12 @@ export const InventoryService = {
     });
   },
 
+  async removeAsset(schoolId: string, id: string) {
+    return prisma.asset.delete({
+      where: { id, school_id: schoolId }
+    });
+  },
+
   async getStock(schoolId: string) {
     return prisma.stockItem.findMany({
       where: { school_id: schoolId },
@@ -128,6 +134,12 @@ export const InventoryService = {
   async createStock(schoolId: string, data: any) {
     return prisma.stockItem.create({
       data: { ...data, school_id: schoolId }
+    });
+  },
+
+  async removeStock(schoolId: string, id: string) {
+    return prisma.stockItem.delete({
+      where: { id, school_id: schoolId }
     });
   },
 
