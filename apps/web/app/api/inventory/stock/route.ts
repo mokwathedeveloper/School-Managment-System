@@ -21,3 +21,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(result, { status: 201 });
   } catch (error) { return handleApiError(error); }
 }
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const session = await getSession(req);
+    if (!session) throw new ApiError('Unauthorized', 401);
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+    if (!id) throw new ApiError('ID is required', 400);
+    await InventoryService.removeStock(session.schoolId, id);
+    return NextResponse.json({ success: true });
+  } catch (error) { return handleApiError(error); }
+}
