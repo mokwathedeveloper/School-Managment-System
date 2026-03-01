@@ -101,9 +101,9 @@ export default function StudentsPage() {
           />
         </div>
         <div className="flex items-center gap-2 w-full md:w-auto">
-          <Button variant="outline" size="sm" className="w-full md:w-auto" onClick={() => alert('Filtering options coming soon!')}>
+          <Button variant="outline" size="sm" className="w-full md:w-auto" onClick={() => setSearch('')}>
             <Filter className="mr-2 h-4 w-4" />
-            Filters
+            Clear Filters
           </Button>
         </div>
       </div>

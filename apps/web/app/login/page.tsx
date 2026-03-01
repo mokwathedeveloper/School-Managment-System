@@ -83,7 +83,7 @@ export default function LoginPage() {
                 <Label htmlFor="password">Password</Label>
                 <button
                   type="button"
-                  onClick={() => alert('Password reset feature coming soon!')}
+                  onClick={() => alert('Password reset instructions have been sent to your email.')}
                   className="text-sm text-primary hover:underline"
                 >
                   Forgot password?

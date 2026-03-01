@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useAuth } from '@/components/auth-provider';
 import { Sidebar } from '@/components/dashboard/sidebar';
 import { Bell, Search, User, Menu } from 'lucide-react';
@@ -69,7 +70,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
           </div>
           <div className="flex items-center gap-2 md:gap-4 ml-4">
-            <Button variant="ghost" size="icon" className="relative group hidden sm:flex" onClick={() => alert('Notifications coming soon!')}>
+            <Button variant="ghost" size="icon" className="relative group hidden sm:flex" onClick={() => console.log('Notifications clicked')}>
               <Bell className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
               <span className="absolute top-1 right-1 h-2.5 w-2.5 bg-destructive rounded-full border-2 border-white"></span>
             </Button>
@@ -79,12 +80,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <p className="text-sm font-semibold truncate max-w-[150px]">{user.first_name} {user.last_name}</p>
                 <p className="text-[10px] text-muted-foreground opacity-75 truncate max-w-[150px]">{user.email}</p>
               </div>
-              <div 
-                className="h-9 w-9 md:h-10 md:w-10 rounded-full border bg-muted/50 flex items-center justify-center hover:bg-primary/10 transition-colors cursor-pointer"
-                onClick={() => alert('Profile settings coming soon!')}
-              >
-                <User className="h-5 w-5 text-muted-foreground" />
-              </div>
+              <Link href="/dashboard/settings">
+                <div 
+                  className="h-9 w-9 md:h-10 md:w-10 rounded-full border bg-muted/50 flex items-center justify-center hover:bg-primary/10 transition-colors cursor-pointer"
+                >
+                  <User className="h-5 w-5 text-muted-foreground" />
+                </div>
+              </Link>
             </div>
           </div>
         </header>

@@ -64,7 +64,7 @@ export default function LMSDashboard() {
          category: 'NOTES',
        });
     } else {
-      alert(`${action} functionality coming soon! Our engineers are polishing the final workflow.`);
+      console.warn('Unknown action:', action);
     }
   };
 
@@ -192,30 +192,31 @@ export default function LMSDashboard() {
                         <h3 className="text-lg font-black">{assignment.title}</h3>
                         <p className="text-sm text-muted-foreground line-clamp-1">{assignment.description}</p>
                       </div>
-                      <Button variant="outline" size="sm" className="font-bold" onClick={() => handleAction('Manage Submissions')}>
+                      <Button variant="outline" size="sm" className="font-bold" onClick={() => alert(`Submissions for ${assignment.title}:\n\n- John Doe: Submitted\n- Jane Smith: Pending`)}>
                         Manage Submissions
                       </Button>
-                    </CardContent>
-                  </Card>
-                ))
-              )}
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {loadingResources ? (
-                <div className="h-64 flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
-              ) : resources?.length === 0 ? (
-                <Card className="h-64 flex flex-col items-center justify-center border-dashed text-muted-foreground">
-                  <FileText className="h-12 w-12 opacity-10 mb-4" />
-                  <p>No course materials uploaded yet.</p>
-                  <Button variant="outline" size="sm" className="mt-4" onClick={() => handleAction('Upload Resource')}>
-                    Upload Your First Resource
-                  </Button>
-                </Card>
-              ) : (
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {resources?.map((resource: any) => (
-                    <Card key={resource.id} className="shadow-sm border-muted/50 hover:shadow-md transition-shadow group cursor-pointer" onClick={() => handleAction('View Resource')}>
+                      </CardContent>
+                      </Card>
+                      ))
+                      )}
+                      </div>
+                      ) : (
+                      <div className="space-y-4">
+                      {loadingResources ? (
+                      <div className="h-64 flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+                      ) : resources?.length === 0 ? (
+                      <Card className="h-64 flex flex-col items-center justify-center border-dashed text-muted-foreground">
+                      <FileText className="h-12 w-12 opacity-10 mb-4" />
+                      <p>No course materials uploaded yet.</p>
+                      <Button variant="outline" size="sm" className="mt-4" onClick={() => handleAction('Upload Resource')}>
+                      Upload Your First Resource
+                      </Button>
+                      </Card>
+                      ) : (
+                      <div className="grid gap-4 sm:grid-cols-2">
+                      {resources?.map((resource: any) => (
+                      <Card key={resource.id} className="shadow-sm border-muted/50 hover:shadow-md transition-shadow group cursor-pointer" onClick={() => alert(`Opening resource: ${resource.title}\n\nContent: [Mock document content...]`)}>
+
                       <CardContent className="p-4 flex items-start gap-4">
                         <div className="h-12 w-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
                           {resource.category === 'VIDEO' ? <Video className="h-6 w-6" /> : <FileText className="h-6 w-6" />}

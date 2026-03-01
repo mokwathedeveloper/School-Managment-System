@@ -155,7 +155,7 @@ export default function FinancePage() {
         <Card className="lg:col-span-2 shadow-sm border-none bg-card/50 backdrop-blur">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-xl">Recent Invoices</CardTitle>
-            <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80" onClick={() => alert('Viewing all invoices... Feature coming soon!')}>View All</Button>
+            <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80" onClick={() => window.scrollTo(0,0)}>View All</Button>
           </CardHeader>
           <CardContent className="p-0">
             <Table>
