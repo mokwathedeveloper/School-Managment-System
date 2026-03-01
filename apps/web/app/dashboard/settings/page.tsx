@@ -33,7 +33,7 @@ export default function SettingsPage() {
   const { data: school, isLoading } = useQuery({
     queryKey: ['school-settings'],
     queryFn: async () => {
-      const res = await api.get('/schools/my-school'); // Need to implement this endpoint
+      const res = await api.get('/schools/my-school');
       setFormData(res.data);
       return res.data;
     },
@@ -41,7 +41,7 @@ export default function SettingsPage() {
 
   const updateMutation = useMutation({
     mutationFn: async (data: any) => {
-      return api.patch(`/schools/${school.id}`, data);
+      return api.patch('/schools/my-school', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['school-settings'] });
