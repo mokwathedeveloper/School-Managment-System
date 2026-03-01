@@ -29,24 +29,38 @@ import {
   User,
   Loader2,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
+  TrendingUp
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 export default function StudentDetailPage() {
   const { id } = useParams();
-  const [selectedTermId, setSelectedTermId] = useState('term-1'); // Placeholder
+  const [selectedTermId, setSelectedTermId] = useState('');
 
-  const { data: report, isLoading } = useQuery({
-    queryKey: ['student-report', id, selectedTermId],
+  const { data: terms } = useQuery({
+    queryKey: ['terms'],
     queryFn: async () => {
-      const res = await api.get(`/academic/report/${id}?termId=${selectedTermId}`);
+      const res = await api.get('/finance/terms');
+      if (res.data.length > 0 && !selectedTermId) {
+        setSelectedTermId(res.data[0].id);
+      }
       return res.data;
     },
   });
 
-  if (isLoading) {
+  const { data: report, isLoading } = useQuery({
+    queryKey: ['student-report', id, selectedTermId],
+    queryFn: async () => {
+      if (!selectedTermId) return null;
+      const res = await api.get(`/academic/report/${id}?termId=${selectedTermId}`);
+      return res.data;
+    },
+    enabled: !!selectedTermId,
+  });
+
+  if (isLoading || !report) {
     return (
       <div className="flex items-center justify-center h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -68,11 +82,19 @@ export default function StudentDetailPage() {
           </div>
           <div>
             <h1 className="text-3xl font-bold tracking-tight">{report?.studentInfo.name}</h1>
-            <p className="text-muted-foreground flex items-center gap-2">
+            <div className="flex items-center gap-3 mt-1">
               <Badge variant="outline" className="font-mono">{report?.studentInfo.admissionNo}</Badge>
-              <span>•</span>
+              <span className="text-muted-foreground">•</span>
               <span className="font-medium text-foreground">{report?.studentInfo.class}</span>
-            </p>
+              <span className="text-muted-foreground">•</span>
+              <select 
+                className="bg-transparent text-sm font-bold text-primary focus:outline-none cursor-pointer"
+                value={selectedTermId}
+                onChange={(e) => setSelectedTermId(e.target.value)}
+              >
+                {terms?.map((t: any) => <option key={t.id} value={t.id}>{t.name}</option>)}
+              </select>
+            </div>
           </div>
         </div>
         <div className="flex gap-3">
@@ -95,7 +117,7 @@ export default function StudentDetailPage() {
             <div className="h-16 w-16 bg-primary rounded-xl flex items-center justify-center text-white font-black text-2xl">S</div>
             <div>
               <h2 className="text-2xl font-bold uppercase tracking-tighter">Official Academic Report</h2>
-              <p className="text-sm font-medium text-muted-foreground">Premier International School • 2024 Academic Year</p>
+              <p className="text-sm font-medium text-muted-foreground">Institutional Multi-Tenant SaaS Platform • 2024 Academic Year</p>
             </div>
           </div>
           <div className="text-right">
@@ -114,45 +136,52 @@ export default function StudentDetailPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted/30 hover:bg-muted/30">
-                    <TableHead className="font-bold">Subject</TableHead>
-                    <TableHead className="text-center font-bold">Raw Score</TableHead>
-                    <TableHead className="text-center font-bold">Percentage</TableHead>
-                    <TableHead className="text-right font-bold">Grade</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {report?.academics.map((subj: any) => {
-                    const percentage = (subj.totalMarks / subj.maxPossible) * 100;
-                    return (
-                      <TableRow key={subj.subject} className="hover:bg-muted/10 transition-colors">
-                        <TableCell className="font-semibold">{subj.subject}</TableCell>
-                        <TableCell className="text-center text-muted-foreground">
-                          {subj.totalMarks} <span className="text-[10px]">/ {subj.maxPossible}</span>
-                        </TableCell>
-                        <TableCell className="text-center font-medium">
-                          {percentage.toFixed(1)}%
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Badge 
-                            variant="secondary" 
-                            className={cn(
-                              "font-bold px-3 py-1",
-                              percentage >= 80 ? "bg-green-100 text-green-700" :
-                              percentage >= 60 ? "bg-blue-100 text-blue-700" :
-                              "bg-orange-100 text-orange-700"
-                            )}
-                          >
-                            {subj.exams[0]?.grade || '-'}
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
+              {report?.academics.length === 0 ? (
+                <div className="h-48 flex flex-col items-center justify-center text-muted-foreground">
+                  <TrendingUp className="h-12 w-12 opacity-10 mb-2" />
+                  <p>No examination results recorded for this term.</p>
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/30 hover:bg-muted/30">
+                      <TableHead className="font-bold">Subject</TableHead>
+                      <TableHead className="text-center font-bold">Raw Score</TableHead>
+                      <TableHead className="text-center font-bold">Percentage</TableHead>
+                      <TableHead className="text-right font-bold">Grade</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {report?.academics.map((subj: any) => {
+                      const percentage = (subj.totalMarks / subj.maxPossible) * 100;
+                      return (
+                        <TableRow key={subj.subject} className="hover:bg-muted/10 transition-colors">
+                          <TableCell className="font-semibold">{subj.subject}</TableCell>
+                          <TableCell className="text-center text-muted-foreground">
+                            {subj.totalMarks} <span className="text-[10px]">/ {subj.maxPossible}</span>
+                          </TableCell>
+                          <TableCell className="text-center font-medium">
+                            {percentage.toFixed(1)}%
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Badge 
+                              variant="secondary" 
+                              className={cn(
+                                "font-bold px-3 py-1",
+                                percentage >= 80 ? "bg-green-100 text-green-700" :
+                                percentage >= 60 ? "bg-blue-100 text-blue-700" :
+                                "bg-orange-100 text-orange-700"
+                              )}
+                            >
+                              {subj.exams[0]?.grade || '-'}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              )}
             </CardContent>
           </Card>
 
@@ -207,7 +236,7 @@ export default function StudentDetailPage() {
                     <div className="h-2 bg-muted rounded-full overflow-hidden">
                       <div 
                         className="h-full bg-primary transition-all duration-1000" 
-                        style={{ width: `${(report?.finance.totalPaid / report?.finance.totalInvoiced) * 100}%` }}
+                        style={{ width: `${report?.finance.totalInvoiced > 0 ? (report?.finance.totalPaid / report?.finance.totalInvoiced) * 100 : 0}%` }}
                       ></div>
                     </div>
                   </div>
@@ -235,9 +264,7 @@ export default function StudentDetailPage() {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground italic min-h-[80px] border-l-2 pl-4 border-primary/20">
-              &quot;{report?.studentInfo.name} has shown consistent improvement in mathematics this term. 
-              Participation in class activities remains high, though focus during afternoon sessions can be improved. 
-              A promising academic trajectory.&quot;
+              &quot;Student performance records synchronized with institutional database. Academic trajectory remains consistent with termly objectives.&quot;
             </p>
             <div className="mt-8 flex justify-between items-end">
               <div className="text-center">
