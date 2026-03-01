@@ -81,12 +81,13 @@ export default function LoginPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
-                <Link
-                  href="/forgot-password"
+                <button
+                  type="button"
+                  onClick={() => alert('Password reset feature coming soon!')}
                   className="text-sm text-primary hover:underline"
                 >
                   Forgot password?
-                </Link>
+                </button>
               </div>
               <Input
                 id="password"
@@ -106,9 +107,13 @@ export default function LoginPage() {
             </Button>
             <div className="text-center text-sm text-muted-foreground">
               Don&apos;t have an account?{' '}
-              <Link href="/register" className="text-primary hover:underline">
+              <button 
+                type="button"
+                onClick={() => alert('Please contact your school administrator to create an account.')}
+                className="text-primary hover:underline"
+              >
                 Contact administration
-              </Link>
+              </button>
             </div>
           </CardFooter>
         </form>
