@@ -81,13 +81,13 @@ export default function ParentDashboard() {
                   <QuickStat 
                     icon={<Calendar className="h-4 w-4" />} 
                     label="Attendance" 
-                    value="98%" 
+                    value={child.stats.attendanceRate} 
                     color="text-green-600"
                   />
                   <QuickStat 
                     icon={<TrendingUp className="h-4 w-4" />} 
                     label="Last Grade" 
-                    value="B+" 
+                    value={child.stats.lastGrade} 
                     color="text-blue-600"
                   />
                 </div>

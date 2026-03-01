@@ -20,6 +20,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 export default function ConductPage() {
+  const queryClient = useQueryClient();
   const { data: records, isLoading } = useQuery({
     queryKey: ['discipline-records'],
     queryFn: async () => {
@@ -27,6 +28,30 @@ export default function ConductPage() {
       return res.data;
     },
   });
+
+  const reportMutation = useMutation({
+    mutationFn: async (data: any) => api.post('/discipline', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['discipline-records'] });
+      alert('Incident has been officially recorded and logged for administrative review.');
+    }
+  });
+
+  const handleReport = () => {
+    const student_id = window.prompt('Enter student UUID:');
+    if (!student_id) return;
+    const title = window.prompt('Enter incident title:');
+    if (!title) return;
+    const severity = window.prompt('Enter severity (LOW, MEDIUM, HIGH, CRITICAL):');
+    if (!severity) return;
+
+    reportMutation.mutate({
+      student_id,
+      title,
+      severity: severity.toUpperCase(),
+      incident_date: new Date().toISOString(),
+    });
+  };
 
   const severityColors: any = {
     LOW: "bg-blue-100 text-blue-700 border-blue-200",
@@ -45,8 +70,8 @@ export default function ConductPage() {
           </h1>
           <p className="text-muted-foreground mt-1 text-lg">Track behavioral incidents and disciplinary actions.</p>
         </div>
-        <Button className="shadow-md bg-rose-600 hover:bg-rose-700 text-white">
-          <AlertTriangle className="mr-2 h-4 w-4" />
+        <Button onClick={handleReport} disabled={reportMutation.isPending} className="shadow-md bg-rose-600 hover:bg-rose-700 text-white">
+          {reportMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <AlertTriangle className="mr-2 h-4 w-4" />}
           Report Incident
         </Button>
       </div>

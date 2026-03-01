@@ -25,5 +25,23 @@ export const HostelsService = {
       },
       orderBy: { room_number: 'asc' }
     });
+  },
+
+  async create(schoolId: string, data: any) {
+    return prisma.hostel.create({
+      data: { ...data, school_id: schoolId }
+    });
+  },
+
+  async createRoom(schoolId: string, hostelId: string, data: any) {
+    // Security check
+    const hostel = await prisma.hostel.findFirst({
+      where: { id: hostelId, school_id: schoolId }
+    });
+    if (!hostel) throw new Error('Hostel not found');
+
+    return prisma.dormRoom.create({
+      data: { ...data, hostel_id: hostelId }
+    });
   }
 };

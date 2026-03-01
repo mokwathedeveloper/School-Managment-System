@@ -32,6 +32,30 @@ export default function HealthPage() {
     },
   });
 
+  const logVisitMutation = useMutation({
+    mutationFn: async (data: any) => api.post('/health/visits', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['clinic-visits'] });
+      alert('Clinic visit has been successfully logged and student records updated.');
+    }
+  });
+
+  const handleLogVisit = () => {
+    const student_id = window.prompt('Enter student UUID:');
+    if (!student_id) return;
+    const symptoms = window.prompt('Enter symptoms:');
+    if (!symptoms) return;
+    const diagnosis = window.prompt('Enter diagnosis:');
+    if (!diagnosis) return;
+
+    logVisitMutation.mutate({
+      student_id,
+      symptoms,
+      diagnosis,
+      visit_date: new Date().toISOString(),
+    });
+  };
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -42,8 +66,8 @@ export default function HealthPage() {
           </h1>
           <p className="text-muted-foreground mt-1 text-lg">Manage student health records and daily clinic visits.</p>
         </div>
-        <Button className="shadow-md bg-rose-600 hover:bg-rose-700 text-white">
-          <Stethoscope className="mr-2 h-4 w-4" />
+        <Button onClick={handleLogVisit} disabled={logVisitMutation.isPending} className="shadow-md bg-rose-600 hover:bg-rose-700 text-white">
+          {logVisitMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Stethoscope className="mr-2 h-4 w-4" />}
           Log New Visit
         </Button>
       </div>

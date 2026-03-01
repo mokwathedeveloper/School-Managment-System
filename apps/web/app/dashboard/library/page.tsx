@@ -43,6 +43,46 @@ export default function LibraryPage() {
     },
   });
 
+  const addTitleMutation = useMutation({
+    mutationFn: async (data: any) => api.post('/library/catalog', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['library-catalog'] });
+      alert('New book title has been successfully added to the catalog.');
+    }
+  });
+
+  const borrowMutation = useMutation({
+    mutationFn: async (data: any) => api.post('/library/borrows', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['library-borrows'] });
+      alert('Borrowing transaction has been successfully recorded.');
+    }
+  });
+
+  const handleAdd = () => {
+    if (view === 'catalog') {
+      const title = window.prompt('Enter book title:');
+      if (!title) return;
+      const author = window.prompt('Enter author:');
+      if (!author) return;
+      const category = window.prompt('Enter category:');
+      if (!category) return;
+
+      addTitleMutation.mutate({ title, author, category });
+    } else {
+      const student_id = window.prompt('Enter student UUID:');
+      if (!student_id) return;
+      const barcode = window.prompt('Enter book copy barcode:');
+      if (!barcode) return;
+
+      borrowMutation.mutate({ 
+        student_id, 
+        barcode,
+        due_date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString()
+      });
+    }
+  };
+
   const returnMutation = useMutation({
     mutationFn: async (copyId: string) => {
       return api.patch(`/library/return/${copyId}`);
@@ -63,8 +103,8 @@ export default function LibraryPage() {
           </h1>
           <p className="text-muted-foreground mt-1 text-lg">Manage book collections, individual copies, and track student borrowing.</p>
         </div>
-        <Button className="shadow-md">
-          <Plus className="mr-2 h-4 w-4" />
+        <Button onClick={handleAdd} disabled={addTitleMutation.isPending || borrowMutation.isPending} className="shadow-md">
+          {addTitleMutation.isPending || borrowMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
           {view === 'catalog' ? 'Add New Title' : 'New Borrowing'}
         </Button>
       </div>

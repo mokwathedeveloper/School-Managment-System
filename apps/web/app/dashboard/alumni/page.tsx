@@ -33,6 +33,32 @@ export default function AlumniPage() {
     },
   });
 
+  const registerMutation = useMutation({
+    mutationFn: async (data: any) => api.post('/alumni', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['alumni'] });
+      alert('Alumnus has been successfully registered in the network.');
+    }
+  });
+
+  const handleRegister = () => {
+    const first_name = window.prompt('Enter first name:');
+    if (!first_name) return;
+    const last_name = window.prompt('Enter last name:');
+    if (!last_name) return;
+    const graduation_year = window.prompt('Enter graduation year (e.g. 2023):');
+    if (!graduation_year) return;
+    const email = window.prompt('Enter email:');
+    if (!email) return;
+
+    registerMutation.mutate({ 
+      first_name, 
+      last_name, 
+      graduation_year: parseInt(graduation_year), 
+      email 
+    });
+  };
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -43,8 +69,8 @@ export default function AlumniPage() {
           </h1>
           <p className="text-muted-foreground mt-1 text-lg">Track graduate careers and foster institutional community.</p>
         </div>
-        <Button className="shadow-md">
-          <Plus className="mr-2 h-4 w-4" />
+        <Button onClick={handleRegister} disabled={registerMutation.isPending} className="shadow-md">
+          {registerMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
           Register Alumnus
         </Button>
       </div>

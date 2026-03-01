@@ -44,6 +44,52 @@ export default function InventoryPage() {
     },
   });
 
+  const addAssetMutation = useMutation({
+    mutationFn: async (data: any) => api.post('/inventory/assets', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['inventory-assets'] });
+      alert('Asset has been successfully registered in the institutional registry.');
+    }
+  });
+
+  const addStockMutation = useMutation({
+    mutationFn: async (data: any) => api.post('/inventory/stock', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['inventory-stock'] });
+      alert('Stock item has been successfully added to the inventory.');
+    }
+  });
+
+  const handleAdd = () => {
+    if (activeTab === 'assets') {
+      const name = window.prompt('Enter asset name:');
+      if (!name) return;
+      const category = window.prompt('Enter category (e.g. FURNITURE, IT, LAB):');
+      if (!category) return;
+      const location = window.prompt('Enter location:');
+      if (!location) return;
+
+      addAssetMutation.mutate({ name, category, location, status: 'OPERATIONAL' });
+    } else {
+      const name = window.prompt('Enter stock item name:');
+      if (!name) return;
+      const category = window.prompt('Enter category:');
+      if (!category) return;
+      const unit = window.prompt('Enter unit (e.g. PCS, KG):');
+      if (!unit) return;
+      const quantity = window.prompt('Enter initial quantity:');
+      if (!quantity) return;
+
+      addStockMutation.mutate({ 
+        name, 
+        category, 
+        unit, 
+        quantity: parseInt(quantity),
+        min_quantity: 5 
+      });
+    }
+  };
+
   const updateStockMutation = useMutation({
     mutationFn: async ({ id, change }: { id: string, change: number }) => {
       return api.patch(`/inventory/stock/${id}/quantity`, { change });
@@ -63,8 +109,8 @@ export default function InventoryPage() {
           </h1>
           <p className="text-muted-foreground mt-1 text-lg">Track school property and manage consumable supplies.</p>
         </div>
-        <Button className="shadow-md">
-          <Plus className="mr-2 h-4 w-4" />
+        <Button onClick={handleAdd} disabled={addAssetMutation.isPending || addStockMutation.isPending} className="shadow-md">
+          {addAssetMutation.isPending || addStockMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
           {activeTab === 'assets' ? 'Add New Asset' : 'Add Stock Item'}
         </Button>
       </div>

@@ -24,6 +24,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 export default function InstitutionalCalendar() {
+  const queryClient = useQueryClient();
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const { data: events, isLoading } = useQuery({
@@ -35,6 +36,31 @@ export default function InstitutionalCalendar() {
       return res.data;
     },
   });
+
+  const scheduleMutation = useMutation({
+    mutationFn: async (data: any) => api.post('/calendar', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['calendar-events'] });
+      alert('Event has been successfully scheduled and published to the institutional calendar.');
+    }
+  });
+
+  const handleSchedule = () => {
+    const title = window.prompt('Enter event title:');
+    if (!title) return;
+    const category = window.prompt('Enter category (ACADEMIC, HOLIDAY, SPORTS, EXAM, OTHER):');
+    if (!category) return;
+    const start_date = window.prompt('Enter start date (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
+    if (!start_date) return;
+
+    scheduleMutation.mutate({
+      title,
+      category: category.toUpperCase(),
+      start_date: new Date(start_date).toISOString(),
+      end_date: new Date(start_date).toISOString(),
+      description: 'Institutional event',
+    });
+  };
 
   const categoryColors: any = {
     ACADEMIC: "bg-blue-100 text-blue-700 border-blue-200",
@@ -62,8 +88,8 @@ export default function InstitutionalCalendar() {
           </h1>
           <p className="text-muted-foreground mt-1 text-lg">Central schedule for term dates, holidays, and events.</p>
         </div>
-        <Button className="shadow-md">
-          <Plus className="mr-2 h-4 w-4" />
+        <Button onClick={handleSchedule} disabled={scheduleMutation.isPending} className="shadow-md">
+          {scheduleMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
           Schedule Event
         </Button>
       </div>

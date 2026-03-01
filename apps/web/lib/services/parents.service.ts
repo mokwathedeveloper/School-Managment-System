@@ -10,13 +10,38 @@ export const ParentsService = {
             user: true,
             class: {
               include: { grade: true }
+            },
+            attendance: {
+              take: 10,
+              orderBy: { date: 'desc' }
+            },
+            results: {
+              take: 1,
+              orderBy: { created_at: 'desc' },
+              include: { exam: true }
             }
           }
         }
       }
     });
 
-    return parent?.students || [];
+    if (!parent) return [];
+
+    return parent.students.map(student => {
+      const attendanceRate = student.attendance.length > 0
+        ? Math.round((student.attendance.filter(a => a.status === 'PRESENT').length / student.attendance.length) * 100)
+        : 100;
+      
+      const lastGrade = student.results[0]?.grade || 'N/A';
+
+      return {
+        ...student,
+        stats: {
+          attendanceRate: `${attendanceRate}%`,
+          lastGrade
+        }
+      };
+    });
   },
 
   async getParentProfile(userId: string) {

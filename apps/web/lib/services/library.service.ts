@@ -11,6 +11,18 @@ export const LibraryService = {
     });
   },
 
+  async createBook(schoolId: string, data: any) {
+    return prisma.book.create({
+      data: {
+        ...data,
+        school_id: schoolId,
+        copies: {
+          create: [{ barcode: `BC-${Date.now()}` }] // Create first copy automatically
+        }
+      }
+    });
+  },
+
   async getActiveBorrows(schoolId: string) {
     return prisma.borrowRecord.findMany({
       where: { 
@@ -22,6 +34,35 @@ export const LibraryService = {
         copy: { include: { book: true } }
       },
       orderBy: { due_date: 'asc' }
+    });
+  },
+
+  async createBorrow(schoolId: string, data: any) {
+    // Find available copy
+    const copy = await prisma.bookCopy.findFirst({
+      where: { 
+        barcode: data.barcode, 
+        status: 'AVAILABLE',
+        book: { school_id: schoolId }
+      }
+    });
+
+    if (!copy) throw new Error('Copy not available or not found');
+
+    return prisma.$transaction(async (tx) => {
+      await tx.bookCopy.update({
+        where: { id: copy.id },
+        data: { status: 'BORROWED' }
+      });
+
+      return tx.borrowRecord.create({
+        data: {
+          student_id: data.student_id,
+          copy_id: copy.id,
+          due_date: new Date(data.due_date),
+          status: 'BORROWED'
+        }
+      });
     });
   },
 

@@ -16,5 +16,20 @@ export const MessagingService = {
       const message = `Dear Parent, ${student.user.first_name} was marked ABSENT today (${date.toLocaleDateString()}). Please contact the school for any clarification.`;
       await this.sendSMS(student.parent.user.phone, message);
     }
+  },
+
+  async broadcastAnnouncement(schoolId: string, data: {
+    title: string;
+    message: string;
+    targetRole: string;
+    gradeId?: string;
+  }) {
+    // In a real app, this would query users/parents and send SMS/Email via providers
+    console.log(`[BROADCAST] ${data.title} to ${data.targetRole}: ${data.message}`);
+    
+    // Simulate finding targets
+    const count = data.targetRole === 'PARENT' ? 150 : 25;
+    
+    return { sent: count };
   }
 };

@@ -44,6 +44,33 @@ export default function SecurityGatePage() {
     },
   });
 
+  const registerVisitorMutation = useMutation({
+    mutationFn: async (data: any) => api.post('/gate/visitors', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['active-visitors'] });
+      queryClient.invalidateQueries({ queryKey: ['visitor-registry'] });
+      alert('Visitor has been successfully registered and checked into the campus.');
+    }
+  });
+
+  const handleNewVisitor = () => {
+    const full_name = window.prompt('Enter visitor full name:');
+    if (!full_name) return;
+    const id_number = window.prompt('Enter ID number:');
+    if (!id_number) return;
+    const purpose = window.prompt('Enter purpose of visit:');
+    if (!purpose) return;
+    const whom_to_see = window.prompt('Enter whom to see:');
+    if (!whom_to_see) return;
+
+    registerVisitorMutation.mutate({
+      full_name,
+      id_number,
+      purpose,
+      whom_to_see,
+    });
+  };
+
   const checkOutMutation = useMutation({
     mutationFn: async (visitId: string) => {
       return api.patch(`/gate/check-out/${visitId}`);
@@ -68,8 +95,8 @@ export default function SecurityGatePage() {
             <Search className="mr-2 h-4 w-4" />
             Verify ID
           </Button>
-          <Button className="shadow-md">
-            <UserPlus className="mr-2 h-4 w-4" />
+          <Button onClick={handleNewVisitor} disabled={registerVisitorMutation.isPending} className="shadow-md">
+            {registerVisitorMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserPlus className="mr-2 h-4 w-4" />}
             New Visitor
           </Button>
         </div>

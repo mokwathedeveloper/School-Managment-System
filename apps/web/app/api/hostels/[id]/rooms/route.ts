@@ -17,3 +17,16 @@ export async function GET(
     return handleApiError(error);
   }
 }
+
+export async function POST(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const session = await getSession(req);
+    if (!session) throw new ApiError('Unauthorized', 401);
+    const body = await req.json();
+    const result = await HostelsService.createRoom(session.schoolId, params.id, body);
+    return NextResponse.json(result, { status: 201 });
+  } catch (error) { return handleApiError(error); }
+}
