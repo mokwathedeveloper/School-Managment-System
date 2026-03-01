@@ -12,6 +12,12 @@ export const AttendanceService = {
     const savedRecords = [];
 
     for (const record of data.records) {
+      // Security check: ensure student belongs to school
+      const student = await prisma.student.findFirst({
+        where: { id: record.student_id, school_id: data.school_id }
+      });
+      if (!student) continue;
+
       const attendance = await prisma.attendance.upsert({
         where: {
           student_id_date: {

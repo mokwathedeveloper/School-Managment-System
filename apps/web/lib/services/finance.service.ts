@@ -43,9 +43,9 @@ export const FinanceService = {
     });
   },
 
-  async getInvoicesByStudent(student_id: string) {
+  async getInvoicesByStudent(schoolId: string, student_id: string) {
     return prisma.invoice.findMany({
-      where: { student_id },
+      where: { student_id, school_id: schoolId },
       orderBy: { created_at: 'desc' },
     });
   },

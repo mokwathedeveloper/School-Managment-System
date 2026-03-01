@@ -94,5 +94,27 @@ export const StudentsService = {
       }
     });
     return student;
+  },
+
+  async update(schoolId: string, id: string, data: Prisma.StudentUpdateInput) {
+    // Ensure student belongs to school before updating
+    const student = await this.findOne(schoolId, id);
+    if (!student) throw new Error('Student not found in this school');
+
+    return prisma.student.update({
+      where: { id },
+      data,
+      include: { user: true, class: true }
+    });
+  },
+
+  async remove(schoolId: string, id: string) {
+    const student = await this.findOne(schoolId, id);
+    if (!student) throw new Error('Student not found in this school');
+
+    return prisma.$transaction(async (tx) => {
+      await tx.student.delete({ where: { id } });
+      await tx.user.delete({ where: { id: student.user_id } });
+    });
   }
 };
