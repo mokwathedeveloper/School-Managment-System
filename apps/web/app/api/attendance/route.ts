@@ -13,14 +13,16 @@ export async function GET(req: NextRequest) {
     const date = searchParams.get('date');
     const classId = searchParams.get('classId');
 
-    if (!date || !classId) throw new ApiError('Date and classId are required', 400);
+    if (date && classId) {
+      const result = await AttendanceService.getAttendance(
+        session.schoolId,
+        classId,
+        new Date(date)
+      );
+      return NextResponse.json(result);
+    }
 
-    const result = await AttendanceService.getAttendance(
-      session.schoolId,
-      classId,
-      new Date(date)
-    );
-
+    const result = await AttendanceService.findAll(session.schoolId);
     return NextResponse.json(result);
   } catch (error) {
     return handleApiError(error);

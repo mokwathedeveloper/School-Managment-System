@@ -62,5 +62,13 @@ export const AttendanceService = {
         },
       },
     });
+  },
+
+  async findAll(schoolId: string) {
+    return prisma.attendance.findMany({
+      where: { school_id: schoolId },
+      orderBy: { date: 'desc' },
+      take: 500, // Reasonable limit for general stats
+    });
   }
 };
