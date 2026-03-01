@@ -21,11 +21,51 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 export default function LMSDashboard() {
+  const queryClient = useQueryClient();
   const [selectedClassId, setSelectedClassId] = useState('');
   const [view, setView] = useState<'assignments' | 'resources'>('assignments');
 
-  const handleAction = (action: string) => {
-    alert(`${action} functionality coming soon! Our engineers are polishing the final workflow.`);
+  const createAssignmentMutation = useMutation({
+    mutationFn: async (data: any) => api.post('/lms/assignments', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['assignments'] });
+      alert('Assignment posted successfully!');
+    }
+  });
+
+  const createResourceMutation = useMutation({
+    mutationFn: async (data: any) => api.post('/lms/resources', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['resources'] });
+      alert('Resource uploaded successfully!');
+    }
+  });
+
+  const handleAction = async (action: string) => {
+    if (action === 'Post Assignment') {
+      if (!selectedClassId) {
+        alert('Please select a class first.');
+        return;
+      }
+      const title = window.prompt('Enter assignment title:');
+      if (!title) return;
+      
+      createAssignmentMutation.mutate({
+        class_id: selectedClassId,
+        title,
+        description: 'New assignment created from dashboard',
+        due_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      });
+    } else if (action === 'Upload Resource') {
+       const title = window.prompt('Enter resource title:');
+       if (!title) return;
+       createResourceMutation.mutate({
+         title,
+         category: 'NOTES',
+       });
+    } else {
+      alert(`${action} functionality coming soon! Our engineers are polishing the final workflow.`);
+    }
   };
 
   const { data: classes } = useQuery({
