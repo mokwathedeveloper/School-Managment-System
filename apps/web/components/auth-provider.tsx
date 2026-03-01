@@ -44,8 +44,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(user);
       
       router.push('/dashboard');
-    } catch (error) {
-      console.error('Login failed:', error);
+    } catch (error: any) {
+      if (error.response) {
+        console.error('Login API error:', error.response.status, error.response.data);
+      } else if (error.request) {
+        console.error('Login network error (no response):', error.request);
+      } else {
+        console.error('Login request setup error:', error.message);
+      }
       throw error;
     }
   };
