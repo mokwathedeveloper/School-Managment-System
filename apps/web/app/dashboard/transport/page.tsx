@@ -20,6 +20,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 export default function TransportPage() {
+  const queryClient = useQueryClient();
   const [view, setView] = useState<'routes' | 'vehicles'>('routes');
 
   const { data: routes, isLoading: loadingRoutes } = useQuery({
@@ -38,6 +39,41 @@ export default function TransportPage() {
     },
   });
 
+  const createRouteMutation = useMutation({
+    mutationFn: async (data: any) => api.post('/transport/routes', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transport-routes'] });
+      alert('Transport route created successfully.');
+    }
+  });
+
+  const createVehicleMutation = useMutation({
+    mutationFn: async (data: any) => api.post('/transport/vehicles', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transport-vehicles'] });
+      alert('Vehicle added to fleet successfully.');
+    }
+  });
+
+  const handleAdd = () => {
+    if (view === 'routes') {
+      const name = window.prompt('Enter route name:');
+      if (!name) return;
+      const cost = window.prompt('Enter cost per term (KES):');
+      if (!cost) return;
+      const stops = window.prompt('Enter stops (comma separated):');
+
+      createRouteMutation.mutate({ name, cost: parseFloat(cost), stops });
+    } else {
+      const reg_number = window.prompt('Enter vehicle registration number:');
+      if (!reg_number) return;
+      const capacity = window.prompt('Enter passenger capacity:');
+      if (!capacity) return;
+
+      createVehicleMutation.mutate({ reg_number, capacity: parseInt(capacity) });
+    }
+  };
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -48,8 +84,8 @@ export default function TransportPage() {
           </h1>
           <p className="text-muted-foreground mt-1 text-lg">Manage bus routes, fleet assignments, and student transport.</p>
         </div>
-        <Button className="shadow-md">
-          <Plus className="mr-2 h-4 w-4" />
+        <Button onClick={handleAdd} disabled={createRouteMutation.isPending || createVehicleMutation.isPending} className="shadow-md">
+          {createRouteMutation.isPending || createVehicleMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
           {view === 'routes' ? 'Create Route' : 'Add Vehicle'}
         </Button>
       </div>

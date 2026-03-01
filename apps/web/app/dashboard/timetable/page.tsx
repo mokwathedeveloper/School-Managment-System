@@ -28,8 +28,8 @@ const DAYS = [
 ];
 
 export default function TimetablePage() {
+  const queryClient = useQueryClient();
   const [selectedClassId, setSelectedClassId] = useState('');
-  const [isAdding, setIsAdding] = useState(false);
 
   const { data: classes } = useQuery({
     queryKey: ['classes'],
@@ -49,6 +49,37 @@ export default function TimetablePage() {
     enabled: !!selectedClassId,
   });
 
+  const addSlotMutation = useMutation({
+    mutationFn: async (data: any) => api.post('/timetable', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['timetable', selectedClassId] });
+      alert('Timetable slot successfully scheduled.');
+    }
+  });
+
+  const handleAddSlot = () => {
+    if (!selectedClassId) {
+        alert('Please select a class first.');
+        return;
+    }
+    const subject_id = window.prompt('Enter subject ID:');
+    if (!subject_id) return;
+    const day_of_week = window.prompt('Enter day of week (1-5):');
+    if (!day_of_week) return;
+    const start_time = window.prompt('Enter start time (e.g., 08:00):');
+    if (!start_time) return;
+    const end_time = window.prompt('Enter end time (e.g., 09:00):');
+    if (!end_time) return;
+
+    addSlotMutation.mutate({
+      class_id: selectedClassId,
+      subject_id,
+      day_of_week: parseInt(day_of_week),
+      start_time,
+      end_time
+    });
+  };
+
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex items-center justify-between">
@@ -58,8 +89,8 @@ export default function TimetablePage() {
         </div>
         <div className="flex gap-2">
             <Button variant="outline">Manage Rooms</Button>
-            <Button onClick={() => setIsAdding(true)} className="shadow-md">
-                <Plus className="h-4 w-4 mr-2" />
+            <Button onClick={handleAddSlot} disabled={addSlotMutation.isPending} className="shadow-md">
+                {addSlotMutation.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Plus className="h-4 w-4 mr-2" />}
                 Add Slot
             </Button>
         </div>

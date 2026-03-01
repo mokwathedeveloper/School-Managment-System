@@ -24,5 +24,17 @@ export const TransportService = {
       },
       orderBy: { reg_number: 'asc' }
     });
+  },
+
+  async createRoute(schoolId: string, data: any) {
+    return prisma.transportRoute.create({
+      data: { ...data, school_id: schoolId }
+    });
+  },
+
+  async createVehicle(schoolId: string, data: any) {
+    return prisma.vehicle.create({
+      data: { ...data, school_id: schoolId }
+    });
   }
 };

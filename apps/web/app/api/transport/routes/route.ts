@@ -14,3 +14,16 @@ export async function GET(req: NextRequest) {
     return handleApiError(error);
   }
 }
+
+export async function POST(req: NextRequest) {
+  try {
+    const session = await getSession(req);
+    if (!session) throw new ApiError('Unauthorized', 401);
+
+    const body = await req.json();
+    const result = await TransportService.createRoute(session.schoolId, body);
+    return NextResponse.json(result, { status: 201 });
+  } catch (error) {
+    return handleApiError(error);
+  }
+}

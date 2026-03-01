@@ -19,5 +19,14 @@ export const TimetableService = {
         { start_time: 'asc' }
       ]
     });
+  },
+
+  async createSlot(schoolId: string, data: any) {
+    return prisma.timetableSlot.create({
+      data: {
+        ...data,
+        school_id: schoolId
+      }
+    });
   }
 };
