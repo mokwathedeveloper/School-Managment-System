@@ -12,7 +12,8 @@ import {
   Loader2,
   ChevronRight,
   ShieldAlert,
-  Building
+  Building,
+  ArrowRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -21,6 +22,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
 import { AddHostelDialog } from '@/components/dashboard/add-hostel-dialog';
 import { AddRoomDialog } from '@/components/dashboard/add-room-dialog';
+import { PremiumLoader } from '@/components/ui/premium-loader';
 
 export default function HostelsPage() {
   const queryClient = useQueryClient();
@@ -44,46 +46,56 @@ export default function HostelsPage() {
     enabled: !!selectedHostelId,
   });
 
+  if (loadingHostels) return <PremiumLoader message="Syncing Boarding Registry" />;
+
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8 animate-in fade-in duration-700">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
-            <Home className="h-8 w-8 text-primary" />
+          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
+            <Home className="h-8 w-8 text-blue-600" />
             Hostel & Boarding
           </h1>
-          <p className="text-muted-foreground mt-1 text-lg">Manage dormitory buildings, room allocations, and student safety.</p>
+          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Institutional Residency & Room Management</p>
         </div>
         <AddHostelDialog />
       </div>
 
-      <div className="grid gap-6 md:grid-cols-4">
+      <div className="grid gap-8 md:grid-cols-4">
         {/* Hostel List */}
-        <Card className="md:col-span-1 shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-lg">Dormitories</CardTitle>
+        <Card className="md:col-span-1 border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2rem] overflow-hidden h-fit">
+          <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-6">
+            <CardTitle className="text-sm font-black uppercase tracking-widest text-slate-400">Building Registry</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2">
-            {loadingHostels ? <Loader2 className="h-6 w-6 animate-spin mx-auto text-primary" /> : (
+          <CardContent className="p-4 space-y-2">
+            {hostels?.length === 0 ? (
+                <div className="py-8 text-center text-[10px] font-black uppercase tracking-widest text-slate-300 italic">No dormitories defined</div>
+            ) : (
               hostels?.map((hostel: any) => (
                 <button
                   key={hostel.id}
                   onClick={() => setSelectedHostelId(hostel.id)}
                   className={cn(
-                    "w-full text-left px-4 py-3 rounded-xl border transition-all flex flex-col gap-1",
+                    "w-full text-left px-5 py-4 rounded-2xl border-2 transition-all duration-300 group",
                     selectedHostelId === hostel.id 
-                      ? "bg-primary border-primary text-primary-foreground shadow-sm" 
-                      : "hover:bg-muted/50"
+                      ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-600/20 scale-[1.02]" 
+                      : "bg-white border-slate-50 hover:border-blue-100 hover:bg-slate-50"
                   )}
                 >
-                  <div className="font-bold flex items-center justify-between">
+                  <div className="font-black text-sm tracking-tight flex items-center justify-between">
                     {hostel.name}
-                    <Badge variant={selectedHostelId === hostel.id ? "secondary" : "outline"} className="text-[10px]">
+                    <Badge variant={selectedHostelId === hostel.id ? "secondary" : "outline"} className={cn(
+                        "font-black text-[9px] uppercase border-none",
+                        selectedHostelId === hostel.id ? "bg-white/20 text-white" : "text-slate-400 bg-slate-50"
+                    )}>
                       {hostel.type}
                     </Badge>
                   </div>
-                  <p className={cn("text-[10px] uppercase font-bold tracking-widest", selectedHostelId === hostel.id ? "text-white/70" : "text-muted-foreground")}>
-                    {hostel._count.rooms} Rooms Total
+                  <p className={cn(
+                    "text-[10px] font-bold uppercase tracking-widest mt-1",
+                    selectedHostelId === hostel.id ? "text-blue-100" : "text-slate-400"
+                  )}>
+                    {hostel._count.rooms} Units Logged
                   </p>
                 </button>
               ))
@@ -94,49 +106,70 @@ export default function HostelsPage() {
         {/* Room Allocations Area */}
         <div className="md:col-span-3">
           {!selectedHostelId ? (
-            <Card className="h-[400px] flex flex-col items-center justify-center text-center text-muted-foreground border-dashed">
-              <Building className="h-12 w-12 opacity-10 mb-4" />
-              <p>Select a dormitory to view room availability and student manifests.</p>
-            </Card>
+            <div className="h-[500px] flex flex-col items-center justify-center text-center p-12 bg-white rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.02)] border-2 border-dashed border-slate-100">
+                <div className="h-20 w-20 rounded-[2rem] bg-slate-50 flex items-center justify-center mb-6 border border-slate-100">
+                    <Building className="h-10 w-10 text-slate-200" />
+                </div>
+                <h3 className="text-xl font-black text-slate-900 tracking-tight mb-2 uppercase tracking-tighter">Manifest Inactive</h3>
+                <p className="text-sm font-bold text-slate-400 max-w-xs uppercase tracking-widest leading-relaxed">
+                    Select a target building from the left sidebar to initialize the residency terminal.
+                </p>
+            </div>
           ) : (
-            <Card className="shadow-sm border-muted/50 overflow-hidden">
-              <CardHeader className="bg-muted/10 border-b flex flex-row items-center justify-between">
+            <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2.5rem] overflow-hidden">
+              <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div>
-                  <CardTitle>Room Inventory</CardTitle>
-                  <CardDescription>Capacity and student allocation for {hostels?.find((h: any) => h.id === selectedHostelId)?.name}.</CardDescription>
+                  <CardTitle className="text-xl font-black text-slate-900">Room Residency Matrix</CardTitle>
+                  <CardDescription className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Occupancy and scholar allocation for {hostels?.find((h: any) => h.id === selectedHostelId)?.name}</CardDescription>
                 </div>
                 <AddRoomDialog hostelId={selectedHostelId} />
               </CardHeader>
               <CardContent className="p-0">
                 <Table>
-                  <TableHeader className="bg-muted/30">
-                    <TableRow>
-                      <TableHead>Room No.</TableHead>
-                      <TableHead>Occupancy</TableHead>
-                      <TableHead>Students</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
+                  <TableHeader className="bg-slate-50/30">
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead className="pl-8 py-4 font-black uppercase tracking-widest text-[10px] text-slate-400">Room Identity</TableHead>
+                      <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Current Occupancy</TableHead>
+                      <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Scholar Manifest</TableHead>
+                      <TableHead className="text-right pr-8 font-black uppercase tracking-widest text-[10px] text-slate-400">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {loadingRooms ? (
-                      <TableRow><TableCell colSpan={4} className="text-center h-32"><Loader2 className="h-6 w-6 animate-spin mx-auto text-primary"/></TableCell></TableRow>
+                      <TableRow><TableCell colSpan={4} className="text-center h-64"><PremiumLoader message="Syncing manifest" /></TableCell></TableRow>
+                    ) : rooms?.length === 0 ? (
+                        <TableRow>
+                            <TableCell colSpan={4} className="h-64 text-center">
+                                <div className="flex flex-col items-center gap-2 text-slate-300">
+                                    <Bed className="h-12 w-12 opacity-20" />
+                                    <p className="font-black uppercase tracking-widest text-xs">No Units Registered</p>
+                                </div>
+                            </TableCell>
+                        </TableRow>
                     ) : (
                       rooms?.map((room: any) => {
                         const occupancyRate = (room._count.students / room.capacity) * 100;
                         return (
-                          <TableRow key={room.id} className="hover:bg-muted/5">
-                            <TableCell className="font-bold">{room.room_number}</TableCell>
-                            <TableCell>
-                              <div className="flex flex-col gap-1 w-24">
-                                <div className="flex justify-between text-[10px] font-bold">
-                                  <span>{room._count.students} / {room.capacity}</span>
-                                  <span>{occupancyRate}%</span>
+                          <TableRow key={room.id} className="group hover:bg-slate-50/50 transition-all duration-300 border-b-slate-50">
+                            <TableCell className="pl-8 py-5">
+                                <div className="flex items-center gap-4">
+                                    <div className="h-10 w-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 font-black text-xs">
+                                        {room.room_number[0]}
+                                    </div>
+                                    <span className="font-black text-slate-900 text-sm tracking-tight">{room.room_number}</span>
                                 </div>
-                                <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex flex-col gap-2 w-32">
+                                <div className="flex justify-between text-[9px] font-black uppercase tracking-widest">
+                                  <span className="text-slate-400">{room._count.students} / {room.capacity}</span>
+                                  <span className={cn(occupancyRate >= 90 ? "text-rose-600" : "text-emerald-600")}>{Math.round(occupancyRate)}%</span>
+                                </div>
+                                <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden shadow-inner">
                                   <div 
                                     className={cn(
-                                      "h-full transition-all duration-500",
-                                      occupancyRate >= 90 ? "bg-rose-500" : "bg-emerald-500"
+                                      "h-full transition-all duration-700",
+                                      occupancyRate >= 90 ? "bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.4)]" : "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]"
                                     )} 
                                     style={{ width: `${occupancyRate}%` }}
                                   />
@@ -144,17 +177,19 @@ export default function HostelsPage() {
                               </div>
                             </TableCell>
                             <TableCell>
-                              <div className="flex -space-x-2 overflow-hidden">
+                              <div className="flex -space-x-3 overflow-hidden group-hover:space-x-1 transition-all duration-500">
                                 {room.students.map((student: any) => (
-                                  <div key={student.id} className="inline-block h-7 w-7 rounded-full ring-2 ring-white bg-slate-200 flex items-center justify-center text-[10px] font-bold" title={student.user.first_name}>
-                                    {student.user.first_name[0]}
+                                  <div key={student.id} className="inline-block h-9 w-9 rounded-xl ring-2 ring-white bg-slate-100 border border-slate-200 flex items-center justify-center text-[10px] font-black text-slate-600 shadow-sm transition-transform hover:scale-110 hover:z-10 cursor-pointer" title={`${student.user.first_name} ${student.user.last_name}`}>
+                                    {student.user.first_name[0]}{student.user.last_name[0]}
                                   </div>
                                 ))}
-                                {room.students.length === 0 && <span className="text-xs text-muted-foreground italic">Empty Room</span>}
+                                {room.students.length === 0 && <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest italic">Station Vacant</span>}
                               </div>
                             </TableCell>
-                            <TableCell className="text-right">
-                              <Button variant="ghost" size="icon" className="hover:text-primary"><ChevronRight className="h-4 w-4" /></Button>
+                            <TableCell className="text-right pr-8">
+                              <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-300 hover:text-blue-600 transition-premium">
+                                <ChevronRight className="h-5 w-5" />
+                              </Button>
                             </TableCell>
                           </TableRow>
                         );
