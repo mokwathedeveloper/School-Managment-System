@@ -128,7 +128,7 @@ export function Sidebar({ collapsed = false, onClose, onToggle }: SidebarProps) 
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
               <input 
                 placeholder="Search terminal..." 
-                className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-blue-600/10 transition-all"
+                className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-medium focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-600/10 transition-all"
               />
             </div>
           </div>
@@ -136,7 +136,7 @@ export function Sidebar({ collapsed = false, onClose, onToggle }: SidebarProps) 
       </div>
 
       {/* Primary Navigation */}
-      <nav className="flex-1 px-3 py-6 space-y-1.5 overflow-y-auto scrollbar-none">
+      <nav className="flex-1 px-3 py-6 space-y-1 overflow-y-auto scrollbar-none">
         {filteredNavigation.map((item) => {
           const isActive = pathname === item.href;
           return (
@@ -145,15 +145,15 @@ export function Sidebar({ collapsed = false, onClose, onToggle }: SidebarProps) 
               href={item.href}
               onClick={onClose}
               className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 group",
+                "flex items-center gap-3 px-3 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all duration-300 group",
                 isActive 
                   ? "bg-blue-50 text-blue-600 shadow-sm shadow-blue-600/5" 
-                  : "text-slate-500 hover:bg-slate-50 hover:text-slate-900",
+                  : "text-slate-400 hover:bg-slate-50 hover:text-slate-900",
                 collapsed && "justify-center px-0"
               )}
             >
               <item.icon className={cn(
-                "h-5 w-5 transition-transform duration-300 group-hover:scale-110",
+                "h-4 w-4 transition-transform duration-300 group-hover:scale-110",
                 isActive ? "text-blue-600" : "text-slate-400 group-hover:text-slate-600"
               )} />
               {!collapsed && (
@@ -174,7 +174,7 @@ export function Sidebar({ collapsed = false, onClose, onToggle }: SidebarProps) 
         {!collapsed ? (
           <div className="space-y-4">
             {/* User Profile Card */}
-            <div className="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm">
+            <div className="bg-white rounded-[1.5rem] p-3 border border-slate-200 shadow-sm">
               <div className="flex items-center gap-3 mb-3">
                 <div className="h-10 w-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
                   <User className="h-5 w-5" />
@@ -193,21 +193,21 @@ export function Sidebar({ collapsed = false, onClose, onToggle }: SidebarProps) 
               
               <div className="grid grid-cols-2 gap-2">
                 <Button 
-                  variant="ghost" 
+                  variant="outline" 
                   size="sm" 
                   onClick={() => router.push('/dashboard/settings')}
-                  className="h-8 rounded-lg text-[10px] font-bold uppercase tracking-tight text-slate-500 hover:bg-slate-100"
+                  className="h-8 rounded-lg text-[9px] px-2"
                 >
-                  <Settings className="mr-1.5 h-3 w-3" />
+                  <Settings className="mr-1 h-3 w-3" />
                   Settings
                 </Button>
                 <Button 
-                  variant="ghost" 
+                  variant="danger" 
                   size="sm" 
                   onClick={logout}
-                  className="h-8 rounded-lg text-[10px_font-bold] uppercase tracking-tight text-destructive hover:bg-destructive/5"
+                  className="h-8 rounded-lg text-[9px] px-2 shadow-rose-500/10"
                 >
-                  <LogOut className="mr-1.5 h-3 w-3" />
+                  <LogOut className="mr-1 h-3 w-3" />
                   Logout
                 </Button>
               </div>
@@ -228,7 +228,7 @@ export function Sidebar({ collapsed = false, onClose, onToggle }: SidebarProps) 
             <Button variant="ghost" size="icon" onClick={() => router.push('/dashboard/settings/profile')} className="rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50">
               <User className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={logout} className="rounded-xl text-slate-400 hover:text-destructive hover:bg-destructive/5">
+            <Button variant="danger" size="icon" onClick={logout} className="rounded-xl shadow-rose-500/10 h-10 w-10">
               <LogOut className="h-5 w-5" />
             </Button>
           </div>
