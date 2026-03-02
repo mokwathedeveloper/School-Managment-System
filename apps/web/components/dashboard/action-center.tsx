@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -6,9 +7,6 @@ import { Button } from '@/components/ui/button';
 import { 
   Plus, 
   Mail, 
-  FileText, 
-  UserPlus, 
-  Calendar, 
   CreditCard,
   ArrowRight,
   Sparkles,
@@ -24,7 +22,7 @@ export function ActionCenter() {
     <Card className="border-none bg-white shadow-[0_8px_30px_rgb(0,0,0,0.02)] rounded-[2.5rem] overflow-hidden group">
       <CardHeader className="p-8 pb-4">
         <div className="flex items-center gap-3 mb-1">
-            <div className="h-10 w-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center transition-premium group-hover:scale-110 group-hover:rotate-3 shadow-sm border border-blue-100">
+            <div className="h-10 w-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-sm border border-blue-100">
                 <Zap className="h-5 w-5" />
             </div>
             <div>
@@ -40,27 +38,27 @@ export function ActionCenter() {
           
           <Link href="/dashboard/finance" className="w-full">
             <Button variant="outline" className="w-full h-16 justify-start gap-4 rounded-2xl border-slate-100 px-5 group/btn">
-              <div className="h-10 w-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shadow-sm border border-emerald-100 group-hover/btn:scale-110 transition-premium">
+              <div className="h-10 w-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shadow-sm border border-emerald-100 group-hover/btn:scale-110 transition-all duration-500">
                 <CreditCard className="h-5 w-5" />
               </div>
               <div className="text-left">
                 <p className="text-xs font-black text-slate-900 leading-none">Generate Billing</p>
                 <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-1">Invoicing & Fees</p>
               </div>
-              <ArrowRight className="ml-auto h-4 w-4 text-slate-300 group-hover/btn:translate-x-1 transition-premium" />
+              <ArrowRight className="ml-auto h-4 w-4 text-slate-300 group-hover/btn:translate-x-1 transition-all duration-500" />
             </Button>
           </Link>
 
           <Link href="/dashboard/messaging" className="w-full">
             <Button variant="outline" className="w-full h-16 justify-start gap-4 rounded-2xl border-slate-100 px-5 group/btn">
-              <div className="h-10 w-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shadow-sm border border-purple-100 group-hover/btn:scale-110 transition-premium">
+              <div className="h-10 w-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shadow-sm border border-purple-100 group-hover/btn:scale-110 transition-all duration-500">
                 <Mail className="h-5 w-5" />
               </div>
               <div className="text-left">
                 <p className="text-xs font-black text-slate-900 leading-none">Broadcast Alert</p>
                 <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-1">SMS & Push</p>
               </div>
-              <ArrowRight className="ml-auto h-4 w-4 text-slate-300 group-hover/btn:translate-x-1 transition-premium" />
+              <ArrowRight className="ml-auto h-4 w-4 text-slate-300 group-hover/btn:translate-x-1 transition-all duration-500" />
             </Button>
           </Link>
         </div>
@@ -78,7 +76,7 @@ export function ActionCenter() {
             <p className="text-xs font-medium text-slate-300 leading-relaxed italic mb-6 relative z-10">
                 Automated end-of-term reporting is currently generating for 428 students across 12 academic streams.
             </p>
-            <Button variant="ghost" className="h-10 px-6 rounded-xl bg-white/10 hover:bg-white/20 text-white border-none relative z-10">
+            <Button variant="ghost" className="h-10 px-6 rounded-xl bg-white/10 hover:bg-white/20 text-white border-none relative z-10 active:scale-100 font-bold">
                 Review Status <ArrowRight className="ml-2 h-3 w-3" />
             </Button>
         </div>
