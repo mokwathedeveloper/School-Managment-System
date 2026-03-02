@@ -20,11 +20,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-    setIsLoading(false);
+    const verifyAuth = async () => {
+      const savedUser = localStorage.getItem('user');
+      const token = Cookies.get('access_token');
+      
+      if (token && savedUser) {
+        try {
+          // If we have a token, we should verify it with the backend
+          // Assuming an endpoint that returns the current user context
+          const response = await apiClient.get('/auth/me');
+          setUser(response.data);
+          localStorage.setItem('user', JSON.stringify(response.data));
+        } catch (error) {
+          console.error('Session validation failed:', error);
+          // If validation fails (e.g., token expired), clear everything
+          logout();
+        }
+      } else {
+        setUser(null);
+      }
+      setIsLoading(false);
+    };
+
+    verifyAuth();
   }, []);
 
   const login = async (credentials: any) => {
