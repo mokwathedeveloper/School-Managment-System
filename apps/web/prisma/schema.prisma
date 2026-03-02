@@ -22,8 +22,11 @@ model School {
   email       String?
   website     String?
   mpesa_paybill String? // For payment integration
+  
+  // Audit & Soft Delete
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
+  deleted_at  DateTime?
 
   users       User[]
   students    Student[]
@@ -58,6 +61,10 @@ model School {
   resources          Resource[]
   alumni             Alumnus[]
   expenses           Expense[]
+  notifications      Notification[]
+  integrations       Integration[]
+  announcements      Announcement[]
+  leave_requests     LeaveRequest[]
 
   @@map("schools")
 }
@@ -73,6 +80,10 @@ model AcademicYear {
 
   terms       Term[]
 
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  deleted_at  DateTime?
+
   @@index([school_id])
   @@map("academic_years")
 }
@@ -85,6 +96,10 @@ model Room {
   capacity    Int?
 
   slots       TimetableSlot[]
+
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  deleted_at  DateTime?
 
   @@index([school_id])
   @@map("rooms")
@@ -111,6 +126,10 @@ model TimetableSlot {
   start_time  String   // HH:mm (e.g. "08:00")
   end_time    String   // HH:mm (e.g. "09:00")
 
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@index([school_id, class_id])
   @@map("timetable_slots")
 }
 
@@ -122,6 +141,9 @@ model GradingSystem {
   
   grades      GradeBoundary[]
   exams       Exam[]
+
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
   @@index([school_id])
   @@map("grading_systems")
@@ -145,12 +167,21 @@ model GradeBoundary {
 // --------------------------------------------------------
 
 enum Role {
-  SUPER_ADMIN // Platform owner
-  SCHOOL_ADMIN // Principal/Admin
+  SUPER_ADMIN
+  SCHOOL_ADMIN
+  HEAD_TEACHER
+  DEPUTY_HEAD_TEACHER
   TEACHER
+  CLASS_TEACHER
+  LIBRARIAN
+  NURSE
+  MATRON
+  SECURITY
+  DRIVER
+  SUBORDINATE
+  ACCOUNTANT
   PARENT
   STUDENT
-  ACCOUNTANT
 }
 
 model User {
@@ -170,11 +201,14 @@ model User {
   student     Student?
   parent      Parent?
   staff       Staff?
+  notifications Notification[]
 
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
+  deleted_at  DateTime?
 
   @@index([school_id])
+  @@index([email])
   @@map("users")
 }
 
@@ -211,12 +245,16 @@ model Student {
   dorm_room       DormRoom? @relation(fields: [dorm_room_id], references: [id])
   discipline_records DisciplineRecord[]
   medical_record     MedicalRecord?
+  submissions        Submission[]
 
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt
+  deleted_at      DateTime?
 
   @@unique([school_id, admission_no]) // Unique admission number per school
-  @@index([school_id])
+  @@index([school_id, admission_no])
+  @@index([class_id])
+  @@index([parent_id])
   @@map("students")
 }
 
@@ -231,6 +269,7 @@ model Parent {
   
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
+  deleted_at  DateTime?
 
   @@index([school_id])
   @@map("parents")
@@ -258,9 +297,11 @@ model Staff {
   reported_discipline DisciplineRecord[]
   clinic_visits       ClinicVisit[]
   recorded_expenses   Expense[] @relation("RecordedExpenses")
+  graded_submissions  Submission[]
 
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
+  deleted_at  DateTime?
 
   @@index([school_id])
   @@map("staff")
@@ -281,12 +322,19 @@ model PayrollRecord {
   status      String   @default("DRAFT") // DRAFT, PAID
   paid_at     DateTime?
 
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
   @@unique([staff_id, month, year])
+  @@index([school_id, month, year])
   @@map("payroll_records")
 }
 
 model LeaveRequest {
   id          String   @id @default(uuid())
+  school_id   String
+  school      School   @relation(fields: [school_id], references: [id])
+  
   staff_id    String
   staff       Staff    @relation(fields: [staff_id], references: [id])
   
@@ -297,6 +345,9 @@ model LeaveRequest {
   reason      String?
 
   created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@index([staff_id])
   @@map("leave_requests")
 }
 
@@ -322,6 +373,7 @@ model Asset {
 
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
+  deleted_at  DateTime?
 
   @@index([school_id])
   @@map("assets")
@@ -338,7 +390,9 @@ model StockItem {
   min_quantity Int     @default(5) // For low-stock alerts
   unit        String   // e.g. "Reams", "Boxes"
 
+  created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
+  deleted_at  DateTime?
 
   @@index([school_id])
   @@map("stock_items")
@@ -357,6 +411,9 @@ model Book {
   copies      BookCopy[]
 
   created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  deleted_at  DateTime?
+
   @@index([school_id])
   @@map("books")
 }
@@ -370,6 +427,9 @@ model BookCopy {
   status      String   @default("AVAILABLE") // AVAILABLE, BORROWED, LOST
   
   borrow_records BorrowRecord[]
+
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
   @@map("book_copies")
 }
@@ -387,6 +447,11 @@ model BorrowRecord {
   return_date DateTime?
   status      String   @default("BORROWED") // BORROWED, RETURNED, OVERDUE
 
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@index([student_id])
+  @@index([copy_id])
   @@map("borrow_records")
 }
 
@@ -396,11 +461,15 @@ model TransportRoute {
   school      School   @relation(fields: [school_id], references: [id])
   
   name        String   // e.g. "Westlands - Route A"
-  cost        Decimal  @db.Decimal(10, 2)
-  stops       String?  // Comma-separated stops
+  fee         Decimal  @db.Decimal(10, 2)
+  description String?
 
   vehicles    Vehicle[]
   students    Student[]
+
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  deleted_at  DateTime?
 
   @@index([school_id])
   @@map("transport_routes")
@@ -411,14 +480,18 @@ model Vehicle {
   school_id   String
   school      School   @relation(fields: [school_id], references: [id])
   
-  reg_number  String   @unique
-  capacity    Int
+  plate_number String   @unique
+  model        String?
+  capacity     Int
   
   driver_id   String?
   driver      Staff?   @relation(fields: [driver_id], references: [id])
   
   route_id    String?
   route       TransportRoute? @relation(fields: [route_id], references: [id])
+
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
   @@index([school_id])
   @@map("vehicles")
@@ -435,6 +508,10 @@ model Hostel {
 
   rooms       DormRoom[]
 
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  deleted_at  DateTime?
+
   @@index([school_id])
   @@map("hostels")
 }
@@ -449,6 +526,10 @@ model DormRoom {
   
   students    Student[]
 
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@index([hostel_id])
   @@map("dorm_rooms")
 }
 
@@ -477,8 +558,9 @@ model DisciplineRecord {
   
   incident_date DateTime @default(now())
   created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
 
-  @@index([school_id])
+  @@index([school_id, student_id])
   @@map("discipline_records")
 }
 
@@ -495,6 +577,8 @@ model Visitor {
   visits      VisitRecord[]
 
   created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
   @@index([school_id])
   @@map("visitors")
 }
@@ -512,6 +596,7 @@ model VisitRecord {
   
   status      String   @default("IN_CAMPUS") // IN_CAMPUS, CHECKED_OUT
 
+  @@index([visitor_id])
   @@map("visit_records")
 }
 
@@ -527,6 +612,7 @@ model MedicalRecord {
   
   visits      ClinicVisit[]
 
+  created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
   @@map("medical_records")
 }
@@ -548,6 +634,9 @@ model ClinicVisit {
   attended_by_id String?
   attended_by    Staff? @relation(fields: [attended_by_id], references: [id])
 
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
   @@index([school_id])
   @@map("clinic_visits")
 }
@@ -567,9 +656,39 @@ model Assignment {
   description String?
   due_date    DateTime
   
+  submissions Submission[]
+
   created_at  DateTime @default(now())
-  @@index([school_id])
+  updated_at  DateTime @updatedAt
+  deleted_at  DateTime?
+
+  @@index([school_id, class_id])
   @@map("assignments")
+}
+
+model Submission {
+  id            String      @id @default(uuid())
+  assignment_id String
+  assignment    Assignment  @relation(fields: [assignment_id], references: [id])
+  
+  student_id    String
+  student       Student     @relation(fields: [student_id], references: [id])
+  
+  content       String?     // Text submission
+  file_url      String?     // File upload link
+  
+  status        String      @default("SUBMITTED") // SUBMITTED, GRADED, LATE
+  
+  grade         Float?
+  feedback      String?
+  graded_by_id  String?
+  graded_by     Staff?      @relation(fields: [graded_by_id], references: [id])
+  
+  submitted_at  DateTime    @default(now())
+  updated_at    DateTime    @updatedAt
+
+  @@unique([assignment_id, student_id])
+  @@map("submissions")
 }
 
 model Resource {
@@ -585,6 +704,9 @@ model Resource {
   subject     Subject? @relation(fields: [subject_id], references: [id])
 
   created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  deleted_at  DateTime?
+
   @@index([school_id])
   @@map("resources")
 }
@@ -608,6 +730,7 @@ model Alumnus {
 
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
+  deleted_at  DateTime?
 
   @@index([school_id])
   @@map("alumni")
@@ -630,6 +753,9 @@ model Expense {
   notes       String?
 
   created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  deleted_at  DateTime?
+
   @@index([school_id])
   @@map("expenses")
 }
@@ -656,6 +782,7 @@ model CalendarEvent {
 
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
+  deleted_at  DateTime?
 
   @@index([school_id])
   @@map("calendar_events")
@@ -682,6 +809,10 @@ model Term {
   classes     Class[] 
   fee_structures FeeStructure[]
 
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  deleted_at  DateTime?
+
   @@index([school_id])
   @@map("terms")
 }
@@ -696,6 +827,10 @@ model GradeLevel {
   classes     Class[]
   fee_structures FeeStructure[]
   admission_applications AdmissionApplication[]
+
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  deleted_at  DateTime?
 
   @@index([school_id])
   @@map("grade_levels")
@@ -723,7 +858,11 @@ model Class {
   timetable_slots TimetableSlot[]
   assignments     Assignment[]
 
-  @@index([school_id])
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  deleted_at  DateTime?
+
+  @@index([school_id, grade_id])
   @@map("classes")
 }
 
@@ -740,6 +879,10 @@ model Subject {
   timetable_slots TimetableSlot[]
   assignments     Assignment[]
   resources       Resource[]
+
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  deleted_at  DateTime?
 
   @@index([school_id])
   @@map("subjects")
@@ -767,7 +910,11 @@ model Exam {
 
   results     Result[]
 
-  @@index([school_id])
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  deleted_at  DateTime?
+
+  @@index([school_id, term_id])
   @@map("exams")
 }
 
@@ -786,6 +933,7 @@ model Result {
   updated_at  DateTime @updatedAt
 
   @@unique([exam_id, student_id])
+  @@index([student_id])
   @@map("results")
 }
 
@@ -827,6 +975,7 @@ model AdmissionApplication {
   
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt
+  deleted_at      DateTime?
 
   @@index([school_id])
   @@map("admission_applications")
@@ -846,8 +995,12 @@ model Attendance {
   status      AttendanceStatus
   remarks     String?
 
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
   @@unique([student_id, date]) // One record per student per day
   @@index([school_id, date])
+  @@index([class_id, date])
   @@map("attendance")
 }
 
@@ -883,8 +1036,10 @@ model FeeStructure {
   
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
+  deleted_at  DateTime?
 
   @@unique([grade_id, term_id])
+  @@index([school_id])
   @@map("fee_structures")
 }
 
@@ -896,6 +1051,9 @@ model FeeItem {
   name        String   // e.g., "Tuition", "Transport", "Activity"
   amount      Decimal  @db.Decimal(10, 2)
   is_optional Boolean  @default(false)
+
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
   @@map("fee_items")
 }
@@ -918,8 +1076,9 @@ model Invoice {
   
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
+  deleted_at  DateTime?
 
-  @@index([school_id])
+  @@index([school_id, student_id])
   @@map("invoices")
 }
 
@@ -941,8 +1100,10 @@ model Payment {
   invoice     Invoice? @relation(fields: [invoice_id], references: [id])
   
   created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
   @@index([school_id])
+  @@index([invoice_id])
   @@map("payments")
 }
 
@@ -960,6 +1121,78 @@ model LedgerEntry {
   
   reference_id String? // Link to Invoice ID or Payment ID
 
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
   @@index([school_id])
   @@map("ledger_entries")
+}
+
+// --------------------------------------------------------
+// NOTIFICATIONS
+// --------------------------------------------------------
+
+enum NotificationType {
+  SYSTEM
+  ACADEMIC
+  FINANCE
+  ATTENDANCE
+  DISCIPLINE
+}
+
+model Notification {
+  id          String   @id @default(uuid())
+  school_id   String
+  school      School   @relation(fields: [school_id], references: [id])
+  
+  user_id     String
+  user        User     @relation(fields: [user_id], references: [id])
+  
+  title       String
+  message     String
+  type        NotificationType @default(SYSTEM)
+  is_read     Boolean  @default(false)
+  
+  link        String?  // Optional link to redirect user
+  
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@index([school_id, user_id])
+  @@map("notifications")
+}
+
+model Integration {
+  id          String   @id @default(uuid())
+  school_id   String
+  school      School   @relation(fields: [school_id], references: [id])
+  
+  provider    String   // GOOGLE, ZOOM
+  access_token String
+  refresh_token String?
+  expires_at  DateTime?
+  
+  config      Json?    // Provider specific config
+  
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@unique([school_id, provider])
+  @@map("integrations")
+}
+
+model Announcement {
+  id          String   @id @default(uuid())
+  school_id   String
+  school      School   @relation(fields: [school_id], references: [id])
+  
+  title       String
+  content     String
+  target_role String   // e.g. "STUDENT", "PARENT", "STAFF", "ALL"
+  
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@index([school_id, target_role])
+  @@map("announcements")
 }
