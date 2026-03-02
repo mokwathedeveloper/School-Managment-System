@@ -11,15 +11,26 @@ export function Providers({ children }: { children: React.ReactNode }) {
     defaultOptions: {
       queries: {
         staleTime: 60 * 1000,
-        retry: 1, // Minimize noise on network flickers
+        retry: 1,
         refetchOnWindowFocus: false,
       },
     },
-    // Global error handling for all queries and mutations
     queryCache: new QueryCache({
       onError: (error: any) => {
         const message = error.response?.data?.message || error.message || "An unexpected error occurred.";
-        toast.error(`Operation Failed: ${message}`);
+        toast.error(`Terminal Error: ${message}`, {
+            style: {
+                borderRadius: '16px',
+                background: '#fff',
+                color: '#0f172a',
+                fontSize: '12px',
+                fontWeight: 'bold',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                border: '1px solid #f1f5f9',
+                boxShadow: '0 20px 40px rgba(0,0,0,0.05)'
+            }
+        });
       },
     }),
   }));

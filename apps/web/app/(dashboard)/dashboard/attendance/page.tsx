@@ -28,6 +28,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
+import { PremiumLoader } from '@/components/ui/premium-loader';
 
 export default function AttendancePage() {
   const queryClient = useQueryClient();
@@ -93,7 +94,7 @@ export default function AttendancePage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['attendance', selectedClassId, selectedDate] });
-      toast.success('Institutional attendance records have been updated and synchronized successfully.');
+      toast.success('Institutional attendance records synchronized successfully.');
     },
   });
 
@@ -123,31 +124,34 @@ export default function AttendancePage() {
   );
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
+    <div className="space-y-8 animate-in fade-in duration-700">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Daily Attendance</h1>
-          <p className="text-muted-foreground mt-1 text-lg">Record and monitor daily student presence.</p>
+          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
+            <UserCheck className="h-8 w-8 text-blue-600" />
+            Daily Attendance
+          </h1>
+          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1 text-lg">Student Presence Terminal</p>
         </div>
         <div className="flex items-center gap-3">
-           <div className="bg-card border rounded-lg p-1 flex items-center shadow-sm">
-             <Button variant="ghost" size="icon" onClick={() => {
+           <div className="bg-white border-2 border-slate-100 rounded-2xl p-1 flex items-center shadow-sm">
+             <Button variant="ghost" size="icon" className="rounded-xl" onClick={() => {
                 const d = new Date(selectedDate);
                 d.setDate(d.getDate() - 1);
                 setSelectedDate(d.toISOString().split('T')[0]);
              }}>
                <ChevronLeft className="h-4 w-4" />
              </Button>
-             <div className="px-3 flex items-center gap-2 text-sm font-medium">
-               <CalendarIcon className="h-4 w-4 text-primary" />
+             <div className="px-4 flex items-center gap-3 text-sm font-black text-slate-900 uppercase tracking-tighter">
+               <CalendarIcon className="h-4 w-4 text-blue-600" />
                <input 
                 type="date" 
-                className="bg-transparent border-none focus:ring-0 p-0 text-sm font-medium" 
+                className="bg-transparent border-none focus:ring-0 p-0 text-sm font-black" 
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
                />
              </div>
-             <Button variant="ghost" size="icon" onClick={() => {
+             <Button variant="ghost" size="icon" className="rounded-xl" onClick={() => {
                 const d = new Date(selectedDate);
                 d.setDate(d.getDate() + 1);
                 setSelectedDate(d.toISOString().split('T')[0]);
@@ -158,125 +162,129 @@ export default function AttendancePage() {
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-4">
-        <Card className="md:col-span-1 shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-lg">Class Filter</CardTitle>
-            <CardDescription>Select a class to begin.</CardDescription>
+      <div className="grid gap-8 md:grid-cols-4">
+        <Card className="md:col-span-1 border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2rem] overflow-hidden">
+          <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-6">
+            <CardTitle className="text-sm font-black uppercase tracking-widest text-slate-400">Class Selection</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              {classes?.map((cls: any) => (
-                <button
-                  key={cls.id}
-                  onClick={() => setSelectedClassId(cls.id)}
-                  className={cn(
-                    "w-full text-left px-4 py-3 rounded-xl border transition-all duration-200 group",
-                    selectedClassId === cls.id 
-                      ? "bg-primary border-primary text-primary-foreground shadow-md ring-2 ring-primary/20 ring-offset-2" 
-                      : "bg-background hover:bg-muted/50 hover:border-primary/30"
-                  )}
-                >
-                  <div className="font-bold flex items-center justify-between">
-                    {cls.grade?.name} {cls.name}
-                    <Badge variant={selectedClassId === cls.id ? "secondary" : "outline"} className="ml-2">
-                      {cls._count?.students}
-                    </Badge>
-                  </div>
-                  <p className={cn(
-                    "text-xs mt-1",
-                    selectedClassId === cls.id ? "text-primary-foreground/80" : "text-muted-foreground"
+          <CardContent className="p-4 space-y-2">
+            {classes?.map((cls: any) => (
+              <button
+                key={cls.id}
+                onClick={() => setSelectedClassId(cls.id)}
+                className={cn(
+                  "w-full text-left px-5 py-4 rounded-2xl border-2 transition-all duration-300 group",
+                  selectedClassId === cls.id 
+                    ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-600/20 scale-[1.02]" 
+                    : "bg-white border-slate-50 hover:border-blue-100 hover:bg-slate-50"
+                )}
+              >
+                <div className="font-black flex items-center justify-between text-sm tracking-tight">
+                  {cls.grade?.name} {cls.name}
+                  <Badge variant={selectedClassId === cls.id ? "secondary" : "outline"} className={cn(
+                      "font-black text-[10px]",
+                      selectedClassId === cls.id ? "bg-white/20 text-white border-none" : "text-slate-400"
                   )}>
-                    {cls.form_teacher?.user?.first_name} {cls.form_teacher?.user?.last_name}
-                  </p>
-                </button>
-              ))}
-            </div>
+                    {cls._count?.students}
+                  </Badge>
+                </div>
+                <p className={cn(
+                  "text-[10px] font-bold uppercase tracking-widest mt-1",
+                  selectedClassId === cls.id ? "text-blue-100" : "text-slate-400"
+                )}>
+                  {cls.form_teacher?.user?.first_name} {cls.form_teacher?.user?.last_name}
+                </p>
+              </button>
+            ))}
           </CardContent>
         </Card>
 
-        <Card className="md:col-span-3 shadow-sm overflow-hidden">
-          <CardHeader className="border-b bg-muted/10">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="relative w-full max-w-sm">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Card className="md:col-span-3 border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2.5rem] overflow-hidden">
+          <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-6">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div className="relative w-full max-w-sm group">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
                 <Input 
                   placeholder="Search students..." 
-                  className="pl-10" 
+                  className="pl-12 h-12 rounded-2xl border-2 border-slate-100 bg-white focus:ring-blue-600/10 font-bold" 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={markAllPresent}>
+                <Button variant="outline" className="rounded-xl font-black uppercase tracking-widest text-[10px] h-12 px-6" onClick={markAllPresent}>
                   <UserCheck className="h-4 w-4 mr-2" />
                   Mark All Present
                 </Button>
                 <Button 
-                  size="sm" 
                   onClick={handleSave} 
                   disabled={markMutation.isPending || !selectedClassId}
-                  className="shadow-sm"
+                  className="rounded-xl font-black uppercase tracking-widest text-[10px] h-12 px-8 shadow-lg shadow-primary/20"
                 >
                   {markMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                  Save Attendance
+                  Save Records
                 </Button>
               </div>
             </div>
           </CardHeader>
           <CardContent className="p-0">
             {!selectedClassId ? (
-              <div className="h-96 flex flex-col items-center justify-center text-muted-foreground">
-                <CalendarIcon className="h-12 w-12 opacity-10 mb-4" />
-                <p>Select a class to mark attendance.</p>
+              <div className="h-[500px] flex flex-col items-center justify-center text-center p-12">
+                <div className="h-20 w-20 rounded-[2rem] bg-slate-50 flex items-center justify-center mb-6 border border-slate-100">
+                    <CalendarIcon className="h-10 w-10 text-slate-200" />
+                </div>
+                <h3 className="text-xl font-black text-slate-900 tracking-tight mb-2">Registry Inactive</h3>
+                <p className="text-sm font-bold text-slate-400 max-w-xs uppercase tracking-widest leading-relaxed">
+                    Select a class from the left sidebar to initialize the attendance terminal.
+                </p>
               </div>
             ) : loadingStudents ? (
-              <div className="h-96 flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <div className="h-[500px] flex items-center justify-center">
+                <PremiumLoader message="Syncing Registry Data" />
               </div>
             ) : (
               <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted/30">
-                    <TableHead className="w-[120px]">Adm No</TableHead>
-                    <TableHead>Student Name</TableHead>
-                    <TableHead className="text-center">Status</TableHead>
-                    <TableHead className="w-[200px] text-right">Actions</TableHead>
+                <TableHeader className="bg-slate-50/30">
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead className="pl-8 py-4 font-black uppercase tracking-widest text-[10px] text-slate-400 w-[150px]">Admission No</TableHead>
+                    <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Student Identity</TableHead>
+                    <TableHead className="text-center font-black uppercase tracking-widest text-[10px] text-slate-400">Current Status</TableHead>
+                    <TableHead className="pr-8 font-black uppercase tracking-widest text-[10px] text-slate-400 text-right">Terminal Controls</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredStudents?.map((student: any) => (
-                    <TableRow key={student.id} className="group hover:bg-muted/20 transition-colors">
-                      <TableCell className="font-mono text-xs font-semibold">{student.admission_no}</TableCell>
+                    <TableRow key={student.id} className="group hover:bg-slate-50/50 transition-colors border-b-slate-50">
+                      <TableCell className="pl-8 py-5 font-black text-blue-600 text-xs tracking-tighter">{student.admission_no}</TableCell>
                       <TableCell>
-                        <div className="font-medium">{student.user.first_name} {student.user.last_name}</div>
+                        <div className="font-black text-slate-900 text-sm">{student.user.first_name} {student.user.last_name}</div>
                       </TableCell>
                       <TableCell className="text-center">
                         {attendanceState[student.id] ? (
                           <Badge 
                             variant="secondary"
                             className={cn(
-                              "font-bold px-3 py-1",
-                              attendanceState[student.id] === 'PRESENT' && "bg-green-100 text-green-700 hover:bg-green-100",
-                              attendanceState[student.id] === 'ABSENT' && "bg-red-100 text-red-700 hover:bg-red-100",
-                              attendanceState[student.id] === 'LATE' && "bg-yellow-100 text-yellow-700 hover:bg-yellow-100",
-                              attendanceState[student.id] === 'EXCUSED' && "bg-blue-100 text-blue-700 hover:bg-blue-100",
+                              "font-black text-[10px] uppercase tracking-widest px-3 py-1 rounded-lg shadow-sm border-none",
+                              attendanceState[student.id] === 'PRESENT' && "bg-emerald-50 text-emerald-600",
+                              attendanceState[student.id] === 'ABSENT' && "bg-rose-50 text-rose-600",
+                              attendanceState[student.id] === 'LATE' && "bg-amber-50 text-amber-600",
+                              attendanceState[student.id] === 'EXCUSED' && "bg-blue-50 text-blue-600",
                             )}
                           >
                             {attendanceState[student.id]}
                           </Badge>
                         ) : (
-                          <span className="text-xs text-muted-foreground italic">Not marked</span>
+                          <div className="h-6 w-24 bg-slate-50 rounded-full mx-auto border border-dashed border-slate-200" />
                         )}
                       </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <TableCell className="text-right pr-8">
+                        <div className="flex items-center justify-end gap-2 opacity-40 group-hover:opacity-100 transition-all duration-300">
                           <Button 
                             variant="ghost" 
                             size="icon" 
                             className={cn(
-                              "h-9 w-9 rounded-full",
-                              attendanceState[student.id] === 'PRESENT' ? "bg-green-500 text-white hover:bg-green-600" : "hover:bg-green-100 text-green-600"
+                              "h-10 w-10 rounded-xl transition-all active:scale-90",
+                              attendanceState[student.id] === 'PRESENT' ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20" : "hover:bg-emerald-50 text-emerald-600"
                             )}
                             onClick={() => handleStatusChange(student.id, 'PRESENT')}
                           >
@@ -286,8 +294,8 @@ export default function AttendancePage() {
                             variant="ghost" 
                             size="icon" 
                             className={cn(
-                              "h-9 w-9 rounded-full",
-                              attendanceState[student.id] === 'ABSENT' ? "bg-red-500 text-white hover:bg-red-600" : "hover:bg-red-100 text-red-600"
+                              "h-10 w-10 rounded-xl transition-all active:scale-90",
+                              attendanceState[student.id] === 'ABSENT' ? "bg-rose-500 text-white shadow-lg shadow-rose-500/20" : "hover:bg-rose-50 text-rose-600"
                             )}
                             onClick={() => handleStatusChange(student.id, 'ABSENT')}
                           >
@@ -297,8 +305,8 @@ export default function AttendancePage() {
                             variant="ghost" 
                             size="icon" 
                             className={cn(
-                              "h-9 w-9 rounded-full",
-                              attendanceState[student.id] === 'LATE' ? "bg-yellow-500 text-white hover:bg-yellow-600" : "hover:bg-yellow-100 text-yellow-600"
+                              "h-10 w-10 rounded-xl transition-all active:scale-90",
+                              attendanceState[student.id] === 'LATE' ? "bg-amber-500 text-white shadow-lg shadow-amber-500/20" : "hover:bg-amber-50 text-amber-600"
                             )}
                             onClick={() => handleStatusChange(student.id, 'LATE')}
                           >

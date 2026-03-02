@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -12,6 +13,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'react-hot-toast';
+import { PremiumLoader } from '@/components/ui/premium-loader';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
@@ -40,20 +42,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }, []);
 
   if (isLoading || !user) {
-    return (
-      <div className="h-screen w-full flex items-center justify-center bg-white">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-xl animate-pulse">
-            <Building2 className="h-6 w-6" />
-          </div>
-          <Loader2 className="h-5 w-5 animate-spin text-slate-300" />
-        </div>
-      </div>
-    );
+    return <PremiumLoader fullScreen message="Authenticating Session" />;
   }
 
   return (
-    <div className="flex min-h-screen bg-[#fafafa] selection:bg-blue-600 selection:text-white antialiased overflow-hidden">
+    <div className="flex min-h-screen bg-[#fafafa] selection:bg-blue-600 selection:text-white antialiased overflow-hidden organic-grain">
       
       {/* Mobile Toggle Button - Only visible when sidebar is closed on mobile */}
       {!isSidebarOpen && (
@@ -61,7 +54,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           variant="ghost" 
           size="icon" 
           onClick={() => setIsSidebarOpen(true)}
-          className="fixed top-4 left-4 z-30 lg:hidden rounded-xl bg-white shadow-md border border-slate-200"
+          className="fixed top-4 left-4 z-30 lg:hidden rounded-xl bg-white/80 backdrop-blur-xl shadow-lg border border-slate-200 transition-premium hover:scale-105 active:scale-95"
         >
           <Menu className="h-5 w-5 text-slate-500" />
         </Button>
@@ -70,14 +63,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Mobile Backdrop Overlay */}
       {isSidebarOpen && (
         <div 
-          className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-30 lg:hidden transition-opacity duration-500"
+          className="fixed inset-0 bg-slate-900/10 backdrop-blur-md z-30 lg:hidden transition-premium"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
       {/* Collapsible Sidebar */}
       <aside className={cn(
-        "fixed inset-y-0 left-0 z-40 bg-white border-r border-slate-200/60 transition-all duration-500 ease-in-out lg:translate-x-0 shadow-[4px_0_24px_rgba(0,0,0,0.02)]",
+        "fixed inset-y-0 left-0 z-40 bg-white border-r border-slate-200/60 transition-premium lg:translate-x-0 shadow-[8px_0_32px_rgba(0,0,0,0.02)]",
         isSidebarOpen ? "w-72 translate-x-0" : "w-[80px] -translate-x-full lg:translate-x-0",
       )}>
         <Sidebar 
@@ -89,7 +82,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Main Content Area */}
       <div className={cn(
-        "flex-1 flex flex-col min-w-0 transition-all duration-500 ease-in-out",
+        "flex-1 flex flex-col min-w-0 transition-premium",
         isSidebarOpen ? "lg:pl-72" : "lg:pl-[80px]"
       )}>
         
@@ -100,7 +93,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
           {/* Premium Dashboard Footer */}
           <footer className="max-w-7xl mx-auto w-full mt-24 pb-12 border-t border-slate-200/60 pt-12">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 items-start opacity-60 hover:opacity-100 transition-opacity duration-500">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 items-start opacity-40 hover:opacity-100 transition-premium">
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
                   <div className="h-6 w-6 rounded-lg bg-slate-900 flex items-center justify-center text-white">

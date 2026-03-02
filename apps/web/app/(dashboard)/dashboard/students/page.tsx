@@ -1,10 +1,21 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import apiClient from '@/lib/api-client';
 import Link from 'next/link';
-import { toast } from 'react-hot-toast';
+import { 
+  Users, 
+  Plus, 
+  Search, 
+  Filter, 
+  MoreHorizontal, 
+  GraduationCap, 
+  Mail, 
+  Phone,
+  ChevronRight,
+  Download
+} from 'lucide-react';
 import { 
   Table, 
   TableBody, 
@@ -16,43 +27,39 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { BulkImportDialog } from '@/components/dashboard/bulk-import-dialog';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AddStudentDialog } from '@/components/dashboard/add-student-dialog';
-import { 
-  Plus, 
-  Search, 
-  MoreVertical, 
-  Filter, 
-  Download,
-  GraduationCap,
-  Loader2
-} from 'lucide-react';
+import { BulkImportDialog } from '@/components/dashboard/bulk-import-dialog';
+import { PremiumLoader } from '@/components/ui/premium-loader';
+import { cn } from '@/lib/utils';
 
 export default function StudentsPage() {
-  const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [skip, setSkip] = useState(0);
   const take = 10;
 
-  const { data, isLoading, refetch } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['students', search, skip],
     queryFn: async () => {
-      const response = await apiClient.get('/students', {
-        params: { search, skip, take }
-      });
-      return response.data;
+      const res = await apiClient.get(`/students?search=${search}&skip=${skip}&take=${take}`);
+      return res.data;
     },
   });
+
+  if (isLoading) return <PremiumLoader message="Syncing Student Registry" />;
 
   const students = data?.items || [];
   const total = data?.total || 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-in fade-in duration-700">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Student Enrollment</h1>
-          <p className="text-muted-foreground mt-1">Manage and track all students in your institution.</p>
+          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
+            <Users className="h-8 w-8 text-blue-600" />
+            Student Directory
+          </h1>
+          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Registry Management & Enrollment</p>
         </div>
         <div className="flex items-center gap-3">
           <BulkImportDialog />
@@ -60,107 +67,136 @@ export default function StudentsPage() {
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-card p-4 rounded-xl border shadow-sm">
-        <div className="relative w-full md:max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input 
-            placeholder="Search by name or admission number..." 
-            className="pl-10"
-            value={search}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
-          />
-        </div>
-        <div className="flex items-center gap-2 w-full md:w-auto">
-          <Button variant="outline" size="sm" className="w-full md:w-auto" onClick={() => setSearch('')}>
-            <Filter className="mr-2 h-4 w-4" />
-            Clear Filters
-          </Button>
-        </div>
-      </div>
-
-      <div className="bg-card rounded-xl border shadow-sm overflow-hidden">
-        <Table>
-          <TableHeader className="bg-muted/30">
-            <TableRow>
-              <TableHead className="w-[100px]">Adm No</TableHead>
-              <TableHead>Student Name</TableHead>
-              <TableHead>Class</TableHead>
-              <TableHead>Gender</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center">
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                    Loading students...
-                  </div>
-                </TableCell>
+      <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2.5rem] overflow-hidden">
+        <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="relative w-full max-w-md group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+              <Input 
+                placeholder="Search by name or admission number..." 
+                className="pl-12 h-12 rounded-2xl border-2 border-slate-100 bg-white focus:ring-blue-600/10 font-bold"
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setSkip(0);
+                }}
+              />
+            </div>
+            <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" className="rounded-xl font-bold uppercase tracking-tighter text-[10px]">
+                    <Filter className="h-3 w-3 mr-2" />
+                    Filters
+                </Button>
+                <Button variant="outline" size="sm" className="rounded-xl font-bold uppercase tracking-tighter text-[10px]">
+                    <Download className="h-3 w-3 mr-2" />
+                    Export
+                </Button>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader className="bg-slate-50/30">
+              <TableRow className="hover:bg-transparent">
+                <TableHead className="pl-8 py-4 font-black uppercase tracking-widest text-[10px] text-slate-400">Student Identity</TableHead>
+                <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Class/Level</TableHead>
+                <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Parental Context</TableHead>
+                <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Status</TableHead>
+                <TableHead className="text-right pr-8 font-black uppercase tracking-widest text-[10px] text-slate-400">Actions</TableHead>
               </TableRow>
-            ) : students.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
-                  No students found.
-                </TableCell>
-              </TableRow>
-            ) : (
-              students.map((student: any) => (
-                <TableRow key={student.id} className="hover:bg-muted/20 transition-colors">
-                  <TableCell className="font-bold text-primary">{student.admission_no}</TableCell>
-                  <TableCell>
-                    <Link href={`/dashboard/students/${student.id}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold">
-                        {student.user.first_name[0]}{student.user.last_name[0]}
-                      </div>
-                      <div>
-                        <p className="font-medium">{student.user.first_name} {student.user.last_name}</p>
-                        <p className="text-xs text-muted-foreground">{student.user.email}</p>
-                      </div>
-                    </Link>
-                  </TableCell>
-                  <TableCell>{student.class?.name || 'Unassigned'}</TableCell>
-                  <TableCell className="capitalize">{student.gender || '—'}</TableCell>
-                  <TableCell>
-                    <Badge variant="success">Active</Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="icon">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
+            </TableHeader>
+            <TableBody>
+              {students.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="h-64 text-center">
+                    <div className="flex flex-col items-center gap-2 text-slate-300">
+                        <Users className="h-12 w-12 opacity-20" />
+                        <p className="font-black uppercase tracking-widest text-xs">No Records Found</p>
+                    </div>
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-
-        <div className="flex items-center justify-between p-4 border-t bg-muted/10">
-          <p className="text-sm text-muted-foreground">
-            Showing <span className="font-medium">{students.length}</span> of <span className="font-medium">{total}</span> students
-          </p>
-          <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              disabled={skip === 0}
-              onClick={() => setSkip(Math.max(0, skip - take))}
-            >
-              Previous
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm"
-              disabled={skip + take >= total}
-              onClick={() => setSkip(skip + take)}
-            >
-              Next
-            </Button>
+              ) : (
+                students.map((student: any) => (
+                  <TableRow key={student.id} className="group hover:bg-slate-50/50 transition-colors border-b-slate-50">
+                    <TableCell className="pl-8 py-5">
+                      <div className="flex items-center gap-4">
+                        <div className="h-12 w-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shadow-sm transition-premium group-hover:scale-110 group-hover:rotate-3">
+                          <span className="font-black text-xs">{student.user.first_name[0]}{student.user.last_name[0]}</span>
+                        </div>
+                        <div>
+                          <p className="font-black text-slate-900 leading-none mb-1">{student.user.first_name} {student.user.last_name}</p>
+                          <p className="text-[10px] font-bold text-blue-600 uppercase tracking-tighter">{student.admission_no}</p>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col">
+                        <span className="font-bold text-slate-700 text-sm">{student.class?.grade?.name} {student.class?.name}</span>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Stream</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2 text-xs font-medium text-slate-600">
+                          <Mail className="h-3 w-3 text-slate-300" />
+                          {student.user.email}
+                        </div>
+                        {student.user.phone && (
+                          <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400">
+                            <Phone className="h-3 w-3 text-slate-300" />
+                            {student.user.phone}
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={cn(
+                        "font-black text-[9px] uppercase tracking-widest border-none px-2.5 py-1 rounded-lg shadow-sm",
+                        student.user.is_active ? "bg-emerald-50 text-emerald-600" : "bg-slate-100 text-slate-400"
+                      )}>
+                        {student.user.is_active ? 'Active' : 'Inactive'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right pr-8">
+                      <Link href={`/dashboard/students/${student.id}`}>
+                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-premium">
+                          <ChevronRight className="h-5 w-5" />
+                        </Button>
+                      </Link>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+          
+          <div className="p-6 border-t border-slate-100 bg-slate-50/30 flex items-center justify-between">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+              Showing <span className="text-slate-900">{students.length}</span> of <span className="text-slate-900">{total}</span> Registry Entries
+            </p>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="rounded-xl font-black uppercase tracking-widest text-[10px]"
+                disabled={skip === 0}
+                onClick={() => setSkip(Math.max(0, skip - take))}
+              >
+                Previous
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="rounded-xl font-black uppercase tracking-widest text-[10px]"
+                disabled={skip + take >= total}
+                onClick={() => setSkip(skip + take)}
+              >
+                Next
+              </Button>
+            </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

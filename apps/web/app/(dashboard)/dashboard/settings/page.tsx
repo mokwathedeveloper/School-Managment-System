@@ -11,28 +11,30 @@ import {
   CardDescription 
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { toast } from 'react-hot-toast';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { 
+  Settings, 
   Building2, 
-  Smartphone, 
-  Globe, 
+  Save, 
+  Loader2, 
+  Shield, 
   Mail, 
-  CreditCard, 
-  Image as ImageIcon,
-  Save,
-  Loader2,
-  Settings as SettingsIcon,
-  ShieldCheck
+  Phone, 
+  MapPin, 
+  Globe,
+  Wallet,
+  Smartphone
 } from 'lucide-react';
+import { toast } from 'react-hot-toast';
+import { PremiumLoader } from '@/components/ui/premium-loader';
 
 export default function SettingsPage() {
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState<any>(null);
 
   const { data: school, isLoading } = useQuery({
-    queryKey: ['school-settings'],
+    queryKey: ['my-school'],
     queryFn: async () => {
       const res = await api.get('/schools/my-school');
       setFormData(res.data);
@@ -41,135 +43,156 @@ export default function SettingsPage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async (data: any) => {
-      return api.patch('/schools/my-school', data);
-    },
+    mutationFn: async (data: any) => api.patch('/schools/my-school', data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['school-settings'] });
-      toast.success('Institutional configurations have been updated and saved successfully.');
+      queryClient.invalidateQueries({ queryKey: ['my-school'] });
+      toast.success('Institutional configuration updated successfully.');
     }
   });
 
-  if (isLoading || !formData) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
+  if (isLoading || !formData) return <PremiumLoader message="Fetching Institutional Config" />;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateMutation.mutate(formData);
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500 max-w-4xl mx-auto">
-      <div className="flex items-center justify-between">
+    <div className="space-y-8 animate-in fade-in duration-700 max-w-5xl mx-auto">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
-            <SettingsIcon className="h-8 w-8 text-primary" />
-            School Settings
+          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
+            <Settings className="h-8 w-8 text-blue-600" />
+            Institutional Terminal
           </h1>
-          <p className="text-muted-foreground mt-1">Manage your institution&apos;s identity and system configuration.</p>
+          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Global Configuration & Multi-Tenancy</p>
         </div>
         <Button 
-          onClick={() => updateMutation.mutate(formData)}
-          disabled={updateMutation.isPending}
-          className="shadow-lg"
+            onClick={handleSubmit} 
+            disabled={updateMutation.isPending}
+            className="h-12 px-8 rounded-xl font-black uppercase tracking-widest shadow-lg shadow-primary/20"
         >
-          {updateMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-          Save Changes
+          {updateMutation.isPending ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Save className="mr-2 h-5 w-5" />}
+          Save Configuration
         </Button>
       </div>
 
       <div className="grid gap-8">
-        {/* Basic Information */}
-        <Card className="shadow-sm border-muted/50 overflow-hidden">
-          <CardHeader className="bg-muted/10">
-            <CardTitle className="flex items-center gap-2">
-              <Building2 className="h-5 w-5 text-primary" />
-              Institutional Identity
-            </CardTitle>
-            <CardDescription>Public information used on report cards and invoices.</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-6 space-y-6">
-            <div className="flex items-center gap-6 pb-6 border-b">
-               <div className="h-24 w-24 rounded-2xl bg-muted flex flex-col items-center justify-center text-muted-foreground border-2 border-dashed relative group overflow-hidden">
-                  {formData.logo ? (
-                    <img src={formData.logo} alt="Logo" className="h-full w-full object-cover" />
-                  ) : (
-                    <>
-                      <ImageIcon className="h-8 w-8 mb-1 opacity-20" />
-                      <span className="text-[10px] font-bold">UPLOAD LOGO</span>
-                    </>
-                  )}
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                    <span className="text-white text-[10px] font-bold">CHANGE</span>
-                  </div>
-               </div>
-               <div className="flex-1 space-y-1">
-                 <h4 className="font-bold">School Brand Logo</h4>
-                 <p className="text-xs text-muted-foreground">Recommend 512x512px SVG or PNG with transparent background.</p>
-               </div>
+        {/* Core Identity */}
+        <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2.5rem] overflow-hidden">
+          <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
+            <div className="flex items-center gap-4">
+                <div className="h-14 w-14 rounded-[1.5rem] bg-blue-600 flex items-center justify-center text-white shadow-xl shadow-blue-600/20">
+                    <Building2 className="h-8 w-8" />
+                </div>
+                <div>
+                    <CardTitle className="text-xl font-black text-slate-900">Institutional Identity</CardTitle>
+                    <CardDescription className="font-bold text-slate-400 uppercase tracking-tighter text-xs">Public profile and branding assets</CardDescription>
+                </div>
             </div>
-
+          </CardHeader>
+          <CardContent className="p-8 space-y-6">
             <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="name">School Name</Label>
-                <Input id="name" value={formData.name} onChange={handleChange} />
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Official School Name</Label>
+                <Input 
+                  value={formData.name} 
+                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  className="h-12 rounded-xl border-2 border-slate-50 focus:ring-blue-600/10 font-bold"
+                />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="slug">System Slug (URL)</Label>
-                <Input id="slug" value={formData.slug} disabled className="bg-muted" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Official Email</Label>
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">System URL Slug</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input id="email" className="pl-10" value={formData.email || ''} onChange={handleChange} />
+                    <Input 
+                        value={formData.slug} 
+                        disabled
+                        className="h-12 rounded-xl border-2 border-slate-50 bg-slate-50 font-mono text-xs font-bold text-slate-400"
+                    />
+                    <Shield className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="phone">Contact Phone</Label>
-                <div className="relative">
-                  <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input id="phone" className="pl-10" value={formData.phone || ''} onChange={handleChange} />
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6">
+                <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Official Email</Label>
+                    <div className="relative group">
+                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
+                        <Input 
+                            value={formData.email} 
+                            onChange={(e) => setFormData({...formData, email: e.target.value})}
+                            className="h-12 pl-12 rounded-xl border-2 border-slate-50 font-bold"
+                        />
+                    </div>
                 </div>
-              </div>
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="website">Website URL</Label>
-                <div className="relative">
-                  <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input id="website" className="pl-10" value={formData.website || ''} onChange={handleChange} />
+                <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Official Phone</Label>
+                    <div className="relative group">
+                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
+                        <Input 
+                            value={formData.phone} 
+                            onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                            className="h-12 pl-12 rounded-xl border-2 border-slate-50 font-bold"
+                        />
+                    </div>
                 </div>
-              </div>
+                <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Institutional Website</Label>
+                    <div className="relative group">
+                        <Globe className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
+                        <Input 
+                            value={formData.website} 
+                            onChange={(e) => setFormData({...formData, website: e.target.value})}
+                            className="h-12 pl-12 rounded-xl border-2 border-slate-50 font-bold"
+                        />
+                    </div>
+                </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Financial Configuration */}
-        <Card className="shadow-sm border-muted/50 border-l-4 border-l-emerald-500 overflow-hidden">
-          <CardHeader className="bg-emerald-50/50">
-            <CardTitle className="flex items-center gap-2">
-              <CreditCard className="h-5 w-5 text-emerald-600" />
-              Payment Integration (M-Pesa)
-            </CardTitle>
-            <CardDescription>Configure your Safaricom Daraja Paybill for automated reconciliation.</CardDescription>
+        {/* Financial Gateway */}
+        <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2.5rem] overflow-hidden">
+          <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
+            <div className="flex items-center gap-4">
+                <div className="h-14 w-14 rounded-[1.5rem] bg-emerald-600 flex items-center justify-center text-white shadow-xl shadow-emerald-600/20">
+                    <Wallet className="h-8 w-8" />
+                </div>
+                <div>
+                    <CardTitle className="text-xl font-black text-slate-900">Financial Gateway</CardTitle>
+                    <CardDescription className="font-bold text-slate-400 uppercase tracking-tighter text-xs">M-Pesa API & Automated Collection</CardDescription>
+                </div>
+            </div>
           </CardHeader>
-          <CardContent className="pt-6">
+          <CardContent className="p-8 space-y-6">
+             <div className="bg-emerald-50/50 border border-emerald-100 p-6 rounded-2xl flex items-start gap-4">
+                <Smartphone className="h-6 w-6 text-emerald-600 mt-1" />
+                <div>
+                    <h4 className="font-black text-emerald-900 text-sm">Automated Fee Collection Enabled</h4>
+                    <p className="text-xs font-bold text-emerald-700/70 mt-1 leading-relaxed">
+                        Your terminal is currently configured to receive real-time STK Push notifications via the Safaricom Daraja API. 
+                        Funds are settled directly to your Paybill account.
+                    </p>
+                </div>
+             </div>
+
              <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="mpesa_paybill">Business Shortcode (Paybill/Till)</Label>
-                  <Input id="mpesa_paybill" placeholder="e.g. 714777" value={formData.mpesa_paybill || ''} onChange={handleChange} />
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">M-Pesa Business Shortcode</Label>
+                    <Input 
+                        value={formData.mpesa_paybill || ''} 
+                        onChange={(e) => setFormData({...formData, mpesa_paybill: e.target.value})}
+                        placeholder="e.g. 400222"
+                        className="h-12 rounded-xl border-2 border-slate-50 font-black tracking-[0.2em] text-center"
+                    />
                 </div>
-                <div className="bg-emerald-50 rounded-xl p-4 flex items-start gap-3">
-                   <ShieldCheck className="h-5 w-5 text-emerald-600 mt-0.5" />
-                   <div className="space-y-1">
-                      <h4 className="text-sm font-bold text-emerald-900">Verified Secure</h4>
-                      <p className="text-[10px] text-emerald-700 leading-relaxed">
-                        M-Pesa credentials are encrypted and used only for STK Push and callback validation.
-                      </p>
-                   </div>
+                <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Settlement Status</Label>
+                    <div className="h-12 flex items-center px-4 bg-slate-50 rounded-xl border-2 border-slate-100">
+                        <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse mr-3" />
+                        <span className="text-xs font-black text-slate-600 uppercase tracking-widest">Active & Operational</span>
+                    </div>
                 </div>
              </div>
           </CardContent>

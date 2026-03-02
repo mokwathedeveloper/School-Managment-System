@@ -21,10 +21,11 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'react-hot-toast';
+import { PremiumLoader } from '@/components/ui/premium-loader';
+import { cn } from '@/lib/utils';
 
 export default function SuperAdminDashboard() {
   const queryClient = useQueryClient();
-  const [isAdding, setIsAdding] = useState(false);
 
   const { data: stats, isLoading: loadingStats } = useQuery({
     queryKey: ['super-admin-stats'],
@@ -47,7 +48,7 @@ export default function SuperAdminDashboard() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['super-admin-schools'] });
       queryClient.invalidateQueries({ queryKey: ['super-admin-stats'] });
-      toast.success('New institution has been successfully integrated and onboarded to the platform.');
+      toast.success('New institution has been successfully integrated.');
     }
   });
 
@@ -62,109 +63,123 @@ export default function SuperAdminDashboard() {
     onboardMutation.mutate({ name, slug, email });
   };
 
+  if (loadingStats || loadingSchools) return <PremiumLoader message="Syncing Platform Nodes" />;
+
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
-          <ShieldCheck className="h-8 w-8 text-primary" />
-          Platform Command Center
-        </h1>
-        <p className="text-muted-foreground mt-1">Manage all institutions and monitor global ecosystem health.</p>
+    <div className="space-y-8 animate-in fade-in duration-700">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
+            <ShieldCheck className="h-8 w-8 text-blue-600" />
+            Platform Command Center
+          </h1>
+          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Global Ecosystem Management</p>
+        </div>
+        <Button onClick={handleOnboard} disabled={onboardMutation.isPending} className="h-12 px-8 rounded-xl font-black uppercase tracking-widest shadow-lg shadow-primary/20">
+          {onboardMutation.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Plus className="h-4 w-4 mr-2" />}
+          Onboard Institution
+        </Button>
       </div>
 
       {/* Global Metrics */}
       <div className="grid gap-6 md:grid-cols-3">
         <StatCard 
           title="Total Institutions" 
-          value={loadingStats ? "..." : (stats?.schoolCount || 0).toString()} 
+          value={(stats?.schoolCount || 0).toString()} 
           icon={<Building2 className="h-5 w-5" />}
           description="Active schools on platform"
+          color="blue"
         />
         <StatCard 
           title="Global Students" 
-          value={loadingStats ? "..." : (stats?.totalStudents?.toLocaleString() || "0")} 
+          value={(stats?.totalStudents?.toLocaleString() || "0")} 
           icon={<GraduationCap className="h-5 w-5" />}
           description="Total enrolled learners"
+          color="emerald"
         />
         <StatCard 
           title="Platform Users" 
-          value={loadingStats ? "..." : (stats?.totalUsers?.toLocaleString() || "0")} 
+          value={(stats?.totalUsers?.toLocaleString() || "0")} 
           icon={<Users className="h-5 w-5" />}
           description="Consolidated user base"
+          color="indigo"
         />
       </div>
 
       <div className="grid gap-8 lg:grid-cols-3">
         {/* Schools Directory */}
-        <Card className="lg:col-span-2 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-4">
+        <Card className="lg:col-span-2 border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2.5rem] overflow-hidden">
+          <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
             <div className="space-y-1">
-              <CardTitle>Institutional Directory</CardTitle>
-              <CardDescription>Managed schools and their operational metrics.</CardDescription>
+              <CardTitle className="text-xl font-black text-slate-900">Institutional Directory</CardTitle>
+              <CardDescription className="font-bold text-slate-400 uppercase tracking-tighter text-xs">Managed school entities and operational metrics</CardDescription>
             </div>
-            <Button onClick={handleOnboard} disabled={onboardMutation.isPending} className="shadow-md">
-              {onboardMutation.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Plus className="h-4 w-4 mr-2" />}
-              Onboard School
-            </Button>
           </CardHeader>
           <CardContent className="p-0">
             <Table>
-              <TableHeader className="bg-muted/30">
-                <TableRow>
-                  <TableHead>School Name</TableHead>
-                  <TableHead>Slug</TableHead>
-                  <TableHead className="text-center">Students</TableHead>
-                  <TableHead className="text-center">Staff</TableHead>
-                  <TableHead className="text-right">Status</TableHead>
+              <TableHeader className="bg-slate-50/30">
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className="pl-8 py-4 font-black uppercase tracking-widest text-[10px] text-slate-400">School Identity</TableHead>
+                  <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">System Slug</TableHead>
+                  <TableHead className="text-center font-black uppercase tracking-widest text-[10px] text-slate-400">Students</TableHead>
+                  <TableHead className="text-center font-black uppercase tracking-widest text-[10px] text-slate-400">Users</TableHead>
+                  <TableHead className="text-right pr-8 font-black uppercase tracking-widest text-[10px] text-slate-400">Status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {loadingSchools ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="h-24 text-center">
-                      <Loader2 className="h-6 w-6 animate-spin mx-auto text-primary" />
+                {schools?.map((school: any) => (
+                  <TableRow key={school.id} className="group hover:bg-slate-50/50 transition-colors border-b-slate-50">
+                    <TableCell className="pl-8 py-5">
+                        <div className="flex items-center gap-3">
+                            <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 font-black text-xs border border-blue-100">
+                                {school.name[0]}
+                            </div>
+                            <span className="font-black text-slate-900">{school.name}</span>
+                        </div>
+                    </TableCell>
+                    <TableCell className="font-mono text-[10px] font-black text-slate-400 uppercase tracking-tighter bg-slate-50/50 px-2 py-1 rounded-lg inline-block mt-4 ml-4">
+                        /{school.slug}
+                    </TableCell>
+                    <TableCell className="text-center font-black text-slate-700">{school._count.students}</TableCell>
+                    <TableCell className="text-center font-black text-slate-700">{school._count.users}</TableCell>
+                    <TableCell className="text-right pr-8">
+                      <Badge className="bg-emerald-50 text-emerald-600 border-none font-black text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-lg shadow-sm">
+                        Active Node
+                      </Badge>
                     </TableCell>
                   </TableRow>
-                ) : (
-                  schools?.map((school: any) => (
-                    <TableRow key={school.id} className="hover:bg-muted/20 transition-colors">
-                      <TableCell className="font-bold">{school.name}</TableCell>
-                      <TableCell className="font-mono text-xs">{school.slug}</TableCell>
-                      <TableCell className="text-center font-medium">{school._count.students}</TableCell>
-                      <TableCell className="text-center font-medium">{school._count.users}</TableCell>
-                      <TableCell className="text-right">
-                        <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">
-                          Active
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
+                ))}
               </TableBody>
             </Table>
           </CardContent>
         </Card>
 
         {/* Platform Insights */}
-        <Card className="shadow-sm border-muted/50">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-primary" />
-              Platform Growth
+        <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2.5rem] overflow-hidden">
+          <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
+            <CardTitle className="text-lg font-black text-slate-900 flex items-center gap-2">
+              <BarChart3 className="h-5 w-5 text-blue-600" />
+              Platform Vitality
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
-             <div className="bg-primary/5 p-6 rounded-2xl text-center space-y-2">
-                <TrendingUp className="h-10 w-10 text-primary mx-auto opacity-50" />
-                <h4 className="text-2xl font-black">+12.4%</h4>
-                <p className="text-xs text-muted-foreground uppercase font-bold tracking-widest">Growth this month</p>
+          <CardContent className="p-8 space-y-6">
+             <div className="bg-blue-50/50 border border-blue-100 p-8 rounded-[2rem] text-center space-y-3 shadow-inner">
+                <div className="h-16 w-16 bg-white rounded-2xl flex items-center justify-center mx-auto shadow-sm">
+                    <TrendingUp className="h-8 w-8 text-blue-600 animate-bounce" />
+                </div>
+                <div>
+                    <h4 className="text-3xl font-black text-slate-900 tracking-tighter">+12.4%</h4>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">Monthly Expansion</p>
+                </div>
              </div>
-             <div className="space-y-4 pt-4 border-t">
-                <h4 className="text-sm font-bold text-muted-foreground uppercase tracking-tight">System Status</h4>
+             
+             <div className="space-y-4 pt-4">
+                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Global Status Registry</h4>
                 <div className="space-y-3">
-                   <ActivityItem text={`${stats?.schoolCount || 0} active institutions`} time="Live" />
-                   <ActivityItem text="M-Pesa reconciliation" time="Synced" />
-                   <ActivityItem text="Daily backups" time="Verified" />
+                   <ActivityItem text={`${stats?.schoolCount || 0} provisioned nodes`} time="Verified" />
+                   <ActivityItem text="M-Pesa Gateway" time="Operational" />
+                   <ActivityItem text="Auth Service (JWT)" time="Encrypted" />
+                   <ActivityItem text="Database Backups" time="Daily" />
                 </div>
              </div>
           </CardContent>
@@ -174,18 +189,23 @@ export default function SuperAdminDashboard() {
   );
 }
 
-function StatCard({ title, value, icon, description }: any) {
+function StatCard({ title, value, icon, description, color }: any) {
   return (
-    <Card className="overflow-hidden shadow-sm border-muted/50">
+    <Card className="group relative overflow-hidden border-none bg-white shadow-[0_8px_30px_rgb(0,0,0,0.02)] transition-premium hover:shadow-[0_20px_40px_rgba(0,0,0,0.04)] hover:-translate-y-1 rounded-[2rem]">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">{title}</CardTitle>
-        <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+        <div className={cn(
+            "h-12 w-12 rounded-2xl flex items-center justify-center transition-premium group-hover:scale-110 group-hover:rotate-3 shadow-sm",
+            color === 'blue' && "bg-blue-50 text-blue-600",
+            color === 'emerald' && "bg-emerald-50 text-emerald-600",
+            color === 'indigo' && "bg-indigo-50 text-indigo-600",
+        )}>
           {icon}
         </div>
       </CardHeader>
       <CardContent>
-        <div className="text-3xl font-black tracking-tighter">{value}</div>
-        <p className="text-[10px] text-muted-foreground font-medium mt-1 uppercase tracking-wider">{description}</p>
+        <div className="text-4xl font-black tracking-tighter text-slate-900 mb-1">{value}</div>
+        <p className="text-[10px] text-slate-400 font-black uppercase tracking-tighter italic">{description}</p>
       </CardContent>
     </Card>
   );
@@ -193,9 +213,9 @@ function StatCard({ title, value, icon, description }: any) {
 
 function ActivityItem({ text, time }: any) {
   return (
-    <div className="flex justify-between items-center text-xs">
-      <span className="font-medium text-slate-700">{text}</span>
-      <span className="text-muted-foreground font-mono">{time}</span>
+    <div className="flex justify-between items-center p-3 bg-slate-50 rounded-xl border border-transparent hover:border-blue-100 transition-all cursor-default group">
+      <span className="font-bold text-xs text-slate-600 group-hover:text-slate-900 transition-colors">{text}</span>
+      <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 bg-white px-2 py-1 rounded-lg border border-slate-100">{time}</span>
     </div>
   );
 }
