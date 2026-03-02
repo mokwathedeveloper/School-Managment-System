@@ -7,7 +7,10 @@ import {
   Briefcase, 
   MessageSquare, 
   History, 
-  Bell
+  Bell,
+  Clock,
+  CheckCircle2,
+  Calendar
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -17,7 +20,7 @@ export function SubordinateView({ stats }: { stats: any }) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <InsightCard 
               title="Daily Duty" 
-              value="Active" 
+              value="Operational" 
               subValue="Registry Status"
               icon={Briefcase}
               trend="Check-in: 07:45"
@@ -25,7 +28,7 @@ export function SubordinateView({ stats }: { stats: any }) {
               color="blue"
           />
           <InsightCard 
-              title="Notifications" 
+              title="Announcements" 
               value="3" 
               subValue="Unread Alerts"
               icon={Bell}
@@ -34,37 +37,68 @@ export function SubordinateView({ stats }: { stats: any }) {
               color="indigo"
           />
           <InsightCard 
-              title="Work Schedule" 
-              value="Optimal" 
-              subValue="Performance Index"
-              icon={History}
-              trend="Registry Sync"
+              title="Punctuality" 
+              value="100%" 
+              subValue="Registry Record"
+              icon={CheckCircle2}
+              trend="Steady"
               trendType="up"
               color="emerald"
           />
           <InsightCard 
-              title="Messaging" 
+              title="Work Schedule" 
               value="Active" 
-              subValue="Comm Hub"
-              icon={MessageSquare}
-              trend="Connected"
+              subValue="Shift Node"
+              icon={History}
+              trend="End: 16:30"
               trendType="neutral"
               color="blue"
           />
       </div>
 
-      <Card className="border-none shadow-sm bg-white border border-slate-100 rounded-[2.5rem] overflow-hidden group">
-          <CardHeader className="p-8 pb-4">
-              <CardTitle className="text-xl font-black tracking-tight text-slate-900">Institutional Announcements</CardTitle>
-              <CardDescription className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Latest updates from the administration</CardDescription>
-          </CardHeader>
-          <CardContent className="p-8 pt-4">
-              <div className="h-48 flex flex-col items-center justify-center text-center p-12 border-2 border-dashed border-slate-50 rounded-3xl">
-                  <MessageSquare className="h-12 w-12 text-slate-100 mb-4" />
-                  <p className="font-black text-slate-300 uppercase tracking-widest text-[10px] italic">No active broadcasts for your segment.</p>
-              </div>
-          </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <Card className="border-none shadow-sm bg-slate-900 text-white rounded-[2rem] overflow-hidden group">
+              <CardHeader className="p-8 pb-4">
+                  <CardTitle className="text-xl font-black tracking-tight">Shift Manifest</CardTitle>
+                  <CardDescription className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Current institutional duty cycle</CardDescription>
+              </CardHeader>
+              <CardContent className="p-8 pt-4 space-y-6">
+                  <div className="flex items-center gap-4">
+                      <div className="h-12 w-12 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-premium">
+                          <Clock className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                          <h4 className="font-black text-lg leading-tight text-white">Morning Sequence</h4>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">07:45 HRS - 12:30 HRS</p>
+                      </div>
+                  </div>
+                  <Button className="w-full h-12 bg-white/10 hover:bg-white/20 text-white border-none rounded-xl font-black uppercase tracking-widest text-[10px]">
+                      Clock-out Node
+                  </Button>
+              </CardContent>
+          </Card>
+
+          <Card className="border-none shadow-sm bg-white border border-slate-100 rounded-[2rem] overflow-hidden group">
+              <CardHeader className="p-8 pb-4">
+                  <CardTitle className="text-xl font-black tracking-tight text-slate-900">Institutional Calendar</CardTitle>
+                  <CardDescription className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Upcoming holidays and events</CardDescription>
+              </CardHeader>
+              <CardContent className="p-8 pt-4 space-y-6">
+                  <div className="flex items-center gap-4">
+                      <div className="h-12 w-12 rounded-2xl bg-slate-50 flex items-center justify-center border border-slate-100 group-hover:scale-110 transition-premium">
+                          <Calendar className="h-6 w-6 text-blue-600" />
+                      </div>
+                      <div>
+                          <h4 className="font-black text-lg leading-tight text-slate-900">Term 1 Closure</h4>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Dec 15, 2024</p>
+                      </div>
+                  </div>
+                  <Button className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white border-none rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-blue-600/20">
+                      View Full Schedule
+                  </Button>
+              </CardContent>
+          </Card>
+      </div>
     </div>
   );
 }
