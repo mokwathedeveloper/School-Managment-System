@@ -26,6 +26,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
+import { AddClassDialog } from '@/components/dashboard/add-class-dialog';
 
 export default function ClassesListPage() {
   const [search, setSearch] = useState('');
@@ -53,12 +54,7 @@ export default function ClassesListPage() {
           </h1>
           <p className="text-muted-foreground mt-1 text-lg">Browse and manage all institutional streams and student groups.</p>
         </div>
-        <Link href="/dashboard/grade-levels">
-          <Button className="shadow-md">
-            <Plus className="mr-2 h-4 w-4" />
-            Define New Class
-          </Button>
-        </Link>
+        <AddClassDialog />
       </div>
 
       <div className="flex items-center gap-4 bg-card p-4 rounded-xl border shadow-sm">
