@@ -37,6 +37,26 @@ export default function AdmissionsDashboard() {
     },
   });
 
+  const broadcastMutation = useMutation({
+    mutationFn: async (data: any) => api.post('/messaging/announcements', data),
+    onSuccess: (res) => {
+      toast.success(`Broadcast dispatched to ${res.data.sent} applicants.`);
+    }
+  });
+
+  const handleBroadcast = () => {
+    const title = window.prompt('Enter announcement title:');
+    if (!title) return;
+    const message = window.prompt('Enter message for applicants:');
+    if (!message) return;
+
+    broadcastMutation.mutate({
+      title,
+      message,
+      targetRole: 'APPLICANT' // MessagingService handles this
+    });
+  };
+
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string, status: string }) => {
       return api.patch(`/admissions/applications/${id}/status`, { status });
@@ -65,8 +85,12 @@ export default function AdmissionsDashboard() {
           </h1>
           <p className="text-muted-foreground mt-1 text-lg">Track and manage prospective student applications.</p>
         </div>
-        <Button className="shadow-md">
-          <Mail className="mr-2 h-4 w-4" />
+        <Button 
+          className="shadow-md"
+          onClick={handleBroadcast}
+          disabled={broadcastMutation.isPending}
+        >
+          {broadcastMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Mail className="mr-2 h-4 w-4" />}
           Broadcast to Applicants
         </Button>
       </div>
