@@ -3,10 +3,12 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Providers } from "@/components/providers";
 import { Toaster } from 'react-hot-toast';
+import { Header } from "@/components/site/header";
+import { Footer } from "@/components/site/footer";
 
 export const metadata: Metadata = {
-  title: "School Management System",
-  description: "Production-grade School Management System for modern institutions.",
+  title: "SchoolOS | Modern Institutional Management",
+  description: "The premium operating system for educational institutions.",
 };
 
 export default function RootLayout({
@@ -15,12 +17,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="scroll-smooth">
       <body className={cn(
-          "min-h-screen bg-background font-sans antialiased organic-grain"
+          "min-h-screen bg-white font-sans antialiased organic-grain"
         )}>
           <Providers>
-            {children}
+            <Header variant="landing" />
+            <main>{children}</main>
+            <Footer />
           </Providers>
           <Toaster position="top-center" />
       </body>
