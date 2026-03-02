@@ -19,7 +19,8 @@ import {
   Receipt, 
   AlertCircle,
   TrendingUp,
-  ArrowRight
+  ArrowRight,
+  Plus
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'react-hot-toast';
