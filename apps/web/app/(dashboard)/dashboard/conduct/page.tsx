@@ -11,7 +11,10 @@ import {
   Plus, 
   User, 
   Loader2,
-  FileWarning
+  FileWarning,
+  ShieldAlert,
+  ChevronRight,
+  Filter
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,6 +22,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
+import { PremiumLoader } from '@/components/ui/premium-loader';
 
 export default function ConductPage() {
   const queryClient = useQueryClient();
@@ -34,7 +38,7 @@ export default function ConductPage() {
     mutationFn: async (data: any) => api.post('/discipline', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['discipline-records'] });
-      toast.success('Incident has been officially recorded and logged for administrative review.');
+      toast.success('Incident has been officially recorded.');
     }
   });
 
@@ -54,94 +58,105 @@ export default function ConductPage() {
     });
   };
 
-  const severityColors: any = {
-    LOW: "bg-blue-100 text-blue-700 border-blue-200",
-    MEDIUM: "bg-yellow-100 text-yellow-700 border-yellow-200",
-    HIGH: "bg-orange-100 text-orange-700 border-orange-200",
-    CRITICAL: "bg-red-100 text-red-700 border-red-200",
-  };
+  if (isLoading) return <PremiumLoader message="Syncing Compliance Registry" />;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8 animate-in fade-in duration-700">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
-            <Gavel className="h-8 w-8 text-primary" />
+          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
+            <Gavel className="h-8 w-8 text-blue-600" />
             Student Conduct
           </h1>
-          <p className="text-muted-foreground mt-1 text-lg">Track behavioral incidents and disciplinary actions.</p>
+          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Behavioral Analytics & Compliance</p>
         </div>
-        <Button onClick={handleReport} disabled={reportMutation.isPending} className="shadow-md bg-rose-600 hover:bg-rose-700 text-white">
+        <Button variant="danger" onClick={handleReport} disabled={reportMutation.isPending} className="h-12 px-8 shadow-rose-500/20">
           {reportMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <AlertTriangle className="mr-2 h-4 w-4" />}
           Report Incident
         </Button>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-4">
-        <div className="md:col-span-4">
-          <Card className="shadow-sm border-muted/50 overflow-hidden">
-            <CardHeader className="bg-muted/10 border-b flex flex-row items-center justify-between">
-              <div>
-                <CardTitle>Incident Log</CardTitle>
-                <CardDescription>Recent disciplinary records across the institution.</CardDescription>
-              </div>
-              <div className="relative w-64">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Search records..." className="pl-10 h-9" />
-              </div>
-            </CardHeader>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader className="bg-muted/30">
-                  <TableRow>
-                    <TableHead>Student</TableHead>
-                    <TableHead>Incident</TableHead>
-                    <TableHead>Severity</TableHead>
-                    <TableHead>Action Taken</TableHead>
-                    <TableHead className="text-right">Reported By</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {isLoading ? (
-                    <TableRow><TableCell colSpan={5} className="text-center h-32"><Loader2 className="h-6 w-6 animate-spin mx-auto text-primary"/></TableCell></TableRow>
-                  ) : records?.length === 0 ? (
-                    <TableRow><TableCell colSpan={5} className="text-center h-32 text-muted-foreground italic">No incidents recorded.</TableCell></TableRow>
-                  ) : (
-                    records?.map((record: any) => (
-                      <TableRow key={record.id} className="hover:bg-muted/5">
-                        <TableCell>
-                          <div className="flex items-center gap-3">
-                            <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center font-bold text-xs">
-                              {record.student.user.first_name[0]}
-                            </div>
-                            <div>
-                              <p className="font-bold text-sm">{record.student.user.first_name} {record.student.user.last_name}</p>
-                              <p className="text-[10px] text-muted-foreground">{record.student.class?.name}</p>
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="font-medium text-sm">{record.title}</div>
-                          <div className="text-xs text-muted-foreground">{new Date(record.incident_date).toLocaleDateString()}</div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className={cn("font-bold text-[10px]", severityColors[record.severity])}>
-                            {record.severity}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-sm italic text-slate-600">{record.action_taken || 'Pending Action'}</TableCell>
-                        <TableCell className="text-right text-xs text-muted-foreground">
-                          {record.reported_by ? `${record.reported_by.user.first_name} ${record.reported_by.user.last_name}` : 'System'}
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+      <div className="flex items-center gap-4 bg-white p-4 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.02)] border-none">
+        <div className="relative flex-1 max-w-md group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+          <Input 
+            placeholder="Search incident records..." 
+            className="pl-12 h-12 rounded-2xl border-2 border-slate-50 bg-slate-50/50 focus:bg-white focus:ring-blue-600/10 font-bold"
+          />
         </div>
+        <Button variant="outline" size="icon" className="rounded-xl h-12 w-12 border-slate-100">
+            <Filter className="h-4 w-4 text-slate-400" />
+        </Button>
       </div>
+
+      <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2.5rem] overflow-hidden">
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader className="bg-slate-50/30">
+              <TableRow className="hover:bg-transparent">
+                <TableHead className="pl-8 py-4 font-black uppercase tracking-widest text-[10px] text-slate-400">Student Scholar</TableHead>
+                <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Incident Details</TableHead>
+                <TableHead className="text-center font-black uppercase tracking-widest text-[10px] text-slate-400">Severity</TableHead>
+                <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400 text-right pr-8">Resolution</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {records?.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="h-64 text-center">
+                    <div className="flex flex-col items-center gap-2 text-slate-300">
+                        <ShieldAlert className="h-12 w-12 opacity-20" />
+                        <p className="font-black uppercase tracking-widest text-xs">Registry Clean</p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                records?.map((record: any) => (
+                  <TableRow key={record.id} className="group hover:bg-slate-50/50 transition-all duration-300 border-b-slate-50">
+                    <TableCell className="pl-8 py-5">
+                      <div className="flex items-center gap-4">
+                        <div className="h-12 w-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 font-black text-xs group-hover:bg-blue-50 group-hover:text-blue-600 transition-all">
+                          {record.student.user.first_name[0]}
+                        </div>
+                        <div>
+                          <p className="font-black text-slate-900 text-sm">{record.student.user.first_name} {record.student.user.last_name}</p>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{record.student.class?.name}</p>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-1">
+                        <p className="font-bold text-slate-700 text-sm">{record.title}</p>
+                        <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest">{new Date(record.incident_date).toLocaleDateString()}</p>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Badge className={cn(
+                        "font-black text-[9px] uppercase tracking-widest px-3 py-1 rounded-lg border-none shadow-sm",
+                        record.severity === 'CRITICAL' ? "bg-rose-50 text-rose-600" :
+                        record.severity === 'HIGH' ? "bg-orange-50 text-orange-600" :
+                        record.severity === 'MEDIUM' ? "bg-amber-50 text-amber-600" : "bg-blue-50 text-blue-600"
+                      )}>
+                        {record.severity}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right pr-8">
+                      <div className="flex items-center justify-end gap-3">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 bg-slate-50 px-2 py-1 rounded-lg">
+                            {record.action_taken || 'Awaiting Review'}
+                        </span>
+                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-300 hover:text-blue-600 transition-premium">
+                            <ChevronRight className="h-5 w-5" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 }
