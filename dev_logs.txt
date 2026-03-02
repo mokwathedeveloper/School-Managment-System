@@ -303,3 +303,33 @@ API Client initialized with baseURL: /api
 <w>  at file /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
 <w>  at resolve commonjs /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
  ✓ Compiled in 1200ms (1211 modules)
+ ✓ Compiled in 2.2s (2316 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat '/home/that/Desktop/project UFO/School-Managment-System/apps/web/.next/server/app/not-found.js'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../apps/web/.next/server/app/not-found' in /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server for build dependencies doesn't lead to expected result '/home/that/Desktop/project UFO/School-Managment-System/apps/web/.next/server/app/not-found.js', but to 'Error: Can't resolve '../../../../apps/web/.next/server/app/not-found' in '/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../apps/web/.next/server/app/not-found (expected /home/that/Desktop/project UFO/School-Managment-System/apps/web/.next/server/app/not-found.js)
+<w>  at file dependencies /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/require.js
+<w>  at file /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/require.js
+<w>  at file dependencies /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/load-components.js
+<w>  at file /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/build/utils.js
+<w>  at file /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/build/worker.js
+<w>  at file /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/build/worker.js
+<w>  at file dependencies /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at resolve commonjs /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+ ✓ Compiled in 1230ms (2316 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat '/home/that/Desktop/project UFO/School-Managment-System/apps/web/.next/server/app/not-found.js'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../apps/web/.next/server/app/not-found' in /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server for build dependencies doesn't lead to expected result '/home/that/Desktop/project UFO/School-Managment-System/apps/web/.next/server/app/not-found.js', but to 'Error: Can't resolve '../../../../apps/web/.next/server/app/not-found' in '/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../apps/web/.next/server/app/not-found (expected /home/that/Desktop/project UFO/School-Managment-System/apps/web/.next/server/app/not-found.js)
+<w>  at file dependencies /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/require.js
+<w>  at file /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/require.js
+<w>  at file dependencies /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/load-components.js
+<w>  at file /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/build/utils.js
+<w>  at file /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/build/worker.js
+<w>  at file /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/build/worker.js
+<w>  at file dependencies /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at resolve commonjs /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
