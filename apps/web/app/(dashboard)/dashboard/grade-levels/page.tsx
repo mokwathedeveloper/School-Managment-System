@@ -21,6 +21,7 @@ import { toast } from 'react-hot-toast';
 import { PremiumLoader } from '@/components/ui/premium-loader';
 import { DialogShell } from '@/components/ui/dialog-shell';
 import { cn } from '@/lib/utils';
+import { DashboardShell, DashboardHeader } from '@/components/dashboard/shell';
 
 export default function GradeLevelsPage() {
   const queryClient = useQueryClient();
@@ -74,20 +75,16 @@ export default function GradeLevelsPage() {
   if (isLoading) return <PremiumLoader message="Syncing Academic Hierarchy" />;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
-            <Layers className="h-8 w-8 text-blue-600" />
-            Academic Hierarchy
-          </h1>
-          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Grade Levels & Class Structural Organization</p>
-        </div>
+    <DashboardShell className="animate-in fade-in duration-700">
+      <DashboardHeader 
+        heading="Academic Hierarchy"
+        text="Grade Levels & Class Structural Organization"
+      >
         <Button variant="premium" onClick={() => setIsAddingGrade(true)} className="h-12 px-8 shadow-xl">
           <Plus className="mr-2 h-4 w-4" />
           Add Grade Level
         </Button>
-      </div>
+      </DashboardHeader>
 
       <div className="grid gap-8">
         <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2.5rem] overflow-hidden">
@@ -236,6 +233,6 @@ export default function GradeLevelsPage() {
           </Button>
         </div>
       </DialogShell>
-    </div>
+    </DashboardShell>
   );
 }

@@ -180,3 +180,91 @@ Please make sure your database server is running at `aws-1-eu-west-1.pooler.supa
  ○ Compiling /not-found ...
  ✓ Compiled /not-found in 1674ms (2147 modules)
 API Client initialized with baseURL: /api
+ ✓ Compiled in 2.2s (2156 modules)
+ ○ Compiling /api/classes ...
+ ✓ Compiled /api/classes in 763ms (2325 modules)
+API Client initialized with baseURL: /api
+ ✓ Compiled in 533ms (1089 modules)
+ ○ Compiling /not-found ...
+ ✓ Compiled /not-found in 599ms (2147 modules)
+API Client initialized with baseURL: /api
+ ✓ Compiled in 551ms (1089 modules)
+ ⨯ Error: Cannot find module './9369.js'
+Require stack:
+- /home/that/Desktop/project UFO/School-Managment-System/apps/web/.next/server/webpack-runtime.js
+- /home/that/Desktop/project UFO/School-Managment-System/apps/web/.next/server/app/not-found.js
+- /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/require.js
+- /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/load-components.js
+- /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/build/utils.js
+- /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/dev/hot-middleware.js
+- /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/dev/hot-reloader-webpack.js
+- /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/lib/router-server.js
+- /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/lib/start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1421:15)
+    at /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at __webpack_require__.f.require (/home/that/Desktop/project UFO/School-Managment-System/apps/web/.next/server/webpack-runtime.js:203:28)
+    at /home/that/Desktop/project UFO/School-Managment-System/apps/web/.next/server/webpack-runtime.js:111:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (/home/that/Desktop/project UFO/School-Managment-System/apps/web/.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (/home/that/Desktop/project UFO/School-Managment-System/apps/web/.next/server/webpack-runtime.js:162:22)
+    at /home/that/Desktop/project UFO/School-Managment-System/apps/web/.next/server/app/(dashboard)/dashboard/classes/page.js:16:471
+    at Object.<anonymous> (/home/that/Desktop/project UFO/School-Managment-System/apps/web/.next/server/app/(dashboard)/dashboard/classes/page.js:16:552)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at requirePage (/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/require.js:109:84)
+    at /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/load-components.js:74:84
+    at async loadComponentsImpl (/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/load-components.js:74:26)
+    at async DevServer.findPageComponentsImpl (/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/next-server.js:675:36) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    '/home/that/Desktop/project UFO/School-Managment-System/apps/web/.next/server/webpack-runtime.js',
+    '/home/that/Desktop/project UFO/School-Managment-System/apps/web/.next/server/app/not-found.js',
+    '/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/require.js',
+    '/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/load-components.js',
+    '/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/build/utils.js',
+    '/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/dev/hot-middleware.js',
+    '/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/dev/hot-reloader-webpack.js',
+    '/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js',
+    '/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/lib/router-server.js',
+    '/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/lib/start-server.js'
+  ],
+  page: '/dashboard/classes'
+}
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 1738ms (2304 modules)
+API Client initialized with baseURL: /api
+ ✓ Compiled /not-found in 397ms (2309 modules)
+API Client initialized with baseURL: /api
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat '/home/that/Desktop/project UFO/School-Managment-System/apps/web/.next/server/app/not-found.js'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../apps/web/.next/server/app/not-found' in /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server for build dependencies doesn't lead to expected result '/home/that/Desktop/project UFO/School-Managment-System/apps/web/.next/server/app/not-found.js', but to 'Error: Can't resolve '../../../../apps/web/.next/server/app/not-found' in '/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../apps/web/.next/server/app/not-found (expected /home/that/Desktop/project UFO/School-Managment-System/apps/web/.next/server/app/not-found.js)
+<w>  at file dependencies /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/require.js
+<w>  at file /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/require.js
+<w>  at file dependencies /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/load-components.js
+<w>  at file /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/build/utils.js
+<w>  at file /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/build/worker.js
+<w>  at file /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/build/worker.js
+<w>  at file dependencies /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at resolve commonjs /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+ ✓ Compiled in 1227ms (1211 modules)
+ ✓ Compiled in 516ms (1211 modules)

@@ -26,6 +26,7 @@ import { cn } from '@/lib/utils';
 import { PremiumLoader } from '@/components/ui/premium-loader';
 import { AddAssignmentDialog } from '@/components/dashboard/add-assignment-dialog';
 import { UploadResourceDialog } from '@/components/dashboard/upload-resource-dialog';
+import { DashboardShell, DashboardHeader } from '@/components/dashboard/shell';
 
 export default function LMSDashboard() {
   const [selectedClassId, setSelectedClassId] = useState('');
@@ -60,15 +61,11 @@ export default function LMSDashboard() {
   if (loadingClasses) return <PremiumLoader message="Syncing Learning Hub" />;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
-            <BookOpen className="h-8 w-8 text-blue-600" />
-            LMS Dashboard
-          </h1>
-          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Courseware Distribution & Digital Classrooms</p>
-        </div>
+    <DashboardShell className="animate-in fade-in duration-700">
+      <DashboardHeader 
+        heading="Learning Management"
+        text="Courseware Distribution & Digital Classrooms"
+      >
         <div className="flex items-center gap-3">
             {view === 'assignments' ? (
                 <AddAssignmentDialog classId={selectedClassId} />
@@ -76,7 +73,7 @@ export default function LMSDashboard() {
                 <UploadResourceDialog />
             )}
         </div>
-      </div>
+      </DashboardHeader>
 
       <div className="grid gap-8 md:grid-cols-4">
         {/* Sidebar: Class & View Selection */}
@@ -230,6 +227,6 @@ export default function LMSDashboard() {
           )}
         </div>
       </div>
-    </div>
+    </DashboardShell>
   );
 }
