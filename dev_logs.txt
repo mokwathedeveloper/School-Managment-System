@@ -1,0 +1,44 @@
+
+> web@0.1.0 dev
+> next dev
+
+   ▲ Next.js 14.1.0
+   - Local:        http://localhost:3000
+   - Environments: .env.local, .env
+
+npm error code ENOWORKSPACES
+npm error This command does not support workspaces.
+npm error A complete log of this run can be found in: /home/that/.npm/_logs/2026-03-02T11_10_11_536Z-debug-0.log
+ ✓ Ready in 1383ms
+ ✓ Compiled /middleware in 228ms (64 modules)
+ ○ Compiling / ...
+
+warn - The class `duration-[1500ms]` is ambiguous and matches multiple utilities.
+warn - If this is content and not a class, replace it with `duration-&lsqb;1500ms&rsqb;` to silence this warning.
+
+warn - The class `duration-[2000ms]` is ambiguous and matches multiple utilities.
+warn - If this is content and not a class, replace it with `duration-&lsqb;2000ms&rsqb;` to silence this warning.
+
+warn - The class `ease-[cubic-bezier(.2,.8,.2,1)]` is ambiguous and matches multiple utilities.
+warn - If this is content and not a class, replace it with `ease-&lsqb;cubic-bezier(.2,.8,.2,1)&rsqb;` to silence this warning.
+
+warn - The class `ease-[cubic-bezier(0.4,0,0.2,1)]` is ambiguous and matches multiple utilities.
+warn - If this is content and not a class, replace it with `ease-&lsqb;cubic-bezier(0.4,0,0.2,1)&rsqb;` to silence this warning.
+ ✓ Compiled / in 5.8s (1033 modules)
+API Client initialized with baseURL: /api
+ ✓ Compiled in 523ms (482 modules)
+ ✓ Compiled /not-found in 402ms (1011 modules)
+API Client initialized with baseURL: /api
+ ✓ Compiled /login in 384ms (1031 modules)
+ ○ Compiling /api/auth/login ...
+ ✓ Compiled /api/auth/login in 789ms (722 modules)
+API Client initialized with baseURL: /api
+ ○ Compiling /dashboard ...
+ ✓ Compiled /dashboard in 3.5s (2232 modules)
+ ✓ Compiled /api/attendance in 326ms (1243 modules)
+ ✓ Compiled (1372 modules)
+ ○ Compiling /dashboard/super-admin ...
+ ✓ Compiled /dashboard/super-admin in 1770ms (2377 modules)
+ ✓ Compiled /api/super-admin/schools in 334ms (1382 modules)
+ ✓ Compiled (1384 modules)
+ ✓ Compiled in 1046ms (1010 modules)
