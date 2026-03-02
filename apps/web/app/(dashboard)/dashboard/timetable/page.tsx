@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,8 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
+import { AddTimetableSlotDialog } from '@/components/dashboard/add-timetable-slot-dialog';
+import { ManageRoomsDialog } from '@/components/dashboard/manage-rooms-dialog';
 
 const DAYS = [
   { id: 1, name: 'Monday' },
@@ -29,7 +31,6 @@ const DAYS = [
 ];
 
 export default function TimetablePage() {
-  const queryClient = useQueryClient();
   const [selectedClassId, setSelectedClassId] = useState('');
 
   const { data: classes } = useQuery({
@@ -50,37 +51,6 @@ export default function TimetablePage() {
     enabled: !!selectedClassId,
   });
 
-  const addSlotMutation = useMutation({
-    mutationFn: async (data: any) => api.post('/timetable', data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['timetable', selectedClassId] });
-      toast.success('Timetable slot successfully scheduled.');
-    }
-  });
-
-  const handleAddSlot = () => {
-    if (!selectedClassId) {
-        toast.error('Please select a class first.');
-        return;
-    }
-    const subject_id = window.prompt('Enter subject ID:');
-    if (!subject_id) return;
-    const day_of_week = window.prompt('Enter day of week (1-5):');
-    if (!day_of_week) return;
-    const start_time = window.prompt('Enter start time (e.g., 08:00):');
-    if (!start_time) return;
-    const end_time = window.prompt('Enter end time (e.g., 09:00):');
-    if (!end_time) return;
-
-    addSlotMutation.mutate({
-      class_id: selectedClassId,
-      subject_id,
-      day_of_week: parseInt(day_of_week),
-      start_time,
-      end_time
-    });
-  };
-
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex items-center justify-between">
@@ -89,11 +59,8 @@ export default function TimetablePage() {
           <p className="text-muted-foreground mt-1">Schedule lessons, assign rooms, and manage teacher rotations.</p>
         </div>
         <div className="flex gap-2">
-            <Button variant="outline">Manage Rooms</Button>
-            <Button onClick={handleAddSlot} disabled={addSlotMutation.isPending} className="shadow-md">
-                {addSlotMutation.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Plus className="h-4 w-4 mr-2" />}
-                Add Slot
-            </Button>
+            <ManageRoomsDialog />
+            <AddTimetableSlotDialog classId={selectedClassId} />
         </div>
       </div>
 
@@ -139,7 +106,13 @@ export default function TimetablePage() {
                                 {day.name}
                             </div>
                             <div className="space-y-3">
-                                {slots?.filter((s: any) => s.day_of_week === day.id).map((slot: any) => (
+                                {loadingSlots ? (
+                                    <div className="flex justify-center p-4">
+                                        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                                    </div>
+                                ) : slots?.filter((s: any) => s.day_of_week === day.id).length === 0 ? (
+                                    <div className="text-[10px] text-center text-muted-foreground italic py-4">No slots</div>
+                                ) : slots?.filter((s: any) => s.day_of_week === day.id).map((slot: any) => (
                                     <Card key={slot.id} className="shadow-sm border-l-4 border-l-primary hover:shadow-md transition-shadow group">
                                         <CardContent className="p-3">
                                             <div className="flex items-center justify-between mb-2">
@@ -161,9 +134,6 @@ export default function TimetablePage() {
                                         </CardContent>
                                     </Card>
                                 ))}
-                                <Button variant="ghost" className="w-full border-dashed border-2 text-muted-foreground hover:text-primary hover:border-primary/30 h-10 group">
-                                    <Plus className="h-4 w-4 opacity-20 group-hover:opacity-100" />
-                                </Button>
                             </div>
                         </div>
                     ))}
