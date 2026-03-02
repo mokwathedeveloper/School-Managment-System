@@ -2,6 +2,22 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/server/auth';
 import { TimetableService } from '@/lib/services/timetable.service';
 import { handleApiError, ApiError } from '@/lib/server/api-utils';
+import { z } from 'zod';
+
+const createRoomSchema = z.object({
+  name: z.string().min(1, 'Room name is required'),
+  capacity: z.number().int().min(1).optional(),
+});
+
+const createSlotSchema = z.object({
+  class_id: z.string().min(1, 'Class ID is required'),
+  subject_id: z.string().min(1, 'Subject ID is required'),
+  teacher_id: z.string().optional(),
+  room_id: z.string().optional(),
+  day_of_week: z.number().int().min(0).max(6),
+  start_time: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid time format (HH:MM)'),
+  end_time: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid time format (HH:MM)'),
+});
 
 export async function GET(req: NextRequest) {
   try {
@@ -30,11 +46,17 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
 
     if (pathname.endsWith('/rooms')) {
-      const result = await TimetableService.createRoom(session.schoolId, body);
+      const validated = createRoomSchema.safeParse(body);
+      if (!validated.success) throw new ApiError('Invalid input: ' + validated.error.message, 400);
+      
+      const result = await TimetableService.createRoom(session.schoolId, validated.data);
       return NextResponse.json(result, { status: 201 });
     }
 
-    const result = await TimetableService.createSlot(session.schoolId, body);
+    const validated = createSlotSchema.safeParse(body);
+    if (!validated.success) throw new ApiError('Invalid input: ' + validated.error.message, 400);
+
+    const result = await TimetableService.createSlot(session.schoolId, validated.data);
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
     return handleApiError(error);

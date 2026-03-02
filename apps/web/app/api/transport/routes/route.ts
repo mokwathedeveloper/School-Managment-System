@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/server/auth';
 import { TransportService } from '@/lib/services/transport.service';
 import { handleApiError, ApiError } from '@/lib/server/api-utils';
+import { z } from 'zod';
+
+const createRouteSchema = z.object({
+  name: z.string().min(1, 'Route name is required'),
+  fee: z.number().min(0, 'Fee must be non-negative'),
+  description: z.string().optional().or(z.literal('')),
+});
 
 export async function GET(req: NextRequest) {
   try {
@@ -21,7 +28,13 @@ export async function POST(req: NextRequest) {
     if (!session) throw new ApiError('Unauthorized', 401);
 
     const body = await req.json();
-    const result = await TransportService.createRoute(session.schoolId, body);
+    const validated = createRouteSchema.safeParse(body);
+    
+    if (!validated.success) {
+      throw new ApiError('Invalid input: ' + validated.error.message, 400);
+    }
+    
+    const result = await TransportService.createRoute(session.schoolId, validated.data);
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
     return handleApiError(error);

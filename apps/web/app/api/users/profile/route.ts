@@ -1,8 +1,15 @@
-
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/server/auth';
 import { UsersService } from '@/lib/services/users.service';
 import { handleApiError, ApiError } from '@/lib/server/api-utils';
+import { z } from 'zod';
+
+const updateProfileSchema = z.object({
+  first_name: z.string().min(1, 'First name is required').optional(),
+  last_name: z.string().min(1, 'Last name is required').optional(),
+  password: z.string().min(6, 'Password must be at least 6 characters').optional(),
+  phone: z.string().optional(),
+});
 
 export async function GET(req: NextRequest) {
   try {
@@ -26,18 +33,13 @@ export async function PATCH(req: NextRequest) {
     if (!session) throw new ApiError('Unauthorized', 401);
 
     const body = await req.json();
+    const validated = updateProfileSchema.safeParse(body);
     
-    // Only allow updating certain fields
-    const allowedUpdates = ['first_name', 'last_name', 'password', 'phone'];
-    const updateData: any = {};
-    
-    allowedUpdates.forEach(field => {
-      if (body[field] !== undefined) {
-        updateData[field] = body[field];
-      }
-    });
+    if (!validated.success) {
+      throw new ApiError('Invalid input: ' + validated.error.message, 400);
+    }
 
-    const updatedUser = await UsersService.update(session.userId, updateData);
+    const updatedUser = await UsersService.update(session.userId, validated.data);
     
     const { password, ...safeUser } = updatedUser;
     return NextResponse.json(safeUser);

@@ -2,6 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/server/auth';
 import { TransportService } from '@/lib/services/transport.service';
 import { handleApiError, ApiError } from '@/lib/server/api-utils';
+import { z } from 'zod';
+
+const createVehicleSchema = z.object({
+  plate_number: z.string().min(1, 'Plate number is required'),
+  model: z.string().optional().or(z.literal('')),
+  capacity: z.number().int().min(1, 'Capacity must be at least 1'),
+  driver_id: z.string().optional(),
+  route_id: z.string().optional(),
+});
 
 export async function GET(req: NextRequest) {
   try {
@@ -21,7 +30,13 @@ export async function POST(req: NextRequest) {
     if (!session) throw new ApiError('Unauthorized', 401);
 
     const body = await req.json();
-    const result = await TransportService.createVehicle(session.schoolId, body);
+    const validated = createVehicleSchema.safeParse(body);
+    
+    if (!validated.success) {
+      throw new ApiError('Invalid input: ' + validated.error.message, 400);
+    }
+    
+    const result = await TransportService.createVehicle(session.schoolId, validated.data);
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
     return handleApiError(error);
