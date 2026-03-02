@@ -24,6 +24,8 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { PremiumLoader } from '@/components/ui/premium-loader';
 import { RecordExpenseDialog } from '@/components/dashboard/record-expense-dialog';
+import { DashboardShell, DashboardHeader } from '@/components/dashboard/shell';
+import { InsightCard } from '@/components/dashboard/insight-card';
 
 export default function ExpensesPage() {
   const queryClient = useQueryClient();
@@ -41,31 +43,25 @@ export default function ExpensesPage() {
   const totalSpent = expenses?.reduce((sum: number, exp: any) => sum + parseFloat(exp.amount), 0) || 0;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
-            <ArrowDownCircle className="h-8 w-8 text-rose-600" />
-            Expenditure Matrix
-          </h1>
-          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Institutional Cash Outflow & Operational Costs</p>
-        </div>
+    <DashboardShell className="animate-in fade-in duration-700">
+      <DashboardHeader 
+        heading="Expenditure Matrix"
+        text="Institutional Cash Outflow & Operational Costs"
+      >
         <RecordExpenseDialog />
-      </div>
+      </DashboardHeader>
 
       {/* Financial Summary */}
       <div className="grid gap-6 md:grid-cols-3">
-        <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2rem] overflow-hidden group">
-          <CardContent className="p-6 flex items-center justify-between">
-            <div className="space-y-1">
-              <p className="text-[10px] font-black text-rose-600 uppercase tracking-[0.2em]">Total Monthly Outflow</p>
-              <p className="text-3xl font-black text-slate-900 tracking-tighter">KES {totalSpent.toLocaleString()}</p>
-            </div>
-            <div className="h-12 w-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center shadow-sm transition-all group-hover:scale-110 group-hover:rotate-3 border border-rose-100">
-              <Banknote className="h-6 w-6" />
-            </div>
-          </CardContent>
-        </Card>
+        <InsightCard 
+          title="Monthly Outflow" 
+          value={`KES ${totalSpent.toLocaleString()}`} 
+          subValue="Institutional overhead"
+          icon={Banknote}
+          trend="+4.2%"
+          trendType="up"
+          color="rose"
+        />
       </div>
 
       <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2.5rem] overflow-hidden">
@@ -138,6 +134,6 @@ export default function ExpensesPage() {
           </Table>
         </CardContent>
       </Card>
-    </div>
+    </DashboardShell>
   );
 }

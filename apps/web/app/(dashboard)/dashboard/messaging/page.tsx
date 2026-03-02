@@ -36,6 +36,7 @@ import { cn } from '@/lib/utils';
 import { PremiumLoader } from '@/components/ui/premium-loader';
 import { FormSelect } from '@/components/ui/form-select';
 import { AddAnnouncementDialog } from '@/components/dashboard/add-announcement-dialog';
+import { DashboardShell, DashboardHeader } from '@/components/dashboard/shell';
 
 export default function MessagingHub() {
   const [formData, setFormData] = useState({
@@ -76,17 +77,13 @@ export default function MessagingHub() {
   if (loadingGrades) return <PremiumLoader message="Syncing Communication Hub" />;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
-            <MessageSquare className="h-8 w-8 text-blue-600" />
-            Messaging Terminal
-          </h1>
-          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Broadcast Announcements & Automated Alerts</p>
-        </div>
+    <DashboardShell className="animate-in fade-in duration-700">
+      <DashboardHeader 
+        heading="Messaging Terminal"
+        text="Broadcast Announcements & Automated Alerts"
+      >
         <AddAnnouncementDialog />
-      </div>
+      </DashboardHeader>
 
       <div className="grid gap-8 lg:grid-cols-3">
         {/* Composer */}
@@ -291,6 +288,6 @@ export default function MessagingHub() {
             )}
         </CardContent>
       </Card>
-    </div>
+    </DashboardShell>
   );
 }

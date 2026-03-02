@@ -27,6 +27,7 @@ import { toast } from 'react-hot-toast';
 import { PremiumLoader } from '@/components/ui/premium-loader';
 import { CreateFeeStructureDialog } from '@/components/dashboard/create-fee-structure-dialog';
 import { cn } from '@/lib/utils';
+import { DashboardShell, DashboardHeader } from '@/components/dashboard/shell';
 
 export default function FinanceFeeStructuresPage() {
   const queryClient = useQueryClient();
@@ -52,17 +53,13 @@ export default function FinanceFeeStructuresPage() {
   if (isLoading) return <PremiumLoader message="Syncing Billing Configurations" />;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
-            <Receipt className="h-8 w-8 text-blue-600" />
-            Fee Templates
-          </h1>
-          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Institutional Billing Rules & Automations</p>
-        </div>
+    <DashboardShell className="animate-in fade-in duration-700">
+      <DashboardHeader 
+        heading="Fee Templates"
+        text="Institutional Billing Rules & Automations"
+      >
         <CreateFeeStructureDialog />
-      </div>
+      </DashboardHeader>
 
       <div className="grid gap-8">
         {structures?.length === 0 ? (
@@ -129,9 +126,9 @@ export default function FinanceFeeStructuresPage() {
                       disabled={generateInvoicesMutation.isPending}
                     >
                       {generateInvoicesMutation.isPending ? (
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       ) : (
-                        <Plus className="mr-2 h-5 w-5" />
+                        <Plus className="mr-2 h-4 w-4" />
                       )}
                       Generate Bulk Invoices
                     </Button>
@@ -146,6 +143,6 @@ export default function FinanceFeeStructuresPage() {
           ))
         )}
       </div>
-    </div>
+    </DashboardShell>
   );
 }
