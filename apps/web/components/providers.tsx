@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import { QueryClient, QueryClientProvider, QueryCache } from '@tanstack/react-query';
 import { AuthProvider } from './auth-provider';
 import { TenantProvider } from './tenant-provider';
-import { toast } from 'react-hot-toast';
+import { NotificationProvider } from './notification-provider';
+import { toast, Toaster } from 'react-hot-toast';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient({
@@ -39,7 +40,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <TenantProvider>
-          {children}
+          <NotificationProvider>
+            {children}
+            <Toaster position="top-right" />
+          </NotificationProvider>
         </TenantProvider>
       </AuthProvider>
     </QueryClientProvider>
