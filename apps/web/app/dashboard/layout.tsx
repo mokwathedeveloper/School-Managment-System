@@ -80,7 +80,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <p className="text-sm font-semibold truncate max-w-[150px]">{user.first_name} {user.last_name}</p>
                 <p className="text-[10px] text-muted-foreground opacity-75 truncate max-w-[150px]">{user.email}</p>
               </div>
-              <Link href="/dashboard/settings">
+              <Link href="/dashboard/settings/profile">
                 <div 
                   className="h-9 w-9 md:h-10 md:w-10 rounded-full border bg-muted/50 flex items-center justify-center hover:bg-primary/10 transition-colors cursor-pointer"
                 >
