@@ -42,8 +42,25 @@ export default function GradeLevelsPage() {
       queryClient.invalidateQueries({ queryKey: ['grade-levels'] });
       setIsAdding(false);
       setNewGrade({ name: '', level: '' });
+      alert('Academic grade level has been successfully established.');
     },
   });
+
+  const addStreamMutation = useMutation({
+    mutationFn: async ({ gradeId, name }: { gradeId: string, name: string }) => {
+      return api.post('/classes', { grade_id: gradeId, name });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['grade-levels'] });
+      alert('New academic stream has been successfully initialized.');
+    }
+  });
+
+  const handleAddStream = (gradeId: string) => {
+    const name = window.prompt('Enter stream name (e.g. North, East, Blue):');
+    if (!name) return;
+    addStreamMutation.mutate({ gradeId, name });
+  };
 
   if (isLoading) {
     return (
@@ -153,8 +170,14 @@ export default function GradeLevelsPage() {
                           ) : (
                             <span className="text-xs text-muted-foreground italic">No streams yet</span>
                           )}
-                          <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full hover:bg-primary/10 hover:text-primary">
-                            <Plus className="h-3 w-3" />
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-6 w-6 rounded-full hover:bg-primary/10 hover:text-primary"
+                            onClick={() => handleAddStream(grade.id)}
+                            disabled={addStreamMutation.isPending}
+                          >
+                            {addStreamMutation.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />}
                           </Button>
                         </div>
                       </TableCell>
