@@ -70,8 +70,6 @@ export default function StaffDirectoryPage() {
           </Button>
           <AddStaffDialog />
         </div>
-
-        </div>
       </div>
 
       <div className="flex items-center gap-4 bg-card p-4 rounded-xl border shadow-sm">
