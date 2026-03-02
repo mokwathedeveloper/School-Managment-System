@@ -17,6 +17,7 @@ import { NurseView } from '@/components/dashboard/role-views/nurse-view';
 import { SecurityView } from '@/components/dashboard/role-views/security-view';
 import { DriverView } from '@/components/dashboard/role-views/driver-view';
 import { SubordinateView } from '@/components/dashboard/role-views/subordinate-view';
+import { AccountantView } from '@/components/dashboard/role-views/accountant-view';
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -38,8 +39,9 @@ export default function DashboardPage() {
       case 'SCHOOL_ADMIN':
       case 'HEAD_TEACHER':
       case 'DEPUTY_HEAD_TEACHER':
-      case 'ACCOUNTANT':
         return <AdminView stats={stats} />;
+      case 'ACCOUNTANT':
+        return <AccountantView stats={stats} />;
       case 'TEACHER':
       case 'CLASS_TEACHER':
         return <TeacherView stats={stats} />;
