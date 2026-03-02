@@ -96,6 +96,16 @@ export const StudentsService = {
     return student;
   },
 
+  async findByAdmissionNo(schoolId: string, admissionNo: string) {
+    return prisma.student.findFirst({
+      where: { admission_no: admissionNo, school_id: schoolId },
+      include: {
+        user: true,
+        class: { include: { grade: true } }
+      }
+    });
+  },
+
   async update(schoolId: string, id: string, data: Prisma.StudentUpdateInput) {
     // Ensure student belongs to school before updating
     const student = await this.findOne(schoolId, id);
