@@ -53,9 +53,19 @@ export const ConductService = {
     });
   },
 
-  async create(schoolId: string, data: any) {
+  async create(schoolId: string, data: any, reporterUserId?: string) {
+    let staffId = undefined;
+    if (reporterUserId) {
+      const staff = await prisma.staff.findUnique({ where: { user_id: reporterUserId } });
+      staffId = staff?.id;
+    }
+
     return prisma.disciplineRecord.create({
-      data: { ...data, school_id: schoolId }
+      data: { 
+        ...data, 
+        school_id: schoolId,
+        reported_by_id: staffId
+      }
     });
   }
 };
@@ -80,7 +90,7 @@ export const HealthService = {
     });
   },
 
-  async create(schoolId: string, data: any) {
+  async create(schoolId: string, data: any, attendedByUserId?: string) {
     // Check if student has medical record
     let medicalRecord = await prisma.medicalRecord.findUnique({
       where: { student_id: data.student_id }
@@ -92,13 +102,20 @@ export const HealthService = {
       });
     }
 
+    let staffId = undefined;
+    if (attendedByUserId) {
+      const staff = await prisma.staff.findUnique({ where: { user_id: attendedByUserId } });
+      staffId = staff?.id;
+    }
+
     return prisma.clinicVisit.create({
       data: {
         school_id: schoolId,
         medical_record_id: medicalRecord.id,
         symptoms: data.symptoms,
         diagnosis: data.diagnosis,
-        visit_date: new Date(data.visit_date)
+        visit_date: new Date(data.visit_date),
+        attended_by_id: staffId
       }
     });
   }
