@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
 import { 
@@ -13,29 +13,22 @@ import {
 } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { 
-  Plus, 
   Loader2, 
   CreditCard, 
-  FileText, 
   Receipt, 
-  Trash2,
-  AlertCircle
+  AlertCircle,
+  TrendingUp,
+  ArrowRight
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'react-hot-toast';
+import { PremiumLoader } from '@/components/ui/premium-loader';
+import { CreateFeeStructureDialog } from '@/components/dashboard/create-fee-structure-dialog';
+import { cn } from '@/lib/utils';
 
 export default function FinanceFeeStructuresPage() {
-
   const queryClient = useQueryClient();
-  const [isAdding, setIsAdding] = useState(false);
-  const [newStructure, setNewStructure] = useState({
-    grade_id: '',
-    term_id: '',
-    items: [{ name: '', amount: '' }]
-  });
 
   const { data: structures, isLoading } = useQuery({
     queryKey: ['fee-structures'],
@@ -45,231 +38,105 @@ export default function FinanceFeeStructuresPage() {
     },
   });
 
-  const { data: grades } = useQuery({
-    queryKey: ['grade-levels'],
-    queryFn: async () => {
-      const res = await api.get('/grade-levels');
-      return res.data;
-    },
-  });
-
-  const { data: terms } = useQuery({
-    queryKey: ['terms'],
-    queryFn: async () => {
-      const res = await api.get('/finance/terms');
-      return res.data;
-    },
-  });
-
-  const createMutation = useMutation({
-    mutationFn: async (data: any) => {
-      return api.post('/finance/fee-structures', {
-        ...data,
-        items: data.items.map((i: any) => ({ ...i, amount: parseFloat(i.amount) }))
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['fee-structures'] });
-      setIsAdding(false);
-    },
-  });
-
   const generateInvoicesMutation = useMutation({
     mutationFn: async ({ gradeId, termId }: { gradeId: string, termId: string }) => {
       return api.post('/finance/generate-bulk-invoices', { grade_id: gradeId, term_id: termId });
     },
     onSuccess: (res) => {
-      toast.success(`Institutional billing initialized. ${res.data.created} invoices were generated. ${res.data.skipped} existing records were preserved.`);
+      toast.success(`Institutional billing initialized. ${res.data.created} invoices were generated.`);
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
     }
   });
 
-  const addItem = () => {
-    setNewStructure({
-      ...newStructure,
-      items: [...newStructure.items, { name: '', amount: '' }]
-    });
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
+  if (isLoading) return <PremiumLoader message="Syncing Billing Configurations" />;
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
-      <div className="flex items-center justify-between">
+    <div className="space-y-8 animate-in fade-in duration-700">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Fee Structures</h1>
-          <p className="text-muted-foreground mt-1">Define termly fee templates and automate student billing.</p>
+          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
+            <Receipt className="h-8 w-8 text-blue-600" />
+            Fee Templates
+          </h1>
+          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Institutional Billing Rules & Automations</p>
         </div>
-        <Button onClick={() => setIsAdding(!isAdding)} className="shadow-md">
-          <Plus className="h-4 w-4 mr-2" />
-          Create Fee Structure
-        </Button>
+        <CreateFeeStructureDialog />
       </div>
 
-      {isAdding && (
-        <Card className="border-primary/20 shadow-lg">
-          <CardHeader>
-            <CardTitle>New Fee Structure</CardTitle>
-            <CardDescription>Select a grade and term to define the standard fee items.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Grade Level</Label>
-                <select 
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  value={newStructure.grade_id}
-                  onChange={(e) => setNewStructure({ ...newStructure, grade_id: e.target.value })}
-                >
-                  <option value="">Select Grade</option>
-                  {grades?.map((g: any) => <option key={g.id} value={g.id}>{g.name}</option>)}
-                </select>
-              </div>
-              <div className="space-y-2">
-                <Label>Academic Term</Label>
-                <select 
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  value={newStructure.term_id}
-                  onChange={(e) => setNewStructure({ ...newStructure, term_id: e.target.value })}
-                >
-                  <option value="">Select Term</option>
-                  {terms?.map((t: any) => <option key={t.id} value={t.id}>{t.name}</option>)}
-                </select>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center justify-between border-b pb-2">
-                <h3 className="font-semibold flex items-center gap-2">
-                  <Receipt className="h-4 w-4" />
-                  Line Items
-                </h3>
-                <Button variant="outline" size="sm" onClick={addItem}>
-                  <Plus className="h-3 w-3 mr-1" /> Add Item
-                </Button>
-              </div>
-              
-              {newStructure.items.map((item, index) => (
-                <div key={index} className="flex gap-4 items-end animate-in slide-in-from-left-2 duration-200">
-                  <div className="flex-1 space-y-1.5">
-                    <Label className="text-xs">Item Name</Label>
-                    <Input 
-                      placeholder="e.g. Tuition Fee" 
-                      value={item.name}
-                      onChange={(e) => {
-                        const items = [...newStructure.items];
-                        items[index].name = e.target.value;
-                        setNewStructure({ ...newStructure, items });
-                      }}
-                    />
-                  </div>
-                  <div className="w-32 space-y-1.5">
-                    <Label className="text-xs">Amount (KES)</Label>
-                    <Input 
-                      type="number" 
-                      placeholder="0.00" 
-                      value={item.amount}
-                      onChange={(e) => {
-                        const items = [...newStructure.items];
-                        items[index].amount = e.target.value;
-                        setNewStructure({ ...newStructure, items });
-                      }}
-                    />
-                  </div>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="text-destructive hover:bg-destructive/10"
-                    onClick={() => {
-                      const items = newStructure.items.filter((_, i) => i !== index);
-                      setNewStructure({ ...newStructure, items });
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-
-            <div className="flex justify-end gap-3 pt-4 border-t">
-              <Button variant="ghost" onClick={() => setIsAdding(false)}>Cancel</Button>
-              <Button 
-                onClick={() => createMutation.mutate(newStructure)}
-                disabled={createMutation.isPending || !newStructure.grade_id || !newStructure.term_id}
-              >
-                Save Structure
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      <div className="grid gap-6">
+      <div className="grid gap-8">
         {structures?.length === 0 ? (
-          <Card className="flex flex-col items-center justify-center p-12 bg-muted/20 border-dashed">
-            <CreditCard className="h-12 w-12 text-muted-foreground opacity-20 mb-4" />
-            <p className="text-lg font-medium text-muted-foreground">No fee structures defined yet.</p>
-            <Button variant="link" onClick={() => setIsAdding(true)}>Create your first template</Button>
-          </Card>
+          <div className="h-[400px] flex flex-col items-center justify-center text-center p-12 bg-white rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.02)] border-2 border-dashed border-slate-100">
+            <div className="h-20 w-20 rounded-[2rem] bg-slate-50 flex items-center justify-center mb-6 border border-slate-100">
+                <CreditCard className="h-10 w-10 text-slate-200" />
+            </div>
+            <h3 className="text-xl font-black text-slate-900 tracking-tight">No Templates Defined</h3>
+            <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mt-2 max-w-xs leading-relaxed">
+                Establish your first institutional fee structure to initialize automated billing.
+            </p>
+          </div>
         ) : (
           structures?.map((structure: any) => (
-            <Card key={structure.id} className="overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-              <CardHeader className="bg-muted/30 pb-4">
-                <div className="flex justify-between items-start">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <CardTitle className="text-xl font-bold">{structure.grade.name}</CardTitle>
-                      <Badge variant="outline">{structure.term.name}</Badge>
-                    </div>
-                    <CardDescription>Defined on {new Date(structure.created_at).toLocaleDateString()}</CardDescription>
+            <Card key={structure.id} className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2.5rem] overflow-hidden group hover:shadow-[0_20px_40px_rgba(0,0,0,0.04)] transition-premium">
+              <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="flex items-center gap-5">
+                  <div className="h-14 w-14 rounded-[1.5rem] bg-blue-600 text-white shadow-xl shadow-blue-600/20 flex items-center justify-center group-hover:scale-110 transition-premium">
+                    <TrendingUp className="h-7 w-7" />
                   </div>
-                  <div className="text-right">
-                    <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Total Amount</p>
-                    <p className="text-2xl font-bold text-primary">KES {parseFloat(structure.total_amount).toLocaleString()}</p>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-3">
+                      <CardTitle className="text-2xl font-black text-slate-900 tracking-tight">{structure.grade.name}</CardTitle>
+                      <Badge className="bg-white text-slate-600 border-slate-200 font-black text-[10px] uppercase tracking-widest px-3 py-1 rounded-lg shadow-sm">
+                        {structure.term.name}
+                      </Badge>
+                    </div>
+                    <CardDescription className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Authorized on {new Date(structure.created_at).toLocaleDateString()}</CardDescription>
                   </div>
                 </div>
+                <div className="text-right">
+                    <p className="text-[10px] text-slate-400 uppercase tracking-[0.2em] font-black mb-1">Terminal Assessment</p>
+                    <p className="text-3xl font-black text-blue-600 tracking-tighter">KES {parseFloat(structure.total_amount).toLocaleString()}</p>
+                </div>
               </CardHeader>
-              <CardContent className="pt-6">
-                <div className="grid md:grid-cols-2 gap-8">
-                  <div className="space-y-3">
-                    <h4 className="text-sm font-semibold flex items-center gap-2 text-muted-foreground uppercase tracking-tight">
-                      Breakdown
+              <CardContent className="p-8">
+                <div className="grid md:grid-cols-2 gap-12">
+                  <div className="space-y-4">
+                    <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 flex items-center gap-2">
+                      <Receipt className="h-3.5 w-3.5" />
+                      Template Breakdown
                     </h4>
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       {structure.items.map((item: any) => (
-                        <div key={item.id} className="flex justify-between text-sm items-center py-1 border-b border-muted last:border-0">
-                          <span className="text-muted-foreground">{item.name}</span>
-                          <span className="font-medium">KES {parseFloat(item.amount).toLocaleString()}</span>
+                        <div key={item.id} className="flex justify-between items-center py-3 border-b border-slate-50 last:border-0 group/item">
+                          <span className="text-sm font-bold text-slate-600 group-hover/item:text-slate-900 transition-colors">{item.name}</span>
+                          <span className="font-black text-slate-900">KES {parseFloat(item.amount).toLocaleString()}</span>
                         </div>
                       ))}
                     </div>
                   </div>
-                  <div className="flex flex-col justify-center items-center bg-primary/5 rounded-xl p-6 text-center space-y-4">
-                    <div className="space-y-1">
-                      <h4 className="font-bold">Billing Automation</h4>
-                      <p className="text-sm text-muted-foreground">Apply this structure to all students in {structure.grade.name} for {structure.term.name}.</p>
+                  <div className="flex flex-col justify-center items-center bg-blue-50/30 border border-blue-50 rounded-[2rem] p-8 text-center space-y-6 shadow-inner relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-4 opacity-[0.03]">
+                        <Receipt className="h-32 w-32" />
+                    </div>
+                    <div className="space-y-2 relative z-10">
+                      <h4 className="font-black text-slate-900 uppercase tracking-tighter">Billing Automation</h4>
+                      <p className="text-xs font-medium text-slate-500 italic max-w-[240px]">Initialize mass invoicing for all scholars in {structure.grade.name} for the current terminal sequence.</p>
                     </div>
                     <Button 
-                      className="w-full shadow-lg"
+                      variant="premium"
+                      className="w-full h-14 rounded-2xl shadow-xl shadow-blue-600/20 relative z-10"
                       onClick={() => generateInvoicesMutation.mutate({ gradeId: structure.grade_id, termId: structure.term_id })}
                       disabled={generateInvoicesMutation.isPending}
                     >
                       {generateInvoicesMutation.isPending ? (
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                       ) : (
-                        <Receipt className="h-4 w-4 mr-2" />
+                        <Plus className="mr-2 h-5 w-5" />
                       )}
                       Generate Bulk Invoices
                     </Button>
-                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
-                      <AlertCircle className="h-3 w-3" />
-                      Existing invoices for this term will not be duplicated.
+                    <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-tighter relative z-10">
+                      <AlertCircle className="h-3 w-3 text-blue-400" />
+                      Registry checks will prevent duplicate entries
                     </div>
                   </div>
                 </div>

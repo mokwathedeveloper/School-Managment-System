@@ -1,21 +1,15 @@
 'use client';
 
 import React, { useState } from 'react';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
-} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Loader2, Calendar } from 'lucide-react';
+import { Plus, Loader2, Calendar, BookOpen, User, MapPin, Clock } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
 import { toast } from 'react-hot-toast';
+import { DialogShell } from '@/components/ui/dialog-shell';
+import { FormSelect } from '@/components/ui/form-select';
 
 interface AddTimetableSlotDialogProps {
   classId: string;
@@ -46,7 +40,7 @@ export function AddTimetableSlotDialog({ classId }: AddTimetableSlotDialogProps)
   const { data: subjects } = useQuery({
     queryKey: ['subjects'],
     queryFn: async () => {
-      const res = await api.get('/classes/subjects'); // Assuming this endpoint exists or similar
+      const res = await api.get('/classes/subjects');
       return res.data;
     }
   });
@@ -62,7 +56,7 @@ export function AddTimetableSlotDialog({ classId }: AddTimetableSlotDialogProps)
   const { data: rooms } = useQuery({
     queryKey: ['academic-rooms'],
     queryFn: async () => {
-      const res = await api.get('/timetable/rooms'); // Assuming we add this endpoint
+      const res = await api.get('/timetable/rooms');
       return res.data;
     }
   });
@@ -71,7 +65,7 @@ export function AddTimetableSlotDialog({ classId }: AddTimetableSlotDialogProps)
     mutationFn: async (data: any) => api.post('/timetable', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['timetable', classId] });
-      toast.success('Timetable slot has been scheduled.');
+      toast.success('Timetable slot has been successfully scheduled.');
       setOpen(false);
       setFormData({ 
         subject_id: '', 
@@ -101,76 +95,71 @@ export function AddTimetableSlotDialog({ classId }: AddTimetableSlotDialogProps)
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button size="sm" className="shadow-md">
-          <Plus className="h-4 w-4 mr-2" />
-          Schedule Slot
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-primary" />
-            Schedule Lesson Slot
-          </DialogTitle>
-          <DialogDescription>
-            Assign a subject, teacher, and room to a specific time slot.
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+    <>
+      <Button size="sm" onClick={() => setOpen(true)} className="h-12 px-6 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20">
+        <Plus className="h-4 w-4 mr-2" />
+        Schedule Slot
+      </Button>
+
+      <DialogShell
+        open={open}
+        onOpenChange={setOpen}
+        title="Schedule Lesson"
+        description="Assign a subject, teacher, and room to a specific time slot"
+        icon={Calendar}
+      >
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="subject_id">Subject</Label>
-            <select 
-              id="subject_id" 
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              value={formData.subject_id}
-              onChange={(e) => setFormData({...formData, subject_id: e.target.value})}
-              required
+            <Label htmlFor="t_subject" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Academic Subject</Label>
+            <FormSelect 
+                id="t_subject" 
+                icon={<BookOpen className="h-4 w-4" />}
+                value={formData.subject_id}
+                onChange={(e) => setFormData({...formData, subject_id: e.target.value})}
+                required
             >
-              <option value="">Select Subject</option>
-              {subjects?.map((s: any) => (
-                <option key={s.id} value={s.id}>{s.name}</option>
-              ))}
-            </select>
+                <option value="">Select Subject</option>
+                {subjects?.map((s: any) => (
+                    <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+            </FormSelect>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
-                <Label htmlFor="teacher_id">Teacher</Label>
-                <select 
-                id="teacher_id" 
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                value={formData.teacher_id}
-                onChange={(e) => setFormData({...formData, teacher_id: e.target.value})}
+                <Label htmlFor="t_teacher" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Instructor</Label>
+                <FormSelect 
+                    id="t_teacher" 
+                    icon={<User className="h-4 w-4" />}
+                    value={formData.teacher_id}
+                    onChange={(e) => setFormData({...formData, teacher_id: e.target.value})}
                 >
-                <option value="">Optional</option>
-                {staff?.map((s: any) => (
-                    <option key={s.id} value={s.id}>{s.user.first_name} {s.user.last_name}</option>
-                ))}
-                </select>
+                    <option value="">Optional</option>
+                    {staff?.map((s: any) => (
+                        <option key={s.id} value={s.id}>{s.user.first_name} {s.user.last_name}</option>
+                    ))}
+                </FormSelect>
             </div>
             <div className="space-y-2">
-                <Label htmlFor="room_id">Room</Label>
-                <select 
-                id="room_id" 
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                value={formData.room_id}
-                onChange={(e) => setFormData({...formData, room_id: e.target.value})}
+                <Label htmlFor="t_room" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Location</Label>
+                <FormSelect 
+                    id="t_room" 
+                    icon={<MapPin className="h-4 w-4" />}
+                    value={formData.room_id}
+                    onChange={(e) => setFormData({...formData, room_id: e.target.value})}
                 >
-                <option value="">Optional</option>
-                {rooms?.map((r: any) => (
-                    <option key={r.id} value={r.id}>{r.name}</option>
-                ))}
-                </select>
+                    <option value="">Optional</option>
+                    {rooms?.map((r: any) => (
+                        <option key={r.id} value={r.id}>{r.name}</option>
+                    ))}
+                </FormSelect>
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="day_of_week">Day of Week</Label>
-            <select 
-              id="day_of_week" 
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+            <Label htmlFor="t_day" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Day of Week</Label>
+            <FormSelect 
+              id="t_day" 
               value={formData.day_of_week}
               onChange={(e) => setFormData({...formData, day_of_week: e.target.value})}
               required
@@ -178,38 +167,46 @@ export function AddTimetableSlotDialog({ classId }: AddTimetableSlotDialogProps)
               {DAYS.map((d) => (
                 <option key={d.id} value={d.id}>{d.name}</option>
               ))}
-            </select>
+            </FormSelect>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="start_time">Start Time</Label>
-              <Input 
-                id="start_time" 
-                type="time" 
-                required 
-                value={formData.start_time}
-                onChange={(e) => setFormData({...formData, start_time: e.target.value})}
-              />
+              <Label htmlFor="t_start" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Start Time</Label>
+              <div className="relative group">
+                <Clock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
+                <Input 
+                    id="t_start" 
+                    type="time" 
+                    required 
+                    className="pl-12 font-black"
+                    value={formData.start_time}
+                    onChange={(e) => setFormData({...formData, start_time: e.target.value})}
+                />
+              </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="end_time">End Time</Label>
-              <Input 
-                id="end_time" 
-                type="time" 
-                required 
-                value={formData.end_time}
-                onChange={(e) => setFormData({...formData, end_time: e.target.value})}
-              />
+              <Label htmlFor="t_end" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">End Time</Label>
+              <div className="relative group">
+                <Clock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
+                <Input 
+                    id="t_end" 
+                    type="time" 
+                    required 
+                    className="pl-12 font-black"
+                    value={formData.end_time}
+                    onChange={(e) => setFormData({...formData, end_time: e.target.value})}
+                />
+              </div>
             </div>
           </div>
 
-          <Button type="submit" className="w-full" disabled={createMutation.isPending}>
-            {createMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            Schedule Lesson
+          <Button type="submit" className="w-full h-14 rounded-2xl shadow-2xl shadow-blue-600/20" variant="premium" disabled={createMutation.isPending}>
+            {createMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Calendar className="mr-2 h-4 w-4" />}
+            Confirm Schedule
           </Button>
         </form>
-      </DialogContent>
-    </Dialog>
+      </DialogShell>
+    </>
   );
 }
