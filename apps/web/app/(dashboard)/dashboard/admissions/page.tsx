@@ -6,22 +6,14 @@ import { api } from '@/lib/api-client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { 
   Users, 
-  Search, 
   ChevronRight, 
-  Calendar, 
   CheckCircle2, 
-  XCircle, 
   Clock, 
-  Loader2,
-  Mail,
-  Smartphone,
   ClipboardList,
   GraduationCap,
   Filter,
-  ArrowRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'react-hot-toast';
@@ -29,6 +21,7 @@ import { cn } from '@/lib/utils';
 import { PremiumLoader } from '@/components/ui/premium-loader';
 import { InsightCard } from '@/components/dashboard/insight-card';
 import { FormSelect } from '@/components/ui/form-select';
+import { BroadcastAdmissionAlertDialog } from '@/components/dashboard/broadcast-admission-alert-dialog';
 
 export default function AdmissionsDashboard() {
   const queryClient = useQueryClient();
@@ -41,26 +34,6 @@ export default function AdmissionsDashboard() {
       return res.data;
     },
   });
-
-  const broadcastMutation = useMutation({
-    mutationFn: async (data: any) => api.post('/messaging/announcements', data),
-    onSuccess: (res) => {
-      toast.success(`Broadcast dispatched to ${res.data.sent} applicants.`);
-    }
-  });
-
-  const handleBroadcast = () => {
-    const title = window.prompt('Enter announcement title:');
-    if (!title) return;
-    const message = window.prompt('Enter message for applicants:');
-    if (!message) return;
-
-    broadcastMutation.mutate({
-      title,
-      message,
-      targetRole: 'APPLICANT' 
-    });
-  };
 
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string, status: string }) => {
@@ -84,15 +57,7 @@ export default function AdmissionsDashboard() {
           </h1>
           <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Registry Flow & Prospect Management</p>
         </div>
-        <Button 
-          variant="premium"
-          className="h-12 px-8"
-          onClick={handleBroadcast}
-          disabled={broadcastMutation.isPending}
-        >
-          {broadcastMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Mail className="mr-2 h-4 w-4" />}
-          Broadcast Alert
-        </Button>
+        <BroadcastAdmissionAlertDialog />
       </div>
 
       {/* Summary Stats using InsightCard */}
@@ -155,15 +120,14 @@ export default function AdmissionsDashboard() {
               <TableRow className="hover:bg-transparent">
                 <TableHead className="pl-8 py-4 font-black uppercase tracking-widest text-[10px] text-slate-400">Prospect Identity</TableHead>
                 <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Applied For</TableHead>
-                <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Communication</TableHead>
-                <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400 text-center">Pipeline Stage</TableHead>
+                <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Pipeline Stage</TableHead>
                 <TableHead className="text-right pr-8 font-black uppercase tracking-widest text-[10px] text-slate-400">Workflow</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {applications?.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="h-64 text-center">
+                  <TableCell colSpan={4} className="h-64 text-center">
                     <div className="flex flex-col items-center gap-2 text-slate-300">
                         <ClipboardList className="h-12 w-12 opacity-20" />
                         <p className="font-black uppercase tracking-widest text-xs">Registry Empty</p>
@@ -178,21 +142,11 @@ export default function AdmissionsDashboard() {
                       <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Applied {new Date(app.created_at).toLocaleDateString()}</div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className="font-black text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-lg border-slate-200">
+                      <Badge variant="outline" className="font-black text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-lg border-slate-200 text-slate-500">
                         {app.applied_grade.name}
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-2 text-xs font-medium text-slate-600">
-                          <Mail className="h-3 w-3 text-slate-300" /> {app.email}
-                        </div>
-                        <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
-                          <Smartphone className="h-3 w-3 text-slate-300" /> {app.phone}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-center">
                       <Badge className={cn(
                         "font-black text-[9px] uppercase tracking-widest px-3 py-1 rounded-lg shadow-sm border-none",
                         app.status === 'ACCEPTED' ? "bg-emerald-50 text-emerald-600" : 
@@ -235,7 +189,7 @@ export default function AdmissionsDashboard() {
                             Accept Student
                           </Button>
                         )}
-                        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl text-slate-300 hover:text-blue-600">
+                        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl text-slate-300 hover:text-blue-600 transition-premium">
                             <ChevronRight className="h-4 w-4" />
                         </Button>
                       </div>
