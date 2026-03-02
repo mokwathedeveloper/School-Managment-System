@@ -1,6 +1,7 @@
 
 import prisma from '../db/prisma';
 import { Staff, Prisma } from '@prisma/client';
+import * as argon2 from 'argon2';
 
 export const StaffService = {
   async findAll(schoolId: string) {
@@ -21,6 +22,35 @@ export const StaffService = {
         classes_managed: true,
         subjects_taught: true,
       }
+    });
+  },
+
+  async create(schoolId: string, data: any) {
+    const passwordHash = await argon2.hash('staff123'); // Default staff password
+
+    return prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          email: data.email,
+          password: passwordHash,
+          first_name: data.first_name,
+          last_name: data.last_name,
+          role: 'TEACHER', // Default role for HR directory entry
+          school_id: schoolId,
+        },
+      });
+
+      return tx.staff.create({
+        data: {
+          user_id: user.id,
+          school_id: schoolId,
+          designation: data.designation,
+          department: data.department,
+          base_salary: data.base_salary,
+          id_number: data.id_number
+        },
+        include: { user: true }
+      });
     });
   },
 
