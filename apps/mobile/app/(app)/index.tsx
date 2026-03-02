@@ -13,6 +13,7 @@ import { AdminMobileView } from '../../components/dashboard/role-views/AdminMobi
 import { TeacherMobileView } from '../../components/dashboard/role-views/TeacherMobileView';
 import { SpecialistMobileView } from '../../components/dashboard/role-views/SpecialistMobileView';
 import { StaffMobileView } from '../../components/dashboard/role-views/StaffMobileView';
+import { AccountantMobileView } from '../../components/dashboard/role-views/AccountantMobileView';
 
 export default function DashboardScreen() {
   const { user } = useAuthStore();
@@ -62,8 +63,9 @@ export default function DashboardScreen() {
       case 'SCHOOL_ADMIN':
       case 'HEAD_TEACHER':
       case 'DEPUTY_HEAD_TEACHER':
-      case 'ACCOUNTANT':
         return <AdminMobileView stats={stats} router={router} />;
+      case 'ACCOUNTANT':
+        return <AccountantMobileView stats={stats} />;
       case 'TEACHER':
       case 'CLASS_TEACHER':
         return <TeacherMobileView stats={stats} router={router} />;
