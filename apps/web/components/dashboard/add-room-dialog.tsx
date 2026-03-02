@@ -1,22 +1,14 @@
-
 'use client';
 
 import React, { useState } from 'react';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
-} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Loader2 } from 'lucide-react';
+import { Plus, Loader2, Home, Hash, Users } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
 import { toast } from 'react-hot-toast';
+import { DialogShell } from '@/components/ui/dialog-shell';
 
 export function AddRoomDialog({ hostelId }: { hostelId: string }) {
   const [open, setOpen] = useState(false);
@@ -52,47 +44,57 @@ export function AddRoomDialog({ hostelId }: { hostelId: string }) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button size="sm" variant="outline">
-          <Plus className="h-4 w-4 mr-2" />
-          Add Room
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Add Dormitory Room</DialogTitle>
-          <DialogDescription>
-            Register a new room within this hostel building.
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+    <>
+      <Button size="sm" variant="outline" onClick={() => setOpen(true)} className="h-9 px-4 rounded-xl border-slate-100">
+        <Plus className="h-4 w-4 mr-2" />
+        Add Room
+      </Button>
+
+      <DialogShell
+        open={open}
+        onOpenChange={setOpen}
+        title="Add Dormitory Room"
+        description="Register a new room within this hostel building"
+        icon={Home}
+      >
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="room_number">Room Number / Name</Label>
-            <Input 
-              id="room_number" 
-              placeholder="e.g. 101 or A-1" 
-              required 
-              value={formData.room_number}
-              onChange={(e) => setFormData({...formData, room_number: e.target.value})}
-            />
+            <Label htmlFor="r_number" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Room Number / Name</Label>
+            <div className="relative group">
+                <Hash className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
+                <Input 
+                    id="r_number" 
+                    required 
+                    placeholder="e.g. 101 or A-1"
+                    className="h-12 pl-12 rounded-xl border-2 border-slate-50 focus:ring-blue-600/10 font-bold"
+                    value={formData.room_number}
+                    onChange={(e) => setFormData({...formData, room_number: e.target.value})}
+                />
+            </div>
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="capacity">Occupancy Capacity</Label>
-            <Input 
-              id="capacity" 
-              type="number" 
-              required 
-              value={formData.capacity}
-              onChange={(e) => setFormData({...formData, capacity: e.target.value})}
-            />
+            <Label htmlFor="r_cap" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Occupancy Capacity</Label>
+            <div className="relative group">
+                <Users className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
+                <Input 
+                    id="r_cap" 
+                    type="number"
+                    required 
+                    placeholder="e.g. 4"
+                    className="h-12 pl-12 rounded-xl border-2 border-slate-50 focus:ring-blue-600/10 font-black"
+                    value={formData.capacity}
+                    onChange={(e) => setFormData({...formData, capacity: e.target.value})}
+                />
+            </div>
           </div>
-          <Button type="submit" className="w-full" disabled={createMutation.isPending}>
-            {createMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            Create Room
+
+          <Button type="submit" className="w-full h-14 rounded-2xl shadow-2xl shadow-blue-600/20" variant="premium" disabled={createMutation.isPending}>
+            {createMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
+            Create Room Unit
           </Button>
         </form>
-      </DialogContent>
-    </Dialog>
+      </DialogShell>
+    </>
   );
 }

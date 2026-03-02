@@ -15,7 +15,12 @@ import {
 } from 'recharts';
 import { 
   Sparkles,
-  Loader2
+  Loader2,
+  Activity,
+  Calendar,
+  CheckCircle2,
+  TrendingUp,
+  Layout
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Insights } from '@/components/dashboard/insights';
@@ -23,6 +28,7 @@ import { ActionCenter } from '@/components/dashboard/action-center';
 import { ActivityFeed } from '@/components/dashboard/activity-feed';
 import { InvoicesTable } from '@/components/dashboard/tables/invoices-table';
 import { DashboardShell, DashboardHeader } from '@/components/dashboard/shell';
+import { PremiumLoader } from '@/components/ui/premium-loader';
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -66,16 +72,7 @@ export default function DashboardPage() {
     { name: 'Fri', rate: 88 },
   ];
 
-  if (loadingStats) {
-    return (
-      <div className="flex items-center justify-center h-[60vh]">
-        <div className="flex flex-col items-center gap-4">
-            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest leading-none">Aggregating Institutional Data</p>
-        </div>
-      </div>
-    );
-  }
+  if (loadingStats) return <PremiumLoader message="Aggregating Institutional Data" />;
 
   return (
     <DashboardShell>
@@ -83,9 +80,9 @@ export default function DashboardPage() {
         heading={`Welcome, ${user?.first_name}.`}
         text="Your institutional dashboard is synchronized and operational."
       >
-        <div className="bg-white px-4 py-2 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3">
+        <div className="bg-white px-5 py-2.5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3 transition-all hover:shadow-md cursor-default">
             <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-xs font-bold text-slate-600 uppercase tracking-widest">Global Terminal Active</span>
+            <span className="text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">Terminal Alpha Active</span>
         </div>
       </DashboardHeader>
 
@@ -95,23 +92,38 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Operational View */}
         <div className="lg:col-span-2 space-y-8">
-            <InvoicesTable invoices={stats?.rawInvoices || []} isLoading={loadingStats} />
+            <div className="bg-white rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.02)] overflow-hidden border-none group">
+                <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8 flex flex-row items-center justify-between">
+                    <div className="space-y-1">
+                        <CardTitle className="text-xl font-black text-slate-900 tracking-tight">Recent Financial Activity</CardTitle>
+                        <CardDescription className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Institutional Billing Registry</CardDescription>
+                    </div>
+                    <Badge variant="outline" className="rounded-xl border-slate-200 font-bold px-3 py-1">Real-time</Badge>
+                </CardHeader>
+                <InvoicesTable invoices={stats?.rawInvoices || []} isLoading={loadingStats} />
+            </div>
             
             {/* Chart Section */}
-            <div className="bg-white p-8 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.02)] space-y-6">
+            <div className="bg-white p-10 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.02)] space-y-8 border-none group hover:shadow-[0_20px_40px_rgba(0,0,0,0.04)] transition-premium">
                 <div className="flex items-center justify-between">
-                    <div className="space-y-1">
-                        <h3 className="text-xl font-black text-slate-900 tracking-tight leading-none">Attendance Momentum</h3>
-                        <p className="text-xs font-medium text-slate-500 italic leading-none">Weekly institutional presence tracking.</p>
+                    <div className="space-y-1.5">
+                        <h3 className="text-2xl font-black text-slate-900 tracking-tight leading-none flex items-center gap-3">
+                            <Activity className="h-6 w-6 text-blue-600" />
+                            Attendance Momentum
+                        </h3>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Weekly institutional presence tracking</p>
                     </div>
-                    <Badge variant="outline" className="rounded-xl font-bold">This Week</Badge>
+                    <div className="flex bg-slate-50 p-1 rounded-xl border border-slate-100">
+                        <button className="px-4 py-1.5 bg-white shadow-sm rounded-lg text-[10px] font-black uppercase tracking-widest text-slate-900 transition-all">This Week</button>
+                        <button className="px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-all">Previous</button>
+                    </div>
                 </div>
-                <div className="h-[300px] w-full pt-4">
+                <div className="h-[320px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
                         <AreaChart data={attendanceData}>
                             <defs>
                                 <linearGradient id="colorRate" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#2563eb" stopOpacity={0.1}/>
+                                    <stop offset="5%" stopColor="#2563eb" stopOpacity={0.15}/>
                                     <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
                                 </linearGradient>
                             </defs>
@@ -120,20 +132,27 @@ export default function DashboardPage() {
                                 dataKey="name" 
                                 axisLine={false} 
                                 tickLine={false} 
-                                tick={{ fontSize: 10, fontWeight: 700, fill: '#94a3b8' }}
-                                dy={10}
+                                tick={{ fontSize: 10, fontWeight: 800, fill: '#94a3b8' }}
+                                dy={15}
                             />
                             <YAxis hide domain={[0, 100]} />
                             <Tooltip 
-                                contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                                contentStyle={{ 
+                                    borderRadius: '20px', 
+                                    border: 'none', 
+                                    boxShadow: '0 20px 40px -12px rgb(0 0 0 / 0.1)',
+                                    padding: '12px 16px'
+                                }}
+                                itemStyle={{ fontSize: '12px', fontWeight: 900, color: '#0f172a', textTransform: 'uppercase' }}
                             />
                             <Area 
                                 type="monotone" 
                                 dataKey="rate" 
                                 stroke="#2563eb" 
-                                strokeWidth={4}
+                                strokeWidth={5}
                                 fillOpacity={1} 
                                 fill="url(#colorRate)" 
+                                animationDuration={2000}
                             />
                         </AreaChart>
                     </ResponsiveContainer>

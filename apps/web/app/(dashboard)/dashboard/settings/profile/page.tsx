@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -21,9 +20,12 @@ import {
   Phone,
   Save,
   Loader2,
-  UserCircle
+  UserCircle,
+  ShieldCheck,
+  Smartphone
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { PremiumLoader } from '@/components/ui/premium-loader';
 
 export default function UserProfilePage() {
   const queryClient = useQueryClient();
@@ -64,13 +66,7 @@ export default function UserProfilePage() {
     }
   });
 
-  if (isLoading || !user) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
+  if (isLoading || !user) return <PremiumLoader message="Syncing User Identity" />;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,103 +78,132 @@ export default function UserProfilePage() {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500 max-w-2xl mx-auto">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
-          <UserCircle className="h-8 w-8 text-primary" />
-          My Profile
-        </h1>
-        <p className="text-muted-foreground mt-1">Manage your personal account details and security settings.</p>
+    <div className="space-y-8 animate-in fade-in duration-700 max-w-2xl mx-auto pb-12">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
+            <UserCircle className="h-8 w-8 text-blue-600" />
+            Personal Terminal
+          </h1>
+          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Identity & Security Configuration</p>
+        </div>
+        <Button 
+            onClick={handleSubmit} 
+            disabled={updateMutation.isPending} 
+            variant="premium"
+            className="h-12 px-8 shadow-xl"
+        >
+          {updateMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+          Update Profile
+        </Button>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <Card className="shadow-sm border-muted/50">
-          <CardHeader>
-            <CardTitle className="text-lg">Personal Information</CardTitle>
-            <CardDescription>Basic details about your account identity.</CardDescription>
+      <form onSubmit={handleSubmit} className="space-y-8">
+        {/* Identity Card */}
+        <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2.5rem] overflow-hidden">
+          <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
+            <CardTitle className="text-xl font-black text-slate-900">Institutional Identity</CardTitle>
+            <CardDescription className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Primary contact and registry details</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+          <CardContent className="p-8 space-y-6">
+            <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="first_name">First Name</Label>
-                <Input 
-                  id="first_name" 
-                  value={formData.first_name} 
-                  onChange={(e) => setFormData({...formData, first_name: e.target.value})} 
-                />
+                <Label htmlFor="first_name" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">First Name</Label>
+                <div className="relative group">
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
+                    <Input 
+                        id="first_name" 
+                        className="h-12 pl-12 rounded-xl border-2 border-slate-50 font-bold"
+                        value={formData.first_name} 
+                        onChange={(e) => setFormData({...formData, first_name: e.target.value})} 
+                    />
+                </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="last_name">Last Name</Label>
+                <Label htmlFor="last_name" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Last Name</Label>
                 <Input 
                   id="last_name" 
+                  className="h-12 rounded-xl border-2 border-slate-50 font-bold"
                   value={formData.last_name} 
                   onChange={(e) => setFormData({...formData, last_name: e.target.value})} 
                 />
               </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input id="email" value={formData.email} disabled className="pl-10 bg-muted" />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="phone">Phone Number</Label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input 
-                  id="phone" 
-                  className="pl-10"
-                  value={formData.phone} 
-                  onChange={(e) => setFormData({...formData, phone: e.target.value})} 
-                />
-              </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                    <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Official Email</Label>
+                    <div className="relative">
+                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
+                        <Input 
+                            id="email" 
+                            value={formData.email} 
+                            disabled 
+                            className="h-12 pl-12 rounded-xl border-2 border-slate-50 bg-slate-50 font-bold text-slate-400 cursor-not-allowed" 
+                        />
+                    </div>
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="phone" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Contact Phone</Label>
+                    <div className="relative group">
+                        <Smartphone className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
+                        <Input 
+                            id="phone" 
+                            className="h-12 pl-12 rounded-xl border-2 border-slate-50 font-bold"
+                            value={formData.phone} 
+                            onChange={(e) => setFormData({...formData, phone: e.target.value})} 
+                        />
+                    </div>
+                </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="shadow-sm border-muted/50 border-l-4 border-l-primary">
-          <CardHeader>
-            <CardTitle className="text-lg">Security</CardTitle>
-            <CardDescription>Update your account password. Leave blank to keep current.</CardDescription>
+        {/* Security Card */}
+        <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2.5rem] overflow-hidden">
+          <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
+            <CardTitle className="text-xl font-black text-slate-900">Cryptographic Security</CardTitle>
+            <CardDescription className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Update authentication credentials</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="password">New Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input 
-                  id="password" 
-                  type="password" 
-                  className="pl-10"
-                  value={formData.password} 
-                  onChange={(e) => setFormData({...formData, password: e.target.value})} 
-                />
-              </div>
+          <CardContent className="p-8 space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                    <Label htmlFor="password" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">New Password</Label>
+                    <div className="relative group">
+                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
+                        <Input 
+                            id="password" 
+                            type="password" 
+                            placeholder="••••••••"
+                            className="h-12 pl-12 rounded-xl border-2 border-slate-50 font-bold"
+                            value={formData.password} 
+                            onChange={(e) => setFormData({...formData, password: e.target.value})} 
+                        />
+                    </div>
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="confirm_password" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Confirm Sequence</Label>
+                    <div className="relative group">
+                        <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
+                        <Input 
+                            id="confirm_password" 
+                            type="password" 
+                            placeholder="••••••••"
+                            className="h-12 pl-12 rounded-xl border-2 border-slate-50 font-bold"
+                            value={formData.confirm_password} 
+                            onChange={(e) => setFormData({...formData, confirm_password: e.target.value})} 
+                        />
+                    </div>
+                </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirm_password">Confirm New Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input 
-                  id="confirm_password" 
-                  type="password" 
-                  className="pl-10"
-                  value={formData.confirm_password} 
-                  onChange={(e) => setFormData({...formData, confirm_password: e.target.value})} 
-                />
-              </div>
+            <div className="p-4 rounded-2xl bg-blue-50/50 border border-blue-100 flex items-center gap-4">
+                <div className="h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
+                <p className="text-[9px] font-black uppercase tracking-widest text-blue-600 leading-relaxed">
+                    Leave fields blank to maintain current secure credentials.
+                </p>
             </div>
           </CardContent>
         </Card>
-
-        <div className="flex justify-end">
-          <Button type="submit" disabled={updateMutation.isPending} className="shadow-lg min-w-[150px]">
-            {updateMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-            Save Profile
-          </Button>
-        </div>
       </form>
     </div>
   );
