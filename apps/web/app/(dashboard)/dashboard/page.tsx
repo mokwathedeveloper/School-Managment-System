@@ -23,6 +23,7 @@ import {
   Layout
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Insights } from '@/components/dashboard/insights';
 import { ActionCenter } from '@/components/dashboard/action-center';
 import { ActivityFeed } from '@/components/dashboard/activity-feed';
