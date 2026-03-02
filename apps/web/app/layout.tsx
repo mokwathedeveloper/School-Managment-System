@@ -22,9 +22,7 @@ export default function RootLayout({
           "min-h-screen bg-white font-sans antialiased organic-grain"
         )}>
           <Providers>
-            <Header variant="landing" />
-            <main>{children}</main>
-            <Footer />
+            {children}
           </Providers>
           <Toaster position="top-center" />
       </body>

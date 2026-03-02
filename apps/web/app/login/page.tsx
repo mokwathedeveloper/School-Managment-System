@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -10,7 +11,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { GraduationCap, Loader2 } from 'lucide-react';
-import Link from 'next/link';
+import { toast } from 'react-hot-toast';
+import { Header } from '@/components/site/header';
+import { Footer } from '@/components/site/footer';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -18,8 +21,6 @@ const loginSchema = z.object({
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
-
-import { toast } from 'react-hot-toast';
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -47,79 +48,83 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1 text-center">
-          <div className="flex justify-center mb-4">
-            <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center text-primary-foreground">
-              <GraduationCap className="h-8 w-8" />
-            </div>
-          </div>
-          <CardTitle className="text-2xl">Welcome back</CardTitle>
-          <CardDescription>
-            Enter your credentials to access your school dashboard
-          </CardDescription>
-        </CardHeader>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <CardContent className="space-y-4">
-            {error && (
-              <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
-                {error}
+    <div className="flex flex-col min-h-screen bg-white antialiased">
+      <Header variant="landing" />
+      <main className="flex-1 flex items-center justify-center bg-muted/40 p-4 pt-24 md:pt-32 pb-20">
+        <Card className="w-full max-w-md shadow-2xl border-slate-200">
+          <CardHeader className="space-y-1 text-center">
+            <div className="flex justify-center mb-4">
+              <div className="h-12 w-12 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg">
+                <GraduationCap className="h-8 w-8" />
               </div>
-            )}
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="name@school.com"
-                {...form.register('email')}
-                disabled={isLoading}
-              />
-              {form.formState.errors.email && (
-                <p className="text-xs text-destructive">{form.formState.errors.email.message}</p>
-              )}
             </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                <button
+            <CardTitle className="text-2xl font-black tracking-tight text-slate-900">Welcome back</CardTitle>
+            <CardDescription className="font-medium">
+              Enter your credentials to access your school dashboard
+            </CardDescription>
+          </CardHeader>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <CardContent className="space-y-4">
+              {error && (
+                <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
+                  {error}
+                </div>
+              )}
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="name@school.com"
+                  {...form.register('email')}
+                  disabled={isLoading}
+                />
+                {form.formState.errors.email && (
+                  <p className="text-xs text-destructive">{form.formState.errors.email.message}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Password</Label>
+                  <button
+                    type="button"
+                    onClick={() => toast.success('Password reset instructions have been sent to your email.')}
+                    className="text-sm text-blue-600 font-bold hover:underline"
+                  >
+                    Forgot password?
+                  </button>
+                </div>
+                <Input
+                  id="password"
+                  type="password"
+                  {...form.register('password')}
+                  disabled={isLoading}
+                />
+                {form.formState.errors.password && (
+                  <p className="text-xs text-destructive">{form.formState.errors.password.message}</p>
+                )}
+              </div>
+            </CardContent>
+            <CardFooter className="flex flex-col space-y-4 pt-4">
+              <Button type="submit" className="w-full h-12 text-lg font-black" disabled={isLoading}>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Sign In
+              </Button>
+              <div className="text-center text-sm text-muted-foreground font-medium">
+                Don&apos;t have an account?{' '}
+                <button 
                   type="button"
-                  onClick={() => toast.success('Password reset instructions have been sent to your email.')}
-                  className="text-sm text-primary hover:underline"
+                  onClick={() => toast.success('Please contact your school administrator to create an account.')}
+                  className="text-blue-600 font-bold hover:underline"
                 >
-                  Forgot password?
+                  Contact administration
                 </button>
               </div>
-              <Input
-                id="password"
-                type="password"
-                {...form.register('password')}
-                disabled={isLoading}
-              />
-              {form.formState.errors.password && (
-                <p className="text-xs text-destructive">{form.formState.errors.password.message}</p>
-              )}
-            </div>
-          </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Sign In
-            </Button>
-            <div className="text-center text-sm text-muted-foreground">
-              Don&apos;t have an account?{' '}
-              <button 
-                type="button"
-                onClick={() => toast.success('Please contact your school administrator to create an account.')}
-                className="text-primary hover:underline"
-              >
-                Contact administration
-              </button>
-            </div>
-          </CardFooter>
-        </form>
-      </Card>
+            </CardFooter>
+          </form>
+        </Card>
+      </main>
+      <Footer />
     </div>
   );
 }
