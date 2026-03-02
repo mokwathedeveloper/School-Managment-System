@@ -1,20 +1,12 @@
-
 'use client';
 
 import React, { useState } from 'react';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
-} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { FileUp, Loader2, CheckCircle2, AlertCircle, Download, Database } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/lib/api-client';
 import { toast } from 'react-hot-toast';
+import { DialogShell } from '@/components/ui/dialog-shell';
 
 export function BulkImportDialog() {
   const [open, setOpen] = useState(false);
@@ -27,7 +19,6 @@ export function BulkImportDialog() {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
       setFile(selectedFile);
-      // In a real app, parse CSV/Excel here
       // Mocking parsed data for demo
       setData([
         { first_name: 'John', last_name: 'Doe', email: 'john@example.com', admission_no: 'S001' },
@@ -49,28 +40,25 @@ export function BulkImportDialog() {
   });
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" className="h-12 px-6 rounded-xl font-black uppercase tracking-widest text-[10px] border-slate-200">
-          <FileUp className="mr-2 h-4 w-4" />
-          Bulk Registry Sync
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[540px] rounded-[2.5rem] border-none shadow-2xl p-0 overflow-hidden">
-        <div className="bg-slate-900 p-8 text-white relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-10">
-                <Database className="h-24 w-24" />
-            </div>
-            <DialogHeader className="relative z-10">
-                <DialogTitle className="text-2xl font-black tracking-tight">Bulk Data Ingestion</DialogTitle>
-                <DialogDescription className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-1">
-                    Synchronize institutional student records via CSV
-                </DialogDescription>
-            </DialogHeader>
-        </div>
+    <>
+      <Button 
+        variant="outline" 
+        onClick={() => setOpen(true)}
+        className="h-12 px-6 rounded-xl font-black uppercase tracking-widest text-[10px] border-slate-200"
+      >
+        <FileUp className="mr-2 h-4 w-4" />
+        Bulk Registry Sync
+      </Button>
 
+      <DialogShell
+        open={open}
+        onOpenChange={setOpen}
+        title="Bulk Data Ingestion"
+        description="Synchronize institutional student records via CSV"
+        icon={Database}
+      >
         {!result ? (
-          <div className="p-8 space-y-8 bg-white">
+          <div className="space-y-8 bg-white">
             <div className="border-2 border-dashed border-slate-100 rounded-[2rem] p-12 text-center hover:border-blue-200 transition-all group cursor-pointer bg-slate-50/30">
               <input 
                 type="file" 
@@ -113,7 +101,7 @@ export function BulkImportDialog() {
             </div>
           </div>
         ) : (
-          <div className="p-12 text-center bg-white space-y-6">
+          <div className="text-center bg-white space-y-6">
             <div className="h-20 w-20 rounded-[2rem] bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto shadow-sm border border-emerald-100">
                 <CheckCircle2 className="h-10 w-10" />
             </div>
@@ -139,7 +127,7 @@ export function BulkImportDialog() {
             </Button>
           </div>
         )}
-      </DialogContent>
-    </Dialog>
+      </DialogShell>
+    </>
   );
 }

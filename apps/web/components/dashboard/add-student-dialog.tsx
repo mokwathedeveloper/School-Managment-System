@@ -1,14 +1,7 @@
+
 'use client';
 
 import React, { useState } from 'react';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
-} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,6 +9,7 @@ import { Plus, Loader2, UserPlus, Fingerprint, Mail, User } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/lib/api-client';
 import { toast } from 'react-hot-toast';
+import { DialogShell } from '@/components/ui/dialog-shell';
 
 export function AddStudentDialog() {
   const [open, setOpen] = useState(false);
@@ -46,34 +40,29 @@ export function AddStudentDialog() {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" className="w-full h-16 justify-start gap-4 rounded-2xl border-slate-100 px-5 group/btn">
-            <div className="h-10 w-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shadow-sm border border-blue-100 group-hover/btn:scale-110 transition-premium">
-                <UserPlus className="h-5 w-5" />
-            </div>
-            <div className="text-left">
-                <p className="text-xs font-black text-slate-900 leading-none">Add Student</p>
-                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-1">Manual Enrollment</p>
-            </div>
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[480px] rounded-[2.5rem] border-none shadow-2xl p-0 overflow-hidden">
-        <div className="bg-slate-900 p-8 text-white relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-10">
-                <UserPlus className="h-24 w-24" />
-            </div>
-            <DialogHeader className="relative z-10">
-                <DialogTitle className="text-2xl font-black tracking-tight flex items-center gap-3">
-                    Enroll New Scholar
-                </DialogTitle>
-                <DialogDescription className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-1">
-                    Institutional Student Onboarding
-                </DialogDescription>
-            </DialogHeader>
-        </div>
+    <>
+      <Button 
+        variant="outline" 
+        onClick={() => setOpen(true)}
+        className="w-full h-16 justify-start gap-4 rounded-2xl border-slate-100 px-5 group/btn"
+      >
+          <div className="h-10 w-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shadow-sm border border-blue-100 group-hover/btn:scale-110 transition-premium">
+              <UserPlus className="h-5 w-5" />
+          </div>
+          <div className="text-left">
+              <p className="text-xs font-black text-slate-900 leading-none">Add Student</p>
+              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-1">Manual Enrollment</p>
+          </div>
+      </Button>
 
-        <form onSubmit={handleSubmit} className="p-8 space-y-6 bg-white">
+      <DialogShell
+        open={open}
+        onOpenChange={setOpen}
+        title="Enroll New Scholar"
+        description="Institutional Student Onboarding"
+        icon={UserPlus}
+      >
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="first_name" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">First Name</Label>
@@ -132,11 +121,11 @@ export function AddStudentDialog() {
           </div>
 
           <Button type="submit" className="w-full h-14 rounded-2xl shadow-2xl shadow-blue-600/20" variant="premium" disabled={createStudentMutation.isPending}>
-            {createStudentMutation.isPending ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Plus className="mr-2 h-5 w-5" />}
+            {createStudentMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
             Initialize Profile
           </Button>
         </form>
-      </DialogContent>
-    </Dialog>
+      </DialogShell>
+    </>
   );
 }

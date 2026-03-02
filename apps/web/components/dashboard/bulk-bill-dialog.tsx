@@ -1,21 +1,13 @@
-
 'use client';
 
 import React, { useState } from 'react';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
-} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Layers, Loader2, Database, Search } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/lib/api-client';
 import { toast } from 'react-hot-toast';
+import { DialogShell } from '@/components/ui/dialog-shell';
 
 export function BulkBillDialog() {
   const [open, setOpen] = useState(false);
@@ -63,27 +55,24 @@ export function BulkBillDialog() {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" className="h-12 px-6 rounded-xl font-black uppercase tracking-widest text-[10px] border-slate-200">
-          <Layers className="mr-2 h-4 w-4" />
-          Bulk Billing
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[480px] rounded-[2.5rem] border-none shadow-2xl p-0 overflow-hidden">
-        <div className="bg-slate-900 p-8 text-white relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-10">
-                <Database className="h-24 w-24" />
-            </div>
-            <DialogHeader className="relative z-10">
-                <DialogTitle className="text-2xl font-black tracking-tight">Institutional Billing</DialogTitle>
-                <DialogDescription className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-1">
-                    Mass invoice generation sequence
-                </DialogDescription>
-            </DialogHeader>
-        </div>
+    <>
+      <Button 
+        variant="outline" 
+        onClick={() => setOpen(true)}
+        className="h-12 px-6 rounded-xl font-black uppercase tracking-widest text-[10px] border-slate-200"
+      >
+        <Layers className="mr-2 h-4 w-4" />
+        Bulk Billing
+      </Button>
 
-        <form onSubmit={handleSubmit} className="p-8 space-y-6 bg-white">
+      <DialogShell
+        open={open}
+        onOpenChange={setOpen}
+        title="Institutional Billing"
+        description="Mass invoice generation sequence"
+        icon={Database}
+      >
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="b_grade_id" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Target Grade Level</Label>
             <div className="relative group">
@@ -107,7 +96,7 @@ export function BulkBillDialog() {
             <Label htmlFor="b_term_id" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Academic Term</Label>
             <select 
               id="b_term_id" 
-              className="flex h-12 w-full rounded-xl border-2 border-slate-50 bg-white px-4 text-sm font-bold focus:ring-blue-600/10 outline-none appearance-none"
+              className="flex h-12 w-full rounded-xl border-2 border-slate-50 bg-white px-4 text-sm font-bold outline-none appearance-none"
               value={formData.term_id}
               onChange={(e) => setFormData({...formData, term_id: e.target.value})}
               required
@@ -124,7 +113,7 @@ export function BulkBillDialog() {
             Execute Bulk Billing
           </Button>
         </form>
-      </DialogContent>
-    </Dialog>
+      </DialogShell>
+    </>
   );
 }

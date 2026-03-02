@@ -1,15 +1,6 @@
-
 'use client';
 
 import React, { useState } from 'react';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
-} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,6 +8,7 @@ import { Plus, Loader2, CreditCard, User, Calendar, Wallet } from 'lucide-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/lib/api-client';
 import { toast } from 'react-hot-toast';
+import { DialogShell } from '@/components/ui/dialog-shell';
 
 export function AddInvoiceDialog() {
   const [open, setOpen] = useState(false);
@@ -68,27 +60,23 @@ export function AddInvoiceDialog() {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="h-12 px-6 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20">
-          <Plus className="mr-2 h-4 w-4" />
-          Create Invoice
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[480px] rounded-[2.5rem] border-none shadow-2xl p-0 overflow-hidden">
-        <div className="bg-slate-900 p-8 text-white relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-10">
-                <CreditCard className="h-24 w-24" />
-            </div>
-            <DialogHeader className="relative z-10">
-                <DialogTitle className="text-2xl font-black tracking-tight">Generate Invoice</DialogTitle>
-                <DialogDescription className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-1">
-                    Institutional Billing Terminal
-                </DialogDescription>
-            </DialogHeader>
-        </div>
+    <>
+      <Button 
+        onClick={() => setOpen(true)}
+        className="h-12 px-6 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20"
+      >
+        <Plus className="mr-2 h-4 w-4" />
+        Create Invoice
+      </Button>
 
-        <form onSubmit={handleSubmit} className="p-8 space-y-6 bg-white">
+      <DialogShell
+        open={open}
+        onOpenChange={setOpen}
+        title="Generate Invoice"
+        description="Institutional Billing Terminal"
+        icon={CreditCard}
+      >
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="f_student_id" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Target Student</Label>
             <div className="relative group">
@@ -156,7 +144,7 @@ export function AddInvoiceDialog() {
             Issue Statement
           </Button>
         </form>
-      </DialogContent>
-    </Dialog>
+      </DialogShell>
+    </>
   );
 }

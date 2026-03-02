@@ -1,15 +1,6 @@
-
 'use client';
 
 import React, { useState } from 'react';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
-} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,6 +8,7 @@ import { Plus, Loader2, Trophy, Search, Calendar, TrendingUp } from 'lucide-reac
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
 import { toast } from 'react-hot-toast';
+import { DialogShell } from '@/components/ui/dialog-shell';
 
 export function AddExamDialog() {
   const [open, setOpen] = useState(false);
@@ -81,27 +73,23 @@ export function AddExamDialog() {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="h-12 px-6 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20">
-          <Plus className="mr-2 h-4 w-4" />
-          Schedule Assessment
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[480px] rounded-[2.5rem] border-none shadow-2xl p-0 overflow-hidden">
-        <div className="bg-slate-900 p-8 text-white relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-10">
-                <Trophy className="h-24 w-24" />
-            </div>
-            <DialogHeader className="relative z-10">
-                <DialogTitle className="text-2xl font-black tracking-tight">Schedule Assessment</DialogTitle>
-                <DialogDescription className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-1">
-                    Academic Evaluation Registry
-                </DialogDescription>
-            </DialogHeader>
-        </div>
+    <>
+      <Button 
+        onClick={() => setOpen(true)}
+        className="h-12 px-6 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20"
+      >
+        <Plus className="mr-2 h-4 w-4" />
+        Schedule Assessment
+      </Button>
 
-        <form onSubmit={handleSubmit} className="p-8 space-y-6 bg-white">
+      <DialogShell
+        open={open}
+        onOpenChange={setOpen}
+        title="Schedule Assessment"
+        description="Academic Evaluation Registry"
+        icon={Trophy}
+      >
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="e_name" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Assessment Name</Label>
             <Input 
@@ -196,7 +184,7 @@ export function AddExamDialog() {
             Confirm Schedule
           </Button>
         </form>
-      </DialogContent>
-    </Dialog>
+      </DialogShell>
+    </>
   );
 }

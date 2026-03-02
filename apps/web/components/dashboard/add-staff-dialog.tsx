@@ -1,14 +1,7 @@
+
 'use client';
 
 import React, { useState } from 'react';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
-} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,6 +9,7 @@ import { Plus, Loader2, UserCog, Mail, User, Briefcase } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
 import { toast } from 'react-hot-toast';
+import { DialogShell } from '@/components/ui/dialog-shell';
 
 export function AddStaffDialog() {
   const [open, setOpen] = useState(false);
@@ -47,32 +41,29 @@ export function AddStaffDialog() {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" className="w-full h-16 justify-start gap-4 rounded-2xl border-slate-100 px-5 group/btn">
-            <div className="h-10 w-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shadow-sm border border-blue-100 group-hover/btn:scale-110 transition-premium">
-                <UserCog className="h-5 w-5" />
-            </div>
-            <div className="text-left">
-                <p className="text-xs font-black text-slate-900 leading-none">Add Staff</p>
-                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-1">HR Onboarding</p>
-            </div>
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[480px] rounded-[2.5rem] border-none shadow-2xl p-0 overflow-hidden">
-        <div className="bg-slate-900 p-8 text-white relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-10">
-                <UserCog className="h-24 w-24" />
-            </div>
-            <DialogHeader className="relative z-10">
-                <DialogTitle className="text-2xl font-black tracking-tight">Onboard Personnel</DialogTitle>
-                <DialogDescription className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-1">
-                    Institutional HR Integration
-                </DialogDescription>
-            </DialogHeader>
-        </div>
+    <>
+      <Button 
+        variant="outline" 
+        onClick={() => setOpen(true)}
+        className="w-full h-16 justify-start gap-4 rounded-2xl border-slate-100 px-5 group/btn"
+      >
+          <div className="h-10 w-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shadow-sm border border-blue-100 group-hover/btn:scale-110 transition-premium">
+              <UserCog className="h-5 w-5" />
+          </div>
+          <div className="text-left">
+              <p className="text-xs font-black text-slate-900 leading-none">Add Staff</p>
+              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-1">HR Onboarding</p>
+          </div>
+      </Button>
 
-        <form onSubmit={handleSubmit} className="p-8 space-y-6 bg-white">
+      <DialogShell
+        open={open}
+        onOpenChange={setOpen}
+        title="Onboard Personnel"
+        description="Institutional HR Integration"
+        icon={UserCog}
+      >
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="s_first_name" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">First Name</Label>
@@ -148,7 +139,7 @@ export function AddStaffDialog() {
             Complete Onboarding
           </Button>
         </form>
-      </DialogContent>
-    </Dialog>
+      </DialogShell>
+    </>
   );
 }
