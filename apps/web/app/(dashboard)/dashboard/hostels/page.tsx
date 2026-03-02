@@ -23,6 +23,7 @@ import { toast } from 'react-hot-toast';
 import { AddHostelDialog } from '@/components/dashboard/add-hostel-dialog';
 import { AddRoomDialog } from '@/components/dashboard/add-room-dialog';
 import { PremiumLoader } from '@/components/ui/premium-loader';
+import { DashboardShell, DashboardHeader } from '@/components/dashboard/shell';
 
 export default function HostelsPage() {
   const queryClient = useQueryClient();
@@ -49,23 +50,19 @@ export default function HostelsPage() {
   if (loadingHostels) return <PremiumLoader message="Syncing Boarding Registry" />;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
-            <Home className="h-8 w-8 text-blue-600" />
-            Hostel & Boarding
-          </h1>
-          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Institutional Residency & Room Management</p>
-        </div>
+    <DashboardShell className="animate-in fade-in duration-700">
+      <DashboardHeader 
+        heading="Hostel & Boarding"
+        text="Institutional Residency & Room Management"
+      >
         <AddHostelDialog />
-      </div>
+      </DashboardHeader>
 
       <div className="grid gap-8 md:grid-cols-4">
         {/* Hostel List */}
         <Card className="md:col-span-1 border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2rem] overflow-hidden h-fit">
           <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-6">
-            <CardTitle className="text-sm font-black uppercase tracking-widest text-slate-400">Building Registry</CardTitle>
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-slate-400">Building Registry</CardTitle>
           </CardHeader>
           <CardContent className="p-4 space-y-2">
             {hostels?.length === 0 ? (
@@ -202,6 +199,6 @@ export default function HostelsPage() {
           )}
         </div>
       </div>
-    </div>
+    </DashboardShell>
   );
 }

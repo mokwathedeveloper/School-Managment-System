@@ -25,6 +25,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
 import { PremiumLoader } from '@/components/ui/premium-loader';
 import { RegisterAlumnusDialog } from '@/components/dashboard/register-alumnus-dialog';
+import { DashboardShell, DashboardHeader } from '@/components/dashboard/shell';
 
 export default function AlumniPage() {
   const [search, setSearch] = useState('');
@@ -40,17 +41,13 @@ export default function AlumniPage() {
   if (isLoading) return <PremiumLoader message="Syncing Alumni Network" />;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
-            <GraduationCap className="h-8 w-8 text-blue-600" />
-            Alumni Network
-          </h1>
-          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Institutional Legacy & Community</p>
-        </div>
+    <DashboardShell className="animate-in fade-in duration-700">
+      <DashboardHeader 
+        heading="Alumni Network"
+        text="Institutional Legacy & Community"
+      >
         <RegisterAlumnusDialog />
-      </div>
+      </DashboardHeader>
 
       <div className="flex items-center gap-4 bg-white p-4 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.02)] border-none">
         <div className="relative flex-1 max-w-md group">
@@ -145,6 +142,6 @@ export default function AlumniPage() {
           </Table>
         </CardContent>
       </Card>
-    </div>
+    </DashboardShell>
   );
 }

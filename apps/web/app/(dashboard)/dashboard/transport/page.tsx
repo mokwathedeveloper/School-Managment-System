@@ -1,17 +1,19 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { 
   Bus, 
-  Map, 
+  MapPin, 
   Users, 
+  Search, 
   Plus, 
-  User, 
+  Navigation, 
+  Clock, 
+  ShieldCheck,
   Loader2,
-  Navigation,
   ChevronRight,
   Filter
 } from 'lucide-react';
@@ -20,14 +22,13 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { toast } from 'react-hot-toast';
-import { PremiumLoader } from '@/components/ui/premium-loader';
 import { AddTransportRouteDialog } from '@/components/dashboard/add-transport-route-dialog';
 import { AddVehicleDialog } from '@/components/dashboard/add-vehicle-dialog';
+import { PremiumLoader } from '@/components/ui/premium-loader';
+import { DashboardShell, DashboardHeader } from '@/components/dashboard/shell';
 
 export default function TransportPage() {
-  const queryClient = useQueryClient();
-  const [view, setView] = useState<'routes' | 'vehicles'>('routes');
+  const [activeTab, setActiveTab] = useState<'routes' | 'vehicles'>('routes');
 
   const { data: routes, isLoading: loadingRoutes } = useQuery({
     queryKey: ['transport-routes'],
@@ -45,92 +46,102 @@ export default function TransportPage() {
     },
   });
 
-  if (loadingRoutes || loadingVehicles) return <PremiumLoader message="Syncing Fleet Intelligence" />;
+  if (loadingRoutes || loadingVehicles) return <PremiumLoader message="Syncing Transport Terminal" />;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
-            <Bus className="h-8 w-8 text-blue-600" />
-            Transport Logistics
-          </h1>
-          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Fleet Management & Zone Optimization</p>
+    <DashboardShell className="animate-in fade-in duration-700">
+      <DashboardHeader 
+        heading="Fleet & Logistics"
+        text="Route Optimization & Vehicle Monitoring"
+      >
+        <div className="flex gap-3">
+            {activeTab === 'routes' ? <AddTransportRouteDialog /> : <AddVehicleDialog />}
         </div>
-        <div className="flex items-center gap-3">
-            {view === 'routes' ? <AddTransportRouteDialog /> : <AddVehicleDialog />}
-        </div>
-      </div>
+      </DashboardHeader>
 
+      {/* Tab Selector */}
       <div className="flex p-1 bg-white border shadow-sm rounded-2xl w-fit">
         <button 
-          onClick={() => setView('routes')}
+          onClick={() => setActiveTab('routes')}
           className={cn(
-            "px-8 py-2.5 text-xs font-black uppercase tracking-widest rounded-xl transition-all duration-300",
-            view === 'routes' ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
+            "px-8 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all duration-300 flex items-center gap-2",
+            activeTab === 'routes' ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
           )}
         >
-          Routes & Zones
+          <Navigation className="h-3.5 w-3.5" />
+          Active Routes
         </button>
         <button 
-          onClick={() => setView('vehicles')}
+          onClick={() => setActiveTab('vehicles')}
           className={cn(
-            "px-8 py-2.5 text-xs font-black uppercase tracking-widest rounded-xl transition-all duration-300",
-            view === 'vehicles' ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
+            "px-8 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all duration-300 flex items-center gap-2",
+            activeTab === 'vehicles' ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
           )}
         >
-          Vehicle Fleet
+          <Bus className="h-3.5 w-3.5" />
+          Institutional Fleet
         </button>
       </div>
 
-      {view === 'routes' ? (
+      {activeTab === 'routes' ? (
         <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2.5rem] overflow-hidden">
+          <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
+            <CardTitle className="text-xl font-black text-slate-900">Route Manifest</CardTitle>
+            <CardDescription className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Managed transit corridors and pricing</CardDescription>
+          </CardHeader>
           <CardContent className="p-0">
             <Table>
               <TableHeader className="bg-slate-50/30">
                 <TableRow className="hover:bg-transparent">
-                  <TableHead className="pl-8 py-4 font-black uppercase tracking-widest text-[10px] text-slate-400">Route Identity</TableHead>
-                  <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Operational Cost</TableHead>
-                  <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Coverage Stops</TableHead>
-                  <TableHead className="text-center font-black uppercase tracking-widest text-[10px] text-slate-400">Enrollment</TableHead>
+                  <TableHead className="pl-8 py-4 font-black uppercase tracking-widest text-[10px] text-slate-400">Route Identifier</TableHead>
+                  <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Assigned Fleet</TableHead>
+                  <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Subscription Fee</TableHead>
+                  <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Enrollment</TableHead>
                   <TableHead className="text-right pr-8 font-black uppercase tracking-widest text-[10px] text-slate-400">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {routes?.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="h-64 text-center">
-                        <div className="flex flex-col items-center gap-2 text-slate-300">
-                            <Map className="h-12 w-12 opacity-20" />
-                            <p className="font-black uppercase tracking-widest text-xs">No Routes Defined</p>
-                        </div>
-                    </TableCell>
-                  </TableRow>
+                  <TableRow><TableCell colSpan={5} className="h-64 text-center text-slate-300 font-black uppercase tracking-widest text-xs italic">No Routes Logged</TableCell></TableRow>
                 ) : (
                   routes?.map((route: any) => (
                     <TableRow key={route.id} className="group hover:bg-slate-50/50 transition-all duration-300 border-b-slate-50">
                       <TableCell className="pl-8 py-5">
                         <div className="flex items-center gap-4">
-                          <div className="h-12 w-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shadow-sm transition-all group-hover:scale-110">
+                          <div className="h-12 w-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shadow-sm transition-premium group-hover:scale-110">
                             <Navigation className="h-6 w-6" />
                           </div>
-                          <span className="font-black text-slate-900 text-sm tracking-tight">{route.name}</span>
+                          <div>
+                            <p className="font-black text-slate-900 text-sm">{route.name}</p>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{route.description || 'Institutional Corridor'}</p>
+                          </div>
                         </div>
                       </TableCell>
-                      <TableCell className="font-black text-slate-900">
-                        <span className="text-[10px] text-slate-400 mr-1">KES</span>
-                        {parseFloat(route.cost).toLocaleString()}
+                      <TableCell>
+                        {route.vehicle ? (
+                          <div className="flex flex-col">
+                            <span className="font-bold text-slate-700 text-sm">{route.vehicle.plate_number}</span>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{route.vehicle.model}</span>
+                          </div>
+                        ) : (
+                          <Badge variant="outline" className="text-[9px] uppercase font-bold text-slate-300 border-dashed">Unassigned</Badge>
+                        )}
                       </TableCell>
                       <TableCell>
-                        <p className="text-[10px] font-bold text-slate-500 uppercase leading-relaxed max-w-[200px] truncate">{route.stops || 'Direct Route'}</p>
+                        <div className="flex items-center gap-1.5 font-black text-slate-900">
+                            <span className="text-[10px] text-slate-400 font-bold">KES</span>
+                            {Number(route.fee).toLocaleString()}
+                        </div>
                       </TableCell>
-                      <TableCell className="text-center">
-                        <Badge variant="secondary" className="font-black text-[10px] bg-slate-50 text-slate-600 px-3 py-1 rounded-lg">
-                            {route._count.students} Students
-                        </Badge>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <div className="h-2 w-2 rounded-full bg-blue-600" />
+                          <span className="font-black text-slate-900">{route._count?.students || 0}</span>
+                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Subscribers</span>
+                        </div>
                       </TableCell>
                       <TableCell className="text-right pr-8">
-                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-300 hover:text-blue-600">
+                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-300 hover:text-blue-600 transition-premium">
                             <ChevronRight className="h-5 w-5" />
                         </Button>
                       </TableCell>
@@ -143,57 +154,59 @@ export default function TransportPage() {
         </Card>
       ) : (
         <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2.5rem] overflow-hidden">
+          <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
+            <CardTitle className="text-xl font-black text-slate-900">Vehicle Registry</CardTitle>
+            <CardDescription className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Fleet configuration and operational status</CardDescription>
+          </CardHeader>
           <CardContent className="p-0">
             <Table>
               <TableHeader className="bg-slate-50/30">
                 <TableRow className="hover:bg-transparent">
-                  <TableHead className="pl-8 py-4 font-black uppercase tracking-widest text-[10px] text-slate-400">Vehicle Unit</TableHead>
-                  <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Assigned Zone</TableHead>
-                  <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Personnel</TableHead>
-                  <TableHead className="text-center font-black uppercase tracking-widest text-[10px] text-slate-400">Capacity</TableHead>
-                  <TableHead className="text-right pr-8 font-black uppercase tracking-widest text-[10px] text-slate-400">Management</TableHead>
+                  <TableHead className="pl-8 py-4 font-black uppercase tracking-widest text-[10px] text-slate-400">Fleet Asset</TableHead>
+                  <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Registration</TableHead>
+                  <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Capacity</TableHead>
+                  <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400 text-center">Status</TableHead>
+                  <TableHead className="text-right pr-8 font-black uppercase tracking-widest text-[10px] text-slate-400">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {vehicles?.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="h-64 text-center">
-                        <div className="flex flex-col items-center gap-2 text-slate-300">
-                            <Bus className="h-12 w-12 opacity-20" />
-                            <p className="font-black uppercase tracking-widest text-xs">Fleet Empty</p>
-                        </div>
-                    </TableCell>
-                  </TableRow>
+                  <TableRow><TableCell colSpan={5} className="h-64 text-center text-slate-300 font-black uppercase tracking-widest text-xs italic">Fleet Registry Clean</TableCell></TableRow>
                 ) : (
                   vehicles?.map((vehicle: any) => (
                     <TableRow key={vehicle.id} className="group hover:bg-slate-50/50 transition-all duration-300 border-b-slate-50">
                       <TableCell className="pl-8 py-5">
                         <div className="flex items-center gap-4">
-                            <div className="h-12 w-12 rounded-2xl bg-slate-900 flex items-center justify-center text-white shadow-lg">
-                                <Bus className="h-6 w-6" />
-                            </div>
-                            <span className="font-black text-slate-900 font-mono tracking-widest">{vehicle.reg_number}</span>
+                          <div className="h-12 w-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center shadow-lg transition-premium group-hover:scale-110">
+                            <Bus className="h-6 w-6" />
+                          </div>
+                          <div>
+                            <p className="font-black text-slate-900 text-sm">{vehicle.model}</p>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{vehicle.driver_name || 'Driver Unassigned'}</p>
+                          </div>
                         </div>
-                      </TableCell>
-                      <TableCell className="font-bold text-sm text-slate-700">
-                        {vehicle.route?.name || <Badge variant="outline" className="text-[9px] uppercase border-dashed opacity-50">Unassigned</Badge>}
                       </TableCell>
                       <TableCell>
-                        {vehicle.driver ? (
-                          <div className="flex items-center gap-2 text-xs font-bold text-slate-600">
-                            <div className="h-2 w-2 rounded-full bg-blue-600" />
-                            {vehicle.driver.user.first_name} {vehicle.driver.user.last_name}
-                          </div>
-                        ) : <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest">Awaiting Pilot</span>}
+                        <span className="font-mono text-sm font-black text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100 uppercase">
+                          {vehicle.plate_number}
+                        </span>
                       </TableCell>
-                      <TableCell className="text-center">
-                        <div className="flex flex-col items-center">
-                            <span className="font-black text-slate-900">{vehicle.capacity}</span>
-                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Seats</span>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Users className="h-3.5 w-3.5 text-slate-300" />
+                          <span className="font-black text-slate-700">{vehicle.capacity}</span>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Seats</span>
                         </div>
                       </TableCell>
+                      <TableCell className="text-center">
+                        <Badge className="bg-emerald-50 text-emerald-600 border-none font-black text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-lg">
+                          OPERATIONAL
+                        </Badge>
+                      </TableCell>
                       <TableCell className="text-right pr-8">
-                        <Button variant="outline" size="sm" className="h-9 px-4 rounded-xl border-slate-100 font-black uppercase tracking-widest text-[9px]">Edit Node</Button>
+                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-300 hover:text-blue-600 transition-premium">
+                            <ChevronRight className="h-5 w-5" />
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))
@@ -203,6 +216,6 @@ export default function TransportPage() {
           </CardContent>
         </Card>
       )}
-    </div>
+    </DashboardShell>
   );
 }

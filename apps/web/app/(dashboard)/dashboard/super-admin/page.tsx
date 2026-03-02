@@ -24,6 +24,7 @@ import { PremiumLoader } from '@/components/ui/premium-loader';
 import { InsightCard } from '@/components/dashboard/insight-card';
 import { OnboardSchoolDialog } from '@/components/dashboard/onboard-school-dialog';
 import { cn } from '@/lib/utils';
+import { DashboardShell, DashboardHeader } from '@/components/dashboard/shell';
 
 export default function SuperAdminDashboard() {
   const queryClient = useQueryClient();
@@ -47,17 +48,13 @@ export default function SuperAdminDashboard() {
   if (loadingStats || loadingSchools) return <PremiumLoader message="Syncing Platform Nodes" />;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
-            <ShieldCheck className="h-8 w-8 text-blue-600" />
-            Platform Command Center
-          </h1>
-          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Global Ecosystem Management</p>
-        </div>
+    <DashboardShell className="animate-in fade-in duration-700">
+      <DashboardHeader 
+        heading="Platform Command Center"
+        text="Global Ecosystem Management"
+      >
         <OnboardSchoolDialog />
-      </div>
+      </DashboardHeader>
 
       {/* Global Metrics */}
       <div className="grid gap-6 md:grid-cols-3">
@@ -102,7 +99,7 @@ export default function SuperAdminDashboard() {
           <CardContent className="p-0">
             <Table>
               <TableHeader className="bg-slate-50/30">
-                <TableRow className="hover:bg-transparent">
+                <TableRow className="hover:bg-transparent border-slate-100">
                   <TableHead className="pl-8 py-4 font-black uppercase tracking-widest text-[10px] text-slate-400">School Identity</TableHead>
                   <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">System Slug</TableHead>
                   <TableHead className="text-center font-black uppercase tracking-widest text-[10px] text-slate-400">Students</TableHead>
@@ -160,7 +157,7 @@ export default function SuperAdminDashboard() {
                     <h4 className="text-3xl font-black text-white tracking-tighter">+12.4%</h4>
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">Monthly Expansion</p>
                 </div>
-                <Button variant="ghost" className="w-full bg-white/5 hover:bg-white/10 text-white border-none h-10 text-[10px] font-black uppercase tracking-widest mt-4">
+                <Button variant="ghost" className="w-full bg-white/5 hover:bg-white/10 text-white border-none h-10 text-[10px] font-black uppercase tracking-widest mt-4 active:scale-100 font-bold">
                     Analytics Report
                 </Button>
              </div>
@@ -176,7 +173,7 @@ export default function SuperAdminDashboard() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </DashboardShell>
   );
 }
 

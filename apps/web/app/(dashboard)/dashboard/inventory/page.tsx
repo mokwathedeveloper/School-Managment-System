@@ -29,6 +29,7 @@ import { toast } from 'react-hot-toast';
 import { AddAssetDialog } from '@/components/dashboard/add-asset-dialog';
 import { AddStockItemDialog } from '@/components/dashboard/add-stock-item-dialog';
 import { PremiumLoader } from '@/components/ui/premium-loader';
+import { DashboardShell, DashboardHeader } from '@/components/dashboard/shell';
 
 export default function InventoryPage() {
   const queryClient = useQueryClient();
@@ -62,19 +63,15 @@ export default function InventoryPage() {
   if (loadingAssets || loadingStock) return <PremiumLoader message="Auditing Institutional Assets" />;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
-            <Package className="h-8 w-8 text-blue-600" />
-            Property & Assets
-          </h1>
-          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Inventory Management & Supply Chain Registry</p>
-        </div>
+    <DashboardShell className="animate-in fade-in duration-700">
+      <DashboardHeader 
+        heading="Property & Assets"
+        text="Inventory Management & Supply Chain Registry"
+      >
         <div className="flex gap-3">
             {activeTab === 'assets' ? <AddAssetDialog /> : <AddStockItemDialog />}
         </div>
-      </div>
+      </DashboardHeader>
 
       {/* Custom Tab Switcher */}
       <div className="flex p-1 bg-white border shadow-sm rounded-2xl w-fit">
@@ -272,6 +269,6 @@ export default function InventoryPage() {
           </Card>
         </div>
       )}
-    </div>
+    </DashboardShell>
   );
 }

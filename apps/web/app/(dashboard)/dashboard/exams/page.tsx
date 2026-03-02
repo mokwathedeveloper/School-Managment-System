@@ -29,6 +29,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { AddExamDialog } from '@/components/dashboard/add-exam-dialog';
 import { PremiumLoader } from '@/components/ui/premium-loader';
+import { DashboardShell, DashboardHeader } from '@/components/dashboard/shell';
 
 export default function ExamsPage() {
   const queryClient = useQueryClient();
@@ -83,17 +84,13 @@ export default function ExamsPage() {
   if (loadingExams) return <PremiumLoader message="Syncing Assessment Terminal" />;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
-            <Trophy className="h-8 w-8 text-blue-600" />
-            Examinations & Grading
-          </h1>
-          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Institutional Assessment & Performance Metrics</p>
-        </div>
+    <DashboardShell className="animate-in fade-in duration-700">
+      <DashboardHeader 
+        heading="Examinations & Grading"
+        text="Institutional Assessment & Performance Metrics"
+      >
         <AddExamDialog />
-      </div>
+      </DashboardHeader>
 
       <div className="grid gap-8 md:grid-cols-4">
         {/* Exam List Sidebar */}
@@ -231,6 +228,6 @@ export default function ExamsPage() {
           )}
         </Card>
       </div>
-    </div>
+    </DashboardShell>
   );
 }

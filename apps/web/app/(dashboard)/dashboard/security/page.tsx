@@ -27,6 +27,7 @@ import { toast } from 'react-hot-toast';
 import { cn } from '@/lib/utils';
 import { PremiumLoader } from '@/components/ui/premium-loader';
 import { AddVisitorDialog } from '@/components/dashboard/add-visitor-dialog';
+import { DashboardShell, DashboardHeader } from '@/components/dashboard/shell';
 
 export default function SecurityDashboard() {
   const queryClient = useQueryClient();
@@ -62,17 +63,13 @@ export default function SecurityDashboard() {
   if (isLoading) return <PremiumLoader message="Syncing Gate Terminal" />;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
-            <ShieldCheck className="h-8 w-8 text-blue-600" />
-            Institutional Security
-          </h1>
-          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Gate Entry & Identity Verification</p>
-        </div>
+    <DashboardShell className="animate-in fade-in duration-700">
+      <DashboardHeader 
+        heading="Institutional Security"
+        text="Gate Entry & Identity Verification"
+      >
         <AddVisitorDialog />
-      </div>
+      </DashboardHeader>
 
       <div className="grid gap-8 lg:grid-cols-3">
         {/* Verification Terminal */}
@@ -163,7 +160,7 @@ export default function SecurityDashboard() {
                         <Button 
                           size="sm" 
                           variant="outline"
-                          className="h-9 px-4 rounded-xl border-rose-100 text-rose-600 hover:bg-rose-50"
+                          className="h-9 px-4 rounded-xl border-rose-100 text-rose-600 hover:bg-rose-50 font-black uppercase tracking-widest text-[9px]"
                           onClick={() => checkOutMutation.mutate(visit.id)}
                         >
                           <LogOut className="h-3 w-3 mr-2" />
@@ -178,6 +175,6 @@ export default function SecurityDashboard() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </DashboardShell>
   );
 }

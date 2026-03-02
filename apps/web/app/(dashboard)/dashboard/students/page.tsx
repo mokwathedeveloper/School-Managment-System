@@ -32,6 +32,7 @@ import { AddStudentDialog } from '@/components/dashboard/add-student-dialog';
 import { BulkImportDialog } from '@/components/dashboard/bulk-import-dialog';
 import { PremiumLoader } from '@/components/ui/premium-loader';
 import { cn } from '@/lib/utils';
+import { DashboardShell, DashboardHeader } from '@/components/dashboard/shell';
 
 export default function StudentsPage() {
   const [search, setSearch] = useState('');
@@ -52,20 +53,16 @@ export default function StudentsPage() {
   const total = data?.total || 0;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
-            <Users className="h-8 w-8 text-blue-600" />
-            Student Directory
-          </h1>
-          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Registry Management & Enrollment</p>
-        </div>
+    <DashboardShell className="animate-in fade-in duration-700">
+      <DashboardHeader 
+        heading="Student Directory"
+        text="Registry Management & Enrollment"
+      >
         <div className="flex items-center gap-3">
           <BulkImportDialog />
           <AddStudentDialog />
         </div>
-      </div>
+      </DashboardHeader>
 
       <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2.5rem] overflow-hidden">
         <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-6">
@@ -97,7 +94,7 @@ export default function StudentsPage() {
         <CardContent className="p-0">
           <Table>
             <TableHeader className="bg-slate-50/30">
-              <TableRow className="hover:bg-transparent">
+              <TableRow className="hover:bg-transparent border-slate-100">
                 <TableHead className="pl-8 py-4 font-black uppercase tracking-widest text-[10px] text-slate-400">Student Identity</TableHead>
                 <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Class/Level</TableHead>
                 <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Parental Context</TableHead>
@@ -111,7 +108,7 @@ export default function StudentsPage() {
                   <TableCell colSpan={5} className="h-64 text-center">
                     <div className="flex flex-col items-center gap-2 text-slate-300">
                         <Users className="h-12 w-12 opacity-20" />
-                        <p className="font-black uppercase tracking-widest text-xs">No Records Found</p>
+                        <p className="font-black uppercase tracking-widest text-xs italic">No Records Found</p>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -159,7 +156,7 @@ export default function StudentsPage() {
                     </TableCell>
                     <TableCell className="text-right pr-8">
                       <Link href={`/dashboard/students/${student.id}`}>
-                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-premium">
+                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-300 hover:text-blue-600 hover:bg-blue-50 transition-premium">
                           <ChevronRight className="h-5 w-5" />
                         </Button>
                       </Link>
@@ -171,14 +168,14 @@ export default function StudentsPage() {
           </Table>
           
           <div className="p-6 border-t border-slate-100 bg-slate-50/30 flex items-center justify-between">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
               Showing <span className="text-slate-900">{students.length}</span> of <span className="text-slate-900">{total}</span> Registry Entries
             </p>
             <div className="flex gap-2">
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="rounded-xl font-black uppercase tracking-widest text-[10px]"
+                className="rounded-xl font-black uppercase tracking-widest text-[9px] px-4"
                 disabled={skip === 0}
                 onClick={() => setSkip(Math.max(0, skip - take))}
               >
@@ -187,7 +184,7 @@ export default function StudentsPage() {
               <Button 
                 variant="outline" 
                 size="sm"
-                className="rounded-xl font-black uppercase tracking-widest text-[10px]"
+                className="rounded-xl font-black uppercase tracking-widest text-[9px] px-4"
                 disabled={skip + take >= total}
                 onClick={() => setSkip(skip + take)}
               >
@@ -197,6 +194,6 @@ export default function StudentsPage() {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </DashboardShell>
   );
 }

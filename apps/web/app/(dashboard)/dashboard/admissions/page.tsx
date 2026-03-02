@@ -22,6 +22,7 @@ import { PremiumLoader } from '@/components/ui/premium-loader';
 import { InsightCard } from '@/components/dashboard/insight-card';
 import { FormSelect } from '@/components/ui/form-select';
 import { BroadcastAdmissionAlertDialog } from '@/components/dashboard/broadcast-admission-alert-dialog';
+import { DashboardShell, DashboardHeader } from '@/components/dashboard/shell';
 
 export default function AdmissionsDashboard() {
   const queryClient = useQueryClient();
@@ -48,17 +49,13 @@ export default function AdmissionsDashboard() {
   if (isLoading) return <PremiumLoader message="Syncing Admissions Pipeline" />;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
-            <ClipboardList className="h-8 w-8 text-blue-600" />
-            Admissions Pipeline
-          </h1>
-          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Registry Flow & Prospect Management</p>
-        </div>
+    <DashboardShell className="animate-in fade-in duration-700">
+      <DashboardHeader 
+        heading="Admissions Pipeline"
+        text="Registry Flow & Prospect Management"
+      >
         <BroadcastAdmissionAlertDialog />
-      </div>
+      </DashboardHeader>
 
       {/* Summary Stats using InsightCard */}
       <div className="grid gap-6 md:grid-cols-4">
@@ -201,6 +198,6 @@ export default function AdmissionsDashboard() {
           </Table>
         </CardContent>
       </Card>
-    </div>
+    </DashboardShell>
   );
 }

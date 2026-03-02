@@ -36,6 +36,7 @@ import { BulkBillDialog } from '@/components/dashboard/bulk-bill-dialog';
 import { PremiumLoader } from '@/components/ui/premium-loader';
 import { InsightCard } from '@/components/dashboard/insight-card';
 import { cn } from '@/lib/utils';
+import { DashboardShell, DashboardHeader } from '@/components/dashboard/shell';
 
 export default function FinancePage() {
   const { user } = useAuth();
@@ -91,20 +92,16 @@ export default function FinancePage() {
   if (isLoading) return <PremiumLoader message="Syncing Financial Terminal" />;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
-            <CreditCard className="h-8 w-8 text-blue-600" />
-            Fee Management
-          </h1>
-          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Institutional Invoicing & Automated Payments</p>
-        </div>
+    <DashboardShell className="animate-in fade-in duration-700">
+      <DashboardHeader 
+        heading="Fee Management"
+        text="Institutional Invoicing & Automated Payments"
+      >
         <div className="flex items-center gap-3">
           <BulkBillDialog />
           <AddInvoiceDialog />
         </div>
-      </div>
+      </DashboardHeader>
 
       <div className="grid gap-6 md:grid-cols-3">
         <InsightCard 
@@ -154,7 +151,7 @@ export default function FinancePage() {
           <CardContent className="p-0">
             <Table>
               <TableHeader className="bg-slate-50/30">
-                <TableRow className="hover:bg-transparent">
+                <TableRow className="hover:bg-transparent border-slate-100">
                   <TableHead className="pl-8 py-4 font-black uppercase tracking-widest text-[10px] text-slate-400">Student Identity</TableHead>
                   <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Title</TableHead>
                   <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Amount</TableHead>
@@ -242,7 +239,7 @@ export default function FinancePage() {
                   <p className="text-xs font-bold text-slate-400 mt-2 px-4 leading-relaxed uppercase tracking-widest">
                     Authorize KES {selectedInvoice?.amount?.toLocaleString()} on your mobile device.
                   </p>
-                  <Button variant="outline" className="mt-10 w-full h-14 rounded-2xl" onClick={() => setSelectedInvoice(null)}>Dismiss Terminal</Button>
+                  <Button variant="outline" className="mt-10 w-full h-14 rounded-2xl font-black uppercase tracking-widest text-[10px]" onClick={() => setSelectedInvoice(null)}>Dismiss Terminal</Button>
                 </div>
               ) : (
                 <>
@@ -275,7 +272,7 @@ export default function FinancePage() {
                   </div>
 
                   <Button 
-                    className="w-full h-16 shadow-2xl shadow-blue-600/20 active:scale-[0.98] transition-all rounded-2xl h-16 text-base" 
+                    className="w-full h-16 shadow-2xl shadow-blue-600/20 active:scale-[0.98] transition-all rounded-2xl text-sm" 
                     variant="premium"
                     disabled={isPaying || !phoneNumber}
                     onClick={initiatePayment}
@@ -289,6 +286,6 @@ export default function FinancePage() {
           </Card>
         </div>
       </div>
-    </div>
+    </DashboardShell>
   );
 }

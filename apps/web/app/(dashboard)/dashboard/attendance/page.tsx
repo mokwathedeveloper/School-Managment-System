@@ -29,6 +29,7 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
 import { PremiumLoader } from '@/components/ui/premium-loader';
+import { DashboardShell, DashboardHeader } from '@/components/dashboard/shell';
 
 export default function AttendancePage() {
   const queryClient = useQueryClient();
@@ -37,7 +38,7 @@ export default function AttendancePage() {
   const [searchQuery, setSearchQuery] = useState('');
 
   // 1. Fetch Classes for dropdown
-  const { data: classes } = useQuery({
+  const { data: classes, isLoading } = useQuery({
     queryKey: ['classes'],
     queryFn: async () => {
       const res = await api.get('/classes');
@@ -123,35 +124,33 @@ export default function AttendancePage() {
     s.admission_no.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  if (isLoading && !classes) return <PremiumLoader message="Syncing Registry Nodes" />;
+
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
-            <UserCheck className="h-8 w-8 text-blue-600" />
-            Daily Attendance
-          </h1>
-          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1 text-lg">Student Presence Terminal</p>
-        </div>
+    <DashboardShell className="animate-in fade-in duration-700">
+      <DashboardHeader 
+        heading="Daily Attendance"
+        text="Student Presence Terminal"
+      >
         <div className="flex items-center gap-3">
            <div className="bg-white border-2 border-slate-100 rounded-2xl p-1 flex items-center shadow-sm">
-             <Button variant="ghost" size="icon" className="rounded-xl" onClick={() => {
+             <Button variant="ghost" size="icon" className="rounded-xl h-9 w-9" onClick={() => {
                 const d = new Date(selectedDate);
                 d.setDate(d.getDate() - 1);
                 setSelectedDate(d.toISOString().split('T')[0]);
              }}>
                <ChevronLeft className="h-4 w-4" />
              </Button>
-             <div className="px-4 flex items-center gap-3 text-sm font-black text-slate-900 uppercase tracking-tighter">
-               <CalendarIcon className="h-4 w-4 text-blue-600" />
+             <div className="px-4 flex items-center gap-3 text-[10px] font-black text-slate-900 uppercase tracking-tighter">
+               <CalendarIcon className="h-3.5 w-3.5 text-blue-600" />
                <input 
                 type="date" 
-                className="bg-transparent border-none focus:ring-0 p-0 text-sm font-black" 
+                className="bg-transparent border-none focus:ring-0 p-0 text-[10px] font-black" 
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
                />
              </div>
-             <Button variant="ghost" size="icon" className="rounded-xl" onClick={() => {
+             <Button variant="ghost" size="icon" className="rounded-xl h-9 w-9" onClick={() => {
                 const d = new Date(selectedDate);
                 d.setDate(d.getDate() + 1);
                 setSelectedDate(d.toISOString().split('T')[0]);
@@ -160,12 +159,12 @@ export default function AttendancePage() {
              </Button>
            </div>
         </div>
-      </div>
+      </DashboardHeader>
 
       <div className="grid gap-8 md:grid-cols-4">
-        <Card className="md:col-span-1 border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2rem] overflow-hidden">
+        <Card className="md:col-span-1 border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2rem] overflow-hidden h-fit">
           <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-6">
-            <CardTitle className="text-sm font-black uppercase tracking-widest text-slate-400">Class Selection</CardTitle>
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-slate-400">Class Selection</CardTitle>
           </CardHeader>
           <CardContent className="p-4 space-y-2">
             {classes?.map((cls: any) => (
@@ -233,7 +232,7 @@ export default function AttendancePage() {
                 <div className="h-20 w-20 rounded-[2rem] bg-slate-50 flex items-center justify-center mb-6 border border-slate-100">
                     <CalendarIcon className="h-10 w-10 text-slate-200" />
                 </div>
-                <h3 className="text-xl font-black text-slate-900 tracking-tight mb-2">Registry Inactive</h3>
+                <h3 className="text-xl font-black text-slate-900 tracking-tight mb-2 uppercase tracking-tighter">Registry Inactive</h3>
                 <p className="text-sm font-bold text-slate-400 max-w-xs uppercase tracking-widest leading-relaxed">
                     Select a class from the left sidebar to initialize the attendance terminal.
                 </p>
@@ -295,7 +294,7 @@ export default function AttendancePage() {
                             size="icon" 
                             className={cn(
                               "h-10 w-10 rounded-xl transition-all active:scale-90",
-                              attendanceState[student.id] === 'ABSENT' ? "bg-rose-500 text-white shadow-lg shadow-rose-500/20" : "hover:bg-rose-50 text-rose-600"
+                              attendanceState[student.id] === 'ABSENT' ? "bg-rose-500 text-white shadow-lg shadow-rose-500/20" : "hover:bg-rose-600"
                             )}
                             onClick={() => handleStatusChange(student.id, 'ABSENT')}
                           >
@@ -306,7 +305,7 @@ export default function AttendancePage() {
                             size="icon" 
                             className={cn(
                               "h-10 w-10 rounded-xl transition-all active:scale-90",
-                              attendanceState[student.id] === 'LATE' ? "bg-amber-500 text-white shadow-lg shadow-amber-500/20" : "hover:bg-amber-50 text-amber-600"
+                              attendanceState[student.id] === 'LATE' ? "bg-amber-500 text-white shadow-lg shadow-amber-500/20" : "hover:bg-amber-600"
                             )}
                             onClick={() => handleStatusChange(student.id, 'LATE')}
                           >
@@ -322,6 +321,6 @@ export default function AttendancePage() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </DashboardShell>
   );
 }

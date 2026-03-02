@@ -28,6 +28,7 @@ import { toast } from 'react-hot-toast';
 import { PremiumLoader } from '@/components/ui/premium-loader';
 import { AddBookDialog } from '@/components/dashboard/add-book-dialog';
 import { BorrowBookDialog } from '@/components/dashboard/borrow-book-dialog';
+import { DashboardShell, DashboardHeader } from '@/components/dashboard/shell';
 
 export default function LibraryPage() {
   const queryClient = useQueryClient();
@@ -63,40 +64,36 @@ export default function LibraryPage() {
   if (loadingCatalog || loadingBorrows) return <PremiumLoader message="Syncing Resource Repository" />;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
-            <Library className="h-8 w-8 text-blue-600" />
-            Library Terminal
-          </h1>
-          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Resource Repository & Circulation Management</p>
-        </div>
+    <DashboardShell className="animate-in fade-in duration-700">
+      <DashboardHeader 
+        heading="Library Terminal"
+        text="Resource Repository & Circulation Management"
+      >
         <div className="flex items-center gap-3">
             {view === 'catalog' ? <AddBookDialog /> : <BorrowBookDialog />}
         </div>
-      </div>
+      </DashboardHeader>
 
       {/* Tab Selector */}
       <div className="flex p-1 bg-white border shadow-sm rounded-2xl w-fit">
         <button 
           onClick={() => setView('catalog')}
           className={cn(
-            "px-8 py-2.5 text-xs font-black uppercase tracking-widest rounded-xl transition-all duration-300 flex items-center gap-2",
+            "px-8 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all duration-300 flex items-center gap-2",
             view === 'catalog' ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
           )}
         >
-          <Book className="h-4 w-4" />
+          <Book className="h-3.5 w-3.5" />
           Collection Catalog
         </button>
         <button 
           onClick={() => setView('borrows')}
           className={cn(
-            "px-8 py-2.5 text-xs font-black uppercase tracking-widest rounded-xl transition-all duration-300 flex items-center gap-2",
+            "px-8 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all duration-300 flex items-center gap-2",
             view === 'borrows' ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
           )}
         >
-          <History className="h-4 w-4" />
+          <History className="h-3.5 w-3.5" />
           Active Circulation
         </button>
       </div>
@@ -254,6 +251,6 @@ export default function LibraryPage() {
           </CardContent>
         </Card>
       )}
-    </div>
+    </DashboardShell>
   );
 }

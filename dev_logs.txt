@@ -42,3 +42,141 @@ API Client initialized with baseURL: /api
  ✓ Compiled /api/super-admin/schools in 334ms (1382 modules)
  ✓ Compiled (1384 modules)
  ✓ Compiled in 1046ms (1010 modules)
+ ✓ Compiled in 426ms (1010 modules)
+ ✓ Compiled in 247ms (1010 modules)
+ ✓ Compiled in 242ms (1010 modules)
+ ✓ Compiled in 261ms (1010 modules)
+ ✓ Compiled in 342ms (1010 modules)
+ ✓ Compiled in 306ms (1010 modules)
+ ✓ Compiled in 284ms (1010 modules)
+ ✓ Compiled in 266ms (1010 modules)
+ ✓ Compiled in 233ms (1010 modules)
+ ✓ Compiled in 284ms (1010 modules)
+API Client initialized with baseURL: /api
+ ○ Compiling /not-found ...
+ ✓ Compiled /not-found in 1039ms (2041 modules)
+API Client initialized with baseURL: /api
+ ○ Compiling /api/auth/login ...
+ ✓ Compiled /api/auth/login in 719ms (1213 modules)
+API Client initialized with baseURL: /api
+ ✓ Compiled /api/attendance in 163ms (1217 modules)
+ ✓ Compiled (1346 modules)
+ ○ Compiling /api/super-admin/schools ...
+ ✓ Compiled /api/super-admin/schools in 677ms (1349 modules)
+ ✓ Compiled (1351 modules)
+ ○ Compiling /dashboard/students ...
+ ✓ Compiled /dashboard/students in 1387ms (2371 modules)
+ ○ Compiling /dashboard/grade-levels ...
+ ✓ Compiled /dashboard/grade-levels in 762ms (2381 modules)
+ ✓ Compiled in 317ms (1025 modules)
+ ○ Compiling /dashboard/hostels ...
+ ✓ Compiled /dashboard/hostels in 1049ms (2274 modules)
+ ✓ Compiled /api/hostels in 256ms (1256 modules)
+ ○ Compiling /dashboard/exams ...
+ ✓ Compiled /dashboard/exams in 799ms (2282 modules)
+ ✓ Compiled /api/exams in 333ms (1257 modules)
+ ✓ Compiled /api/finance/terms in 211ms (1259 modules)
+ ✓ Compiled (1381 modules)
+ ○ Compiling /dashboard/finance ...
+ ✓ Compiled /dashboard/finance in 539ms (2429 modules)
+ ✓ Compiled /api/finance in 195ms (918 modules)
+ ○ Compiling /dashboard/lms ...
+ ✓ Compiled /dashboard/lms in 656ms (1971 modules)
+ ✓ Compiled /api/lms/resources in 234ms (926 modules)
+ ✓ Compiled (929 modules)
+ ○ Compiling /dashboard/staff ...
+ ✓ Compiled /dashboard/staff in 728ms (1988 modules)
+ ✓ Compiled /api/hr/directory in 282ms (940 modules)
+ ○ Compiling /dashboard/transport ...
+ ✓ Compiled /dashboard/transport in 643ms (2011 modules)
+ ✓ Compiled /api/transport/vehicles in 340ms (939 modules)
+ ✓ Compiled (941 modules)
+ ○ Compiling /dashboard/library ...
+ ✓ Compiled /dashboard/library in 556ms (2024 modules)
+ ✓ Compiled /api/library/borrows/active in 270ms (957 modules)
+ ✓ Compiled (959 modules)
+ ✓ Compiled in 504ms (1084 modules)
+ ✓ Compiled /api/library/borrows/active in 899ms (1694 modules)
+ ✓ Compiled in 0ms (708 modules)
+ ✓ Compiled in 582ms (1084 modules)
+ ✓ Compiled in 296ms (1084 modules)
+ ✓ Compiled in 2s (1694 modules)
+ ✓ Compiled in 286ms (1084 modules)
+ ✓ Compiled in 879ms (1084 modules)
+ ✓ Compiled in 261ms (1084 modules)
+ ✓ Compiled in 230ms (1084 modules)
+ ✓ Compiled in 226ms (1084 modules)
+ ✓ Compiled in 649ms (1694 modules)
+API Client initialized with baseURL: /api
+ ○ Compiling /not-found ...
+ ✓ Compiled /not-found in 952ms (1685 modules)
+API Client initialized with baseURL: /api
+ ✓ Compiled /login in 454ms (619 modules)
+ ✓ Compiled /api/auth/login in 305ms (774 modules)
+ ○ Compiling /dashboard ...
+ ✓ Compiled /dashboard in 951ms (2327 modules)
+API Client initialized with baseURL: /api
+ ✓ Compiled /api/grade-levels in 199ms (1259 modules)
+ ✓ Compiled (1388 modules)
+API Error: PrismaClientKnownRequestError: 
+Invalid `prisma.student.count()` invocation:
+
+
+Can't reach database server at `aws-1-eu-west-1.pooler.supabase.com:6543`
+
+Please make sure your database server is running at `aws-1-eu-west-1.pooler.supabase.com:6543`.
+    at $n.handleRequestError (/home/that/Desktop/project UFO/School-Managment-System/node_modules/@prisma/client/runtime/library.js:121:7315)
+    at $n.handleAndLogRequestError (/home/that/Desktop/project UFO/School-Managment-System/node_modules/@prisma/client/runtime/library.js:121:6623)
+    at $n.request (/home/that/Desktop/project UFO/School-Managment-System/node_modules/@prisma/client/runtime/library.js:121:6307)
+    at async l (/home/that/Desktop/project UFO/School-Managment-System/node_modules/@prisma/client/runtime/library.js:130:9633)
+    at async Promise.all (index 1)
+    at async Object.findAll (webpack-internal:///(rsc)/./lib/services/students.service.ts:80:32)
+    at async GET (webpack-internal:///(rsc)/./app/api/students/route.ts:35:24)
+    at async /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:63809
+    at async eU.execute (/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:53964)
+    at async eU.handle (/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:65062)
+    at async doRender (/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/base-server.js:1333:42)
+    at async cacheEntry.responseCache.get.routeKind (/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/base-server.js:1555:28)
+    at async DevServer.renderToResponseWithComponentsImpl (/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/base-server.js:1463:28)
+    at async DevServer.renderPageComponent (/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/base-server.js:1856:24)
+    at async DevServer.renderToResponseImpl (/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/base-server.js:1894:32)
+    at async DevServer.pipeImpl (/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/base-server.js:911:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/next-server.js:271:17)
+    at async DevServer.handleRequestImpl (/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/base-server.js:807:17)
+    at async /home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/dev/next-dev-server.js:331:20
+    at async Span.traceAsyncFn (/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/trace/trace.js:151:20)
+    at async DevServer.handleRequest (/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/dev/next-dev-server.js:328:24)
+    at async invokeRender (/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/lib/router-server.js:163:21)
+    at async handleRequest (/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/lib/router-server.js:342:24)
+    at async requestHandlerImpl (/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/lib/router-server.js:366:13)
+    at async Server.requestListener (/home/that/Desktop/project UFO/School-Managment-System/node_modules/next/dist/server/lib/start-server.js:140:13) {
+  code: 'P1001',
+  clientVersion: '5.22.0',
+  meta: {
+    modelName: 'Student',
+    database_host: 'aws-1-eu-west-1.pooler.supabase.com',
+    database_port: 6543
+  }
+}
+ ✓ Compiled in 591ms (1086 modules)
+ ○ Compiling /dashboard/super-admin ...
+ ✓ Compiled /dashboard/super-admin in 1151ms (1379 modules)
+ ✓ Compiled /api/super-admin/schools in 275ms (1382 modules)
+ ✓ Compiled (1384 modules)
+ ○ Compiling /dashboard/classes ...
+ ✓ Compiled /dashboard/classes in 712ms (2466 modules)
+ ○ Compiling /api/classes ...
+ ✓ Compiled /api/classes in 525ms (1394 modules)
+ ✓ Compiled /api/hr/directory in 241ms (1397 modules)
+ ✓ Compiled in 319ms (1089 modules)
+ ✓ Compiled in 397ms (1089 modules)
+ ✓ Compiled in 285ms (1089 modules)
+ ✓ Compiled in 1301ms (2156 modules)
+ ✓ Compiled in 318ms (1089 modules)
+ ✓ Compiled in 285ms (1089 modules)
+ ✓ Compiled in 302ms (1089 modules)
+ ✓ Compiled in 996ms (1089 modules)
+ ✓ Compiled in 439ms (1089 modules)
+ ○ Compiling /not-found ...
+ ✓ Compiled /not-found in 1674ms (2147 modules)
+API Client initialized with baseURL: /api

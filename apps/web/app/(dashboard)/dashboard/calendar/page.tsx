@@ -22,6 +22,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { PremiumLoader } from '@/components/ui/premium-loader';
 import { AddEventDialog } from '@/components/dashboard/add-event-dialog';
+import { DashboardShell, DashboardHeader } from '@/components/dashboard/shell';
 
 export default function CalendarPage() {
   const { data: events, isLoading } = useQuery({
@@ -39,17 +40,13 @@ export default function CalendarPage() {
     .slice(0, 5);
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
-            <Calendar className="h-8 w-8 text-blue-600" />
-            Institutional Calendar
-          </h1>
-          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Academic Events & Operational Milestones</p>
-        </div>
+    <DashboardShell className="animate-in fade-in duration-700">
+      <DashboardHeader 
+        heading="Institutional Calendar"
+        text="Academic Events & Operational Milestones"
+      >
         <AddEventDialog />
-      </div>
+      </DashboardHeader>
 
       <div className="grid gap-8 lg:grid-cols-3">
         {/* Main Calendar View Placeholder */}
@@ -116,7 +113,7 @@ export default function CalendarPage() {
                 </div>
               ) : (
                 upcomingEvents?.map((event: any) => (
-                  <div key={event.id} className="p-4 rounded-2xl bg-slate-50 border border-transparent hover:border-blue-100 hover:bg-white transition-all duration-300 group cursor-pointer shadow-sm hover:shadow-md">
+                  <div key={event.id} className="p-4 rounded-2xl bg-slate-50 border border-transparent hover:border-blue-100 hover:bg-white transition-all duration-300 group cursor-default shadow-sm hover:shadow-md">
                     <div className="flex justify-between items-start mb-2">
                         <Badge className={cn(
                             "font-black text-[8px] uppercase tracking-widest border-none px-2 h-4 rounded-md",
@@ -144,7 +141,7 @@ export default function CalendarPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-slate-900 border-none rounded-[2rem] p-8 text-white relative overflow-hidden group">
+          <Card className="bg-slate-900 border-none rounded-[2rem] p-8 text-white relative overflow-hidden group shadow-2xl shadow-slate-900/20">
             <div className="absolute top-0 right-0 p-4 opacity-10">
                 <Calendar className="h-20 w-20 text-white" />
             </div>
@@ -159,13 +156,13 @@ export default function CalendarPage() {
                 <p className="text-xs font-medium text-slate-400 leading-relaxed italic pt-2">
                     Distribute institutional milestones directly to parent and staff personal devices with one-click synchronization.
                 </p>
-                <Button variant="ghost" className="w-full bg-white/5 hover:bg-white/10 text-white border-none h-12 text-[10px] font-black uppercase tracking-widest mt-4">
+                <Button variant="ghost" className="w-full bg-white/5 hover:bg-white/10 text-white border-none h-12 text-[10px] font-black uppercase tracking-widest mt-4 active:scale-100">
                     Initialize External Sync
                 </Button>
             </div>
           </Card>
         </div>
       </div>
-    </div>
+    </DashboardShell>
   );
 }

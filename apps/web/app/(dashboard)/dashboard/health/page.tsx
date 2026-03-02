@@ -23,6 +23,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { PremiumLoader } from '@/components/ui/premium-loader';
 import { RecordHealthVisitDialog } from '@/components/dashboard/record-health-visit-dialog';
+import { DashboardShell, DashboardHeader } from '@/components/dashboard/shell';
 
 export default function HealthPage() {
   const queryClient = useQueryClient();
@@ -37,17 +38,13 @@ export default function HealthPage() {
   if (isLoading) return <PremiumLoader message="Syncing Clinical Registry" />;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
-            <HeartPulse className="h-8 w-8 text-rose-600" />
-            Institutional Health
-          </h1>
-          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Student Wellness & Clinical Logs</p>
-        </div>
+    <DashboardShell className="animate-in fade-in duration-700">
+      <DashboardHeader 
+        heading="Institutional Health"
+        text="Student Wellness & Clinical Logs"
+      >
         <RecordHealthVisitDialog />
-      </div>
+      </DashboardHeader>
 
       <div className="flex items-center gap-4 bg-white p-4 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.02)] border-none">
         <div className="relative flex-1 max-w-md group">
@@ -68,7 +65,7 @@ export default function HealthPage() {
                 <CardTitle className="text-xl font-black text-slate-900">Clinical Encounters</CardTitle>
                 <CardDescription className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Real-time log of student visits and diagnosis</CardDescription>
             </div>
-            <Button variant="outline" size="sm" className="h-10 px-4">
+            <Button variant="outline" size="sm" className="h-10 px-4 rounded-xl border-slate-100 font-bold uppercase tracking-widest text-[9px]">
                 <History className="mr-2 h-4 w-4" />
                 Audit Logs
             </Button>
@@ -132,6 +129,6 @@ export default function HealthPage() {
           </Table>
         </CardContent>
       </Card>
-    </div>
+    </DashboardShell>
   );
 }

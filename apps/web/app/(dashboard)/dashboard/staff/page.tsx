@@ -29,6 +29,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AddStaffDialog } from '@/components/dashboard/add-staff-dialog';
 import { PremiumLoader } from '@/components/ui/premium-loader';
 import { cn } from '@/lib/utils';
+import { DashboardShell, DashboardHeader } from '@/components/dashboard/shell';
 
 export default function StaffPage() {
   const [search, setSearch] = useState('');
@@ -44,17 +45,13 @@ export default function StaffPage() {
   if (isLoading) return <PremiumLoader message="Syncing Staff Terminal" />;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
-            <UserCog className="h-8 w-8 text-blue-600" />
-            Staff Directory
-          </h1>
-          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Personnel Management & HR</p>
-        </div>
+    <DashboardShell className="animate-in fade-in duration-700">
+      <DashboardHeader 
+        heading="Staff Directory"
+        text="Personnel Management & HR"
+      >
         <AddStaffDialog />
-      </div>
+      </DashboardHeader>
 
       <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2.5rem] overflow-hidden">
         <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-6">
@@ -71,7 +68,7 @@ export default function StaffPage() {
         <CardContent className="p-0">
           <Table>
             <TableHeader className="bg-slate-50/30">
-              <TableRow className="hover:bg-transparent">
+              <TableRow className="hover:bg-transparent border-slate-100">
                 <TableHead className="pl-8 py-4 font-black uppercase tracking-widest text-[10px] text-slate-400">Personnel Identity</TableHead>
                 <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Designation</TableHead>
                 <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Contact</TableHead>
@@ -85,13 +82,13 @@ export default function StaffPage() {
                   <TableCell colSpan={5} className="h-64 text-center">
                     <div className="flex flex-col items-center gap-2 text-slate-300">
                         <Users className="h-12 w-12 opacity-20" />
-                        <p className="font-black uppercase tracking-widest text-xs">No Personnel Records</p>
+                        <p className="font-black uppercase tracking-widest text-xs italic">No Personnel Records</p>
                     </div>
                   </TableCell>
                 </TableRow>
               ) : (
                 staff?.map((member: any) => (
-                  <TableRow key={member.id} className="group hover:bg-slate-50/50 transition-colors border-b-slate-50">
+                  <TableRow key={member.id} className="group hover:bg-slate-50/50 transition-all duration-300 border-b-slate-50">
                     <TableCell className="pl-8 py-5">
                       <div className="flex items-center gap-4">
                         <div className="h-12 w-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shadow-sm transition-premium group-hover:scale-110 group-hover:rotate-3">
@@ -132,7 +129,7 @@ export default function StaffPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right pr-8">
-                      <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-premium">
+                      <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-300 hover:text-blue-600 hover:bg-blue-50 transition-premium">
                         <ChevronRight className="h-5 w-5" />
                       </Button>
                     </TableCell>
@@ -143,6 +140,6 @@ export default function StaffPage() {
           </Table>
         </CardContent>
       </Card>
-    </div>
+    </DashboardShell>
   );
 }

@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { PremiumLoader } from '@/components/ui/premium-loader';
+import { DashboardShell, DashboardHeader } from '@/components/dashboard/shell';
 
 export default function SettingsPage() {
   const queryClient = useQueryClient();
@@ -58,24 +59,20 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700 max-w-5xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
-            <Settings className="h-8 w-8 text-blue-600" />
-            Institutional Terminal
-          </h1>
-          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Global Configuration & Multi-Tenancy</p>
-        </div>
+    <DashboardShell className="animate-in fade-in duration-700 max-w-5xl mx-auto">
+      <DashboardHeader 
+        heading="Institutional Terminal"
+        text="Global Configuration & Multi-Tenancy"
+      >
         <Button 
             onClick={handleSubmit} 
             disabled={updateMutation.isPending}
             className="h-12 px-8 rounded-xl font-black uppercase tracking-widest shadow-lg shadow-primary/20"
         >
-          {updateMutation.isPending ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Save className="mr-2 h-5 w-5" />}
+          {updateMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
           Save Configuration
         </Button>
-      </div>
+      </DashboardHeader>
 
       <div className="grid gap-8">
         {/* Core Identity */}
@@ -198,6 +195,6 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </DashboardShell>
   );
 }

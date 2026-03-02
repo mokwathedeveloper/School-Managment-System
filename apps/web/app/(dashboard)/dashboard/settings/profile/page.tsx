@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { PremiumLoader } from '@/components/ui/premium-loader';
+import { DashboardShell, DashboardHeader } from '@/components/dashboard/shell';
 
 export default function UserProfilePage() {
   const queryClient = useQueryClient();
@@ -78,15 +79,11 @@ export default function UserProfilePage() {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700 max-w-2xl mx-auto pb-12">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
-            <UserCircle className="h-8 w-8 text-blue-600" />
-            Personal Terminal
-          </h1>
-          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Identity & Security Configuration</p>
-        </div>
+    <DashboardShell className="animate-in fade-in duration-700 max-w-2xl mx-auto pb-12">
+      <DashboardHeader 
+        heading="Personal Terminal"
+        text="Identity & Security Configuration"
+      >
         <Button 
             onClick={handleSubmit} 
             disabled={updateMutation.isPending} 
@@ -96,7 +93,7 @@ export default function UserProfilePage() {
           {updateMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
           Update Profile
         </Button>
-      </div>
+      </DashboardHeader>
 
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Identity Card */}
@@ -205,6 +202,6 @@ export default function UserProfilePage() {
           </CardContent>
         </Card>
       </form>
-    </div>
+    </DashboardShell>
   );
 }

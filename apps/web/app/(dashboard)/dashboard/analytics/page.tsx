@@ -37,6 +37,7 @@ import { PremiumLoader } from '@/components/ui/premium-loader';
 import { InsightCard } from '@/components/dashboard/insight-card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { DashboardShell, DashboardHeader } from '@/components/dashboard/shell';
 
 const COLORS = ['#2563eb', '#10b981', '#6366f1', '#f59e0b', '#ef4444', '#64748b'];
 
@@ -59,15 +60,11 @@ export default function AnalyticsPage() {
   const gradeDistribution = stats?.academics?.distribution || [];
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
-            <Activity className="h-8 w-8 text-blue-600" />
-            Intelligence Terminal
-          </h1>
-          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Institutional Performance & Big Data</p>
-        </div>
+    <DashboardShell className="animate-in fade-in duration-700">
+      <DashboardHeader 
+        heading="Intelligence Terminal"
+        text="Institutional Performance & Big Data"
+      >
         <div className="flex gap-3">
             <Button variant="outline" size="sm" className="h-11 px-4 rounded-xl border-slate-100">
                 <Filter className="h-4 w-4 mr-2 text-slate-400" />
@@ -78,7 +75,7 @@ export default function AnalyticsPage() {
                 Export Brief
             </Button>
         </div>
-      </div>
+      </DashboardHeader>
 
       <div className="grid gap-6 md:grid-cols-4">
         <InsightCard 
@@ -277,6 +274,6 @@ export default function AnalyticsPage() {
             </div>
         </CardContent>
       </Card>
-    </div>
+    </DashboardShell>
   );
 }

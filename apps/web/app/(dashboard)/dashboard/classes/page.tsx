@@ -29,6 +29,7 @@ import Link from 'next/link';
 import { AddClassDialog } from '@/components/dashboard/add-class-dialog';
 import { PremiumLoader } from '@/components/ui/premium-loader';
 import { cn } from '@/lib/utils';
+import { DashboardShell, DashboardHeader } from '@/components/dashboard/shell';
 
 export default function ClassesListPage() {
   const [search, setSearch] = useState('');
@@ -49,17 +50,13 @@ export default function ClassesListPage() {
   );
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
-            <BookOpen className="h-8 w-8 text-blue-600" />
-            Class Management
-          </h1>
-          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Browse & Organize Institutional Streams</p>
-        </div>
+    <DashboardShell className="animate-in fade-in duration-700">
+      <DashboardHeader 
+        heading="Class Management"
+        text="Browse & Organize Institutional Streams"
+      >
         <AddClassDialog />
-      </div>
+      </DashboardHeader>
 
       <div className="flex items-center gap-4 bg-white p-4 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.02)] border-none">
         <div className="relative flex-1 max-w-md group">
@@ -130,7 +127,7 @@ export default function ClassesListPage() {
                       <Badge className="bg-emerald-50 text-emerald-600 border-none font-black text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-lg">Active</Badge>
                     </TableCell>
                     <TableCell className="text-right pr-8">
-                      <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-premium">
+                      <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-300 hover:text-blue-600 hover:bg-blue-50 transition-premium">
                         <ChevronRight className="h-5 w-5" />
                       </Button>
                     </TableCell>
@@ -141,6 +138,6 @@ export default function ClassesListPage() {
           </Table>
         </CardContent>
       </Card>
-    </div>
+    </DashboardShell>
   );
 }

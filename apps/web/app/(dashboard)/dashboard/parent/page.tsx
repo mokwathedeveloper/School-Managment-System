@@ -29,6 +29,7 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { PremiumLoader } from '@/components/ui/premium-loader';
 import { cn } from '@/lib/utils';
+import { DashboardShell, DashboardHeader } from '@/components/dashboard/shell';
 
 export default function ParentDashboard() {
   const { data: children, isLoading } = useQuery({
@@ -42,20 +43,16 @@ export default function ParentDashboard() {
   if (isLoading) return <PremiumLoader message="Syncing Family Terminal" />;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
-            <Heart className="h-8 w-8 text-rose-600 fill-rose-600/10" />
-            Parent Portal
-          </h1>
-          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Family Academic Hub & Fee Management</p>
-        </div>
+    <DashboardShell className="animate-in fade-in duration-700">
+      <DashboardHeader 
+        heading={`Parental Control Center`}
+        text="Family Academic Hub & Fee Management"
+      >
         <div className="bg-white px-5 py-2.5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3">
             <div className="h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
             <span className="text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">Guardian Node Active</span>
         </div>
-      </div>
+      </DashboardHeader>
 
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {children?.length === 0 ? (
@@ -154,7 +151,7 @@ export default function ParentDashboard() {
           />
         </CardContent>
       </Card>
-    </div>
+    </DashboardShell>
   );
 }
 
