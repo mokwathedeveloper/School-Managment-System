@@ -80,6 +80,25 @@ export default function SecurityGatePage() {
     }
   });
 
+  const verifyMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await api.get(`/gate/verify?id=${id}`);
+      return res.data;
+    },
+    onSuccess: (data) => {
+      if (data.verified) {
+        alert(`VERIFIED: ${data.student.name}\nClass: ${data.student.class}\nAdmission: ${data.student.admissionNo}`);
+      } else {
+        alert(`ACCESS DENIED: ${data.message}`);
+      }
+    }
+  });
+
+  const handleVerify = () => {
+    const id = window.prompt('Enter student admission number to verify:');
+    if (id) verifyMutation.mutate(id);
+  };
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -91,8 +110,8 @@ export default function SecurityGatePage() {
           <p className="text-muted-foreground mt-1 text-lg">Real-time visitor logs and campus access management.</p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" className="shadow-sm">
-            <Search className="mr-2 h-4 w-4" />
+          <Button variant="outline" className="shadow-sm" onClick={handleVerify} disabled={verifyMutation.isPending}>
+            {verifyMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Search className="mr-2 h-4 w-4" />}
             Verify ID
           </Button>
           <Button onClick={handleNewVisitor} disabled={registerVisitorMutation.isPending} className="shadow-md">
