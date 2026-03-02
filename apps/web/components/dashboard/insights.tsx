@@ -26,7 +26,7 @@ export function Insights({ stats }: { stats: any }) {
       subValue: `KES ${stats?.totalInvoiced?.toLocaleString()}`,
       icon: CreditCard,
       trend: stats?.debtPercentage ? `-${stats.debtPercentage}% Debt` : "Stable",
-      trendType: (stats?.debtPercentage > 15 ? "down" : "up") as const,
+      trendType: stats?.debtPercentage > 15 ? ("down" as const) : ("up" as const),
       color: "emerald" as const
     },
     {
