@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     const session = await getSession(req);
     if (!session) throw new ApiError('Unauthorized', 401);
     const body = await req.json();
-    const result = await HealthService.create(session.schoolId, body);
+    const result = await HealthService.create(session.schoolId, body, session.userId);
     return NextResponse.json(result, { status: 201 });
   } catch (error) { return handleApiError(error); }
 }
