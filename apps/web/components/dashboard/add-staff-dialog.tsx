@@ -1,15 +1,15 @@
-
 'use client';
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Loader2, UserCog, Mail, User, Briefcase } from 'lucide-react';
+import { Plus, Loader2, UserCog, Mail, User, Briefcase, Shield } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
 import { toast } from 'react-hot-toast';
 import { DialogShell } from '@/components/ui/dialog-shell';
+import { FormSelect } from '@/components/ui/form-select';
 
 export function AddStaffDialog() {
   const [open, setOpen] = useState(false);
@@ -20,15 +20,23 @@ export function AddStaffDialog() {
     email: '',
     designation: '',
     department: '',
+    role: 'TEACHER'
   });
 
   const createStaffMutation = useMutation({
     mutationFn: async (data: any) => api.post('/hr/directory', data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['staff'] });
+      queryClient.invalidateQueries({ queryKey: ['hr-directory'] });
       toast.success('Personnel record has been successfully onboarded.');
       setOpen(false);
-      setFormData({ first_name: '', last_name: '', email: '', designation: '', department: '' });
+      setFormData({ 
+        first_name: '', 
+        last_name: '', 
+        email: '', 
+        designation: '', 
+        department: '', 
+        role: 'TEACHER' 
+      });
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Failed to onboard staff');
@@ -39,6 +47,21 @@ export function AddStaffDialog() {
     e.preventDefault();
     createStaffMutation.mutate(formData);
   };
+
+  const ROLES = [
+    { label: 'Head Teacher', value: 'HEAD_TEACHER' },
+    { label: 'Deputy Head Teacher', value: 'DEPUTY_HEAD_TEACHER' },
+    { label: 'Subject Teacher', value: 'TEACHER' },
+    { label: 'Class Teacher', value: 'CLASS_TEACHER' },
+    { label: 'Librarian', value: 'LIBRARIAN' },
+    { label: 'School Nurse', value: 'NURSE' },
+    { label: 'Matron', value: 'MATRON' },
+    { label: 'Security Guard', value: 'SECURITY' },
+    { label: 'Bus Driver', value: 'DRIVER' },
+    { label: 'Support Staff', value: 'SUBORDINATE' },
+    { label: 'Accountant', value: 'ACCOUNTANT' },
+    { label: 'School Admin', value: 'SCHOOL_ADMIN' },
+  ];
 
   return (
     <>
@@ -90,19 +113,38 @@ export function AddStaffDialog() {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="s_email" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Official Email</Label>
-            <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
-                <Input 
-                    id="s_email" 
-                    type="email" 
-                    required 
-                    placeholder="name@school.com"
-                    className="h-12 pl-12 rounded-xl border-2 border-slate-50 focus:ring-blue-600/10 font-bold"
-                    value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
-                />
+          <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-2">
+                <Label htmlFor="s_email" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Official Email</Label>
+                <div className="relative group">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
+                    <Input 
+                        id="s_email" 
+                        type="email" 
+                        required 
+                        placeholder="name@school.com"
+                        className="h-12 pl-12 rounded-xl border-2 border-slate-50 focus:ring-blue-600/10 font-bold"
+                        value={formData.email}
+                        onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    />
+                </div>
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="s_role" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Access Role</Label>
+                <div className="relative group">
+                    <Shield className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors z-10" />
+                    <FormSelect 
+                        id="s_role"
+                        required
+                        className="h-12 pl-12 rounded-xl border-2 border-slate-50 focus:ring-blue-600/10 font-bold"
+                        value={formData.role}
+                        onChange={(e) => setFormData({...formData, role: e.target.value})}
+                    >
+                        {ROLES.map(role => (
+                            <option key={role.value} value={role.value}>{role.label}</option>
+                        ))}
+                    </FormSelect>
+                </div>
             </div>
           </div>
 

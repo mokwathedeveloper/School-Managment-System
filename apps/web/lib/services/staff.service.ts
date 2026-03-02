@@ -4,9 +4,21 @@ import { Staff, Prisma } from '@prisma/client';
 import * as argon2 from 'argon2';
 
 export const StaffService = {
-  async findAll(schoolId: string) {
+  async findAll(schoolId: string, query?: { search?: string }) {
+    const where: Prisma.StaffWhereInput = {
+      school_id: schoolId,
+      ...(query?.search && {
+        OR: [
+          { user: { first_name: { contains: query.search, mode: 'insensitive' as any } } },
+          { user: { last_name: { contains: query.search, mode: 'insensitive' as any } } },
+          { user: { email: { contains: query.search, mode: 'insensitive' as any } } },
+          { designation: { contains: query.search, mode: 'insensitive' as any } },
+        ]
+      })
+    };
+
     return prisma.staff.findMany({
-      where: { school_id: schoolId },
+      where,
       include: {
         user: true,
       },
@@ -35,7 +47,7 @@ export const StaffService = {
           password: passwordHash,
           first_name: data.first_name,
           last_name: data.last_name,
-          role: 'TEACHER', // Default role for HR directory entry
+          role: data.role || 'TEACHER', 
           school_id: schoolId,
         },
       });
@@ -88,5 +100,37 @@ export const StaffService = {
     }
 
     return { processed };
+  },
+
+  // Leaves
+  async getLeaves(schoolId: string) {
+    return prisma.leaveRequest.findMany({
+      where: { school_id: schoolId },
+      include: {
+        staff: { include: { user: true } }
+      },
+      orderBy: { created_at: 'desc' }
+    });
+  },
+
+  async requestLeave(schoolId: string, staffId: string, data: any) {
+    return prisma.leaveRequest.create({
+      data: {
+        school_id: schoolId,
+        staff_id: staffId,
+        type: data.type,
+        start_date: new Date(data.start_date),
+        end_date: new Date(data.end_date),
+        reason: data.reason,
+        status: 'PENDING'
+      }
+    });
+  },
+
+  async updateLeaveStatus(schoolId: string, leaveId: string, status: 'APPROVED' | 'REJECTED') {
+    return prisma.leaveRequest.update({
+      where: { id: leaveId, school_id: schoolId },
+      data: { status }
+    });
   }
 };
