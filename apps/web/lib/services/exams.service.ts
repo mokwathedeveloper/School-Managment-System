@@ -1,6 +1,20 @@
 import prisma from '../db/prisma';
 
 export const ExamsService = {
+  async create(schoolId: string, data: any) {
+    return prisma.exam.create({
+      data: {
+        school_id: schoolId,
+        term_id: data.term_id,
+        subject_id: data.subject_id,
+        grading_system_id: data.grading_system_id,
+        name: data.name,
+        date: new Date(data.date),
+        max_marks: data.max_marks || 100
+      }
+    });
+  },
+
   async findAll(schoolId: string) {
     return prisma.exam.findMany({
       where: { school_id: schoolId },

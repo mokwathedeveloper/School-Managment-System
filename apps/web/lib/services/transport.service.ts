@@ -22,7 +22,7 @@ export const TransportService = {
           include: { user: true }
         }
       },
-      orderBy: { reg_number: 'asc' }
+      orderBy: { plate_number: 'asc' }
     });
   },
 

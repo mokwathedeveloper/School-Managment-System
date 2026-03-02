@@ -58,9 +58,9 @@ export const StudentsService = {
       ...(classId && { class_id: classId }),
       ...(search && {
         OR: [
-          { admission_no: { contains: search } },
-          { user: { first_name: { contains: search } } },
-          { user: { last_name: { contains: search } } },
+          { admission_no: { contains: search, mode: 'insensitive' as any } },
+          { user: { first_name: { contains: search, mode: 'insensitive' as any } } },
+          { user: { last_name: { contains: search, mode: 'insensitive' as any } } },
         ]
       })
     };
