@@ -1,72 +1,97 @@
-
 'use client';
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { TrendingUp, Users, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { TrendingUp, Clock, ShieldCheck, Zap, ArrowUpRight } from 'lucide-react';
+
+const outcomes = [
+  {
+    label: "Efficiency Increase",
+    value: "85%",
+    description: "Reduction in manual administrative processing time via automated workflows.",
+    icon: Clock,
+    color: "blue"
+  },
+  {
+    label: "Fee Recovery",
+    value: "KES 2.4M",
+    description: "Average increase in collection rates within the first two academic terms.",
+    icon: TrendingUp,
+    color: "emerald"
+  },
+  {
+    label: "Data Integrity",
+    value: "100%",
+    description: "Cryptographic verification of all student and financial records across the node.",
+    icon: ShieldCheck,
+    color: "indigo"
+  }
+];
 
 export function Outcomes() {
-  const metrics = [
-    {
-      label: "Revenue Recovery",
-      value: "22%",
-      description: "Average increase in collection rates within the first 6 months of automation.",
-      icon: <TrendingUp className="h-5 w-5" />
-    },
-    {
-      label: "Operational Efficiency",
-      value: "40hr",
-      description: "Monthly administrative time saved through automated reporting and billing.",
-      icon: <Users className="h-5 w-5" />
-    },
-    {
-      label: "Data Accuracy",
-      value: "100%",
-      description: "Elimination of manual entry errors in financial reconciliation and grading.",
-      icon: <CheckCircle2 className="h-5 w-5" />
-    }
-  ];
-
   return (
-    <section className="py-24 bg-white px-4">
-      <div className="container mx-auto">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          <div className="space-y-8">
-            <h2 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-[1.1]">
-              Measurable outcomes for <br /><span className="text-blue-600">institutional success.</span>
-            </h2>
-            <p className="text-lg text-slate-500 font-medium leading-relaxed max-w-xl">
-              Moving beyond traditional management. We provide the technical infrastructure to eliminate revenue leakage and optimize academic trajectories.
-            </p>
-            
+    <section className="py-32 bg-white relative overflow-hidden organic-grain">
+      <div className="container relative z-10 px-4 md:px-6 mx-auto">
+        <div className="grid lg:grid-cols-2 gap-24 items-center">
+          <div className="space-y-10">
             <div className="space-y-4">
-                {["Real-time institutional oversight", "Bank-grade financial security", "Automated student performance tracking"].map((item) => (
-                    <div key={item} className="flex items-center gap-3 text-slate-700 font-bold">
-                        <div className="h-6 w-6 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
-                            <CheckCircle2 className="h-4 w-4" />
-                        </div>
-                        {item}
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600">
+                    <Zap className="h-3.5 w-3.5 fill-emerald-600" />
+                    <span className="text-[10px] font-black uppercase tracking-widest">Measurable Impact</span>
+                </div>
+                <h2 className="text-4xl md:text-6xl font-black tracking-tighter text-slate-900 leading-tight">
+                    Performance <br />
+                    <span className="text-slate-400 italic">quantified.</span>
+                </h2>
+                <p className="text-lg text-slate-500 font-medium leading-relaxed max-w-md">
+                    SchoolOS delivers tangible operational improvements through technical excellence and precision engineering.
+                </p>
+            </div>
+
+            <div className="space-y-6">
+                <div className="p-6 rounded-3xl bg-slate-50 border border-slate-100 flex items-start gap-4 transition-premium hover:bg-white hover:shadow-xl group">
+                    <div className="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/20 group-hover:rotate-6 transition-premium">
+                        <ArrowUpRight className="h-5 w-5" />
                     </div>
-                ))}
+                    <div>
+                        <h4 className="font-black text-slate-900 text-sm uppercase tracking-tighter">Real-time Intelligence</h4>
+                        <p className="text-xs text-slate-500 font-medium mt-1">Access instantaneous reporting across all institutional metrics.</p>
+                    </div>
+                </div>
+                <div className="p-6 rounded-3xl bg-slate-50 border border-slate-100 flex items-start gap-4 transition-premium hover:bg-white hover:shadow-xl group">
+                    <div className="h-10 w-10 rounded-xl bg-slate-900 flex items-center justify-center text-white shadow-lg group-hover:rotate-6 transition-premium">
+                        <ShieldCheck className="h-5 w-5" />
+                    </div>
+                    <div>
+                        <h4 className="font-black text-slate-900 text-sm uppercase tracking-tighter">Audit-Ready Compliance</h4>
+                        <p className="text-xs text-slate-500 font-medium mt-1">Every transaction and registry update is immutable and verifiable.</p>
+                    </div>
+                </div>
             </div>
           </div>
 
           <div className="grid gap-6">
-            {metrics.map((metric, index) => (
-              <Card key={index} className="border-slate-100 shadow-sm rounded-3xl hover:border-blue-200 transition-colors">
-                <CardContent className="p-8 flex items-center gap-6">
-                  <div className="h-12 w-12 rounded-2xl bg-slate-50 flex items-center justify-center text-blue-600">
-                    {metric.icon}
+            {outcomes.map((outcome, i) => (
+              <div 
+                key={i} 
+                className="p-8 rounded-[2.5rem] bg-white border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.02)] relative overflow-hidden group hover:shadow-[0_20px_40px_rgba(0,0,0,0.04)] transition-premium"
+              >
+                <div className="flex items-center justify-between relative z-10">
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{outcome.label}</p>
+                    <h3 className="text-4xl font-black text-slate-900 tracking-tighter">{outcome.value}</h3>
                   </div>
-                  <div>
-                    <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-black text-slate-900">{metric.value}</span>
-                        <span className="text-sm font-bold text-slate-400 uppercase tracking-widest">{metric.label}</span>
-                    </div>
-                    <p className="text-sm text-slate-500 font-medium mt-1">{metric.description}</p>
+                  <div className={`h-12 w-12 rounded-2xl flex items-center justify-center transition-premium group-hover:scale-110 shadow-sm border ${
+                    outcome.color === 'blue' ? 'bg-blue-50 text-blue-600 border-blue-100' : 
+                    outcome.color === 'emerald' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 
+                    'bg-indigo-50 text-indigo-600 border-indigo-100'
+                  }`}>
+                    <outcome.icon className="h-6 w-6" />
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+                <p className="text-sm text-slate-500 font-medium mt-4 leading-relaxed relative z-10">
+                  {outcome.description}
+                </p>
+              </div>
             ))}
           </div>
         </div>
