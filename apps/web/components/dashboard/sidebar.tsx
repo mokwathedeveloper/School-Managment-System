@@ -45,6 +45,7 @@ import {
 import { useAuth } from '@/components/auth-provider';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
+import { CommandMenu } from './command-menu';
 
 interface SidebarProps {
   collapsed?: boolean;
@@ -56,6 +57,7 @@ export function Sidebar({ collapsed = false, onClose, onToggle }: SidebarProps) 
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const router = useRouter();
+  const [commandOpen, setCommandOpen] = React.useState(false);
 
   const navigation = [
     { name: 'Terminal Home', href: '/dashboard', icon: LayoutDashboard, roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'TEACHER', 'PARENT', 'STUDENT'] },
@@ -124,16 +126,24 @@ export function Sidebar({ collapsed = false, onClose, onToggle }: SidebarProps) 
 
         {!collapsed && (
           <div className="flex flex-col gap-2">
-            <div className="relative group">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
-              <input 
-                placeholder="Search terminal..." 
-                className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-medium focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-600/10 transition-all"
-              />
-            </div>
+            <button 
+              onClick={() => setCommandOpen(true)}
+              className="w-full flex items-center justify-between px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-slate-400 hover:bg-slate-100 hover:border-slate-200 transition-all group"
+            >
+              <div className="flex items-center gap-3">
+                <Search className="h-3.5 w-3.5 group-hover:text-blue-600 transition-colors" />
+                <span className="text-[10px] font-black uppercase tracking-widest">Search...</span>
+              </div>
+              <div className="flex items-center gap-1 bg-white px-1.5 py-0.5 rounded border shadow-sm">
+                <span className="text-[8px] font-black">⌘</span>
+                <span className="text-[8px] font-black">K</span>
+              </div>
+            </button>
           </div>
         )}
       </div>
+
+      <CommandMenu open={commandOpen} setOpen={setCommandOpen} />
 
       {/* Primary Navigation */}
       <nav className="flex-1 px-3 py-6 space-y-1 overflow-y-auto scrollbar-none">
