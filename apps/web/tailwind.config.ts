@@ -57,6 +57,13 @@ const config = {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        '2xl': '1rem',
+        '3xl': '1.5rem',
+        '4xl': '2rem',
+      },
+      boxShadow: {
+        'premium': '0 8px 30px rgb(0,0,0,0.02)',
+        'premium-hover': '0 8px 30px rgb(0,0,0,0.04)',
       },
       keyframes: {
         "accordion-down": {
