@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -37,19 +36,26 @@ import {
   UserCog,
   BookText,
   ShieldAlert,
-  CheckCircle2
+  CheckCircle2,
+  User,
+  Search,
+  BellRing,
+  ChevronLeft
 } from 'lucide-react';
 import { useAuth } from '@/components/auth-provider';
 import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 
 interface SidebarProps {
   collapsed?: boolean;
   onClose?: () => void;
+  onToggle?: () => void;
 }
 
-export function Sidebar({ collapsed = false, onClose }: SidebarProps) {
+export function Sidebar({ collapsed = false, onClose, onToggle }: SidebarProps) {
   const pathname = usePathname();
   const { user, logout } = useAuth();
+  const router = useRouter();
 
   const navigation = [
     { name: 'Terminal Home', href: '/dashboard', icon: LayoutDashboard, roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'TEACHER', 'PARENT', 'STUDENT'] },
@@ -77,25 +83,55 @@ export function Sidebar({ collapsed = false, onClose }: SidebarProps) {
 
   return (
     <div className="flex flex-col h-full bg-white select-none">
-      {/* Brand Identity */}
+      {/* Brand Identity & School Info */}
       <div className={cn(
-        "h-20 flex items-center px-6 border-b border-slate-100 transition-all duration-500",
-        collapsed && "px-0 justify-center"
+        "pt-6 pb-4 flex flex-col px-6 border-b border-slate-100 transition-all duration-500 relative",
+        collapsed && "px-0 items-center"
       )}>
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/20 transform transition-transform hover:scale-105 active:scale-95 cursor-pointer">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="h-10 w-10 min-w-[40px] rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/20 transform transition-transform hover:scale-105 active:scale-95 cursor-pointer">
             <Building2 className="h-6 w-6" />
           </div>
           {!collapsed && (
-            <span className="text-xl font-black tracking-tighter text-slate-900 animate-in fade-in slide-in-from-left-2 duration-500">
-              SchoolOS
-            </span>
+            <div className="flex flex-col min-w-0">
+              <span className="text-xl font-black tracking-tighter text-slate-900 animate-in fade-in slide-in-from-left-2 duration-500">
+                SchoolOS
+              </span>
+              <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest truncate">
+                {user?.school?.name || 'Institutional Terminal'}
+              </span>
+            </div>
+          )}
+          
+          {/* Collapse Toggle - Desktop */}
+          <button 
+            onClick={onToggle}
+            className={cn(
+              "hidden lg:flex absolute -right-3 top-8 h-6 w-6 items-center justify-center rounded-full bg-white border border-slate-200 shadow-sm text-slate-500 hover:text-blue-600 hover:border-blue-200 transition-all z-50",
+              collapsed && "rotate-180"
+            )}
+          >
+            <ChevronLeft className="h-3.5 w-3.5" />
+          </button>
+
+          {/* Close Button - Mobile */}
+          {onClose && !collapsed && (
+            <button onClick={onClose} className="ml-auto lg:hidden p-2 text-slate-400 hover:bg-slate-50 rounded-xl">
+              <X className="h-5 w-5" />
+            </button>
           )}
         </div>
-        {onClose && !collapsed && (
-          <button onClick={onClose} className="ml-auto lg:hidden p-2 text-slate-400 hover:bg-slate-50 rounded-xl">
-            <X className="h-5 w-5" />
-          </button>
+
+        {!collapsed && (
+          <div className="flex flex-col gap-2">
+            <div className="relative group">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+              <input 
+                placeholder="Search terminal..." 
+                className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-blue-600/10 transition-all"
+              />
+            </div>
+          </div>
         )}
       </div>
 
@@ -125,44 +161,77 @@ export function Sidebar({ collapsed = false, onClose }: SidebarProps) {
                   {item.name}
                 </span>
               )}
-              {isActive && !collapsed && (
-                <div className="ml-auto h-1.5 w-1.5 rounded-full bg-blue-600 animate-in zoom-in duration-500" />
-              )}
             </Link>
           );
         })}
       </nav>
 
-      {/* Institutional Context (Footer) */}
+      {/* User & System Footer */}
       <div className={cn(
         "p-4 border-t border-slate-100 bg-slate-50/50 transition-all duration-500",
-        collapsed && "px-0 flex justify-center"
+        collapsed && "px-0 flex flex-col items-center gap-4"
       )}>
         {!collapsed ? (
-          <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm animate-in slide-in-from-bottom-2 duration-500">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="h-8 w-8 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
-                <CheckCircle2 className="h-4 w-4" />
+          <div className="space-y-4">
+            {/* User Profile Card */}
+            <div className="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="h-10 w-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
+                  <User className="h-5 w-5" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-black text-slate-900 truncate">{user?.first_name} {user?.last_name}</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase truncate">{user?.role?.replace('_', ' ')}</p>
+                </div>
+                <button 
+                  onClick={() => router.push('/dashboard/settings/profile')}
+                  className="ml-auto p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                >
+                  <UserCog className="h-4 w-4" />
+                </button>
               </div>
-              <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">System Status</p>
-                <p className="text-xs font-black text-slate-900">Synchronized</p>
+              
+              <div className="grid grid-cols-2 gap-2">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => router.push('/dashboard/settings')}
+                  className="h-8 rounded-lg text-[10px] font-bold uppercase tracking-tight text-slate-500 hover:bg-slate-100"
+                >
+                  <Settings className="mr-1.5 h-3 w-3" />
+                  Settings
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={logout}
+                  className="h-8 rounded-lg text-[10px_font-bold] uppercase tracking-tight text-destructive hover:bg-destructive/5"
+                >
+                  <LogOut className="mr-1.5 h-3 w-3" />
+                  Logout
+                </Button>
               </div>
             </div>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={logout}
-              className="w-full h-9 rounded-xl font-bold border-slate-200 text-slate-600 hover:bg-destructive/5 hover:text-destructive hover:border-destructive/20 transition-all"
-            >
-              <LogOut className="mr-2 h-3.5 w-3.5" />
-              Sign Out
-            </Button>
+
+            <div className="flex items-center justify-between px-2">
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Active</span>
+              </div>
+              <button className="text-slate-400 hover:text-blue-600 transition-colors">
+                <BellRing className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         ) : (
-          <Button variant="ghost" size="icon" onClick={logout} className="rounded-xl text-slate-400 hover:text-destructive hover:bg-destructive/5">
-            <LogOut className="h-5 w-5" />
-          </Button>
+          <div className="flex flex-col items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={() => router.push('/dashboard/settings/profile')} className="rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50">
+              <User className="h-5 w-5" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={logout} className="rounded-xl text-slate-400 hover:text-destructive hover:bg-destructive/5">
+              <LogOut className="h-5 w-5" />
+            </Button>
+          </div>
         )}
       </div>
     </div>
