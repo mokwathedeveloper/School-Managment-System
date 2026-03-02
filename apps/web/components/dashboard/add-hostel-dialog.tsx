@@ -1,22 +1,15 @@
-
 'use client';
 
 import React, { useState } from 'react';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
-} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Loader2, Home } from 'lucide-react';
+import { Plus, Loader2, Home, Building2, Layers } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
 import { toast } from 'react-hot-toast';
+import { DialogShell } from '@/components/ui/dialog-shell';
+import { FormSelect } from '@/components/ui/form-select';
 
 export function AddHostelDialog() {
   const [open, setOpen] = useState(false);
@@ -45,54 +38,57 @@ export function AddHostelDialog() {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="shadow-md">
-          <Plus className="mr-2 h-4 w-4" />
-          Add New Hostel
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Home className="h-5 w-5 text-primary" />
-            Register Hostel Building
-          </DialogTitle>
-          <DialogDescription>
-            Add a new dormitory building to the institutional campus.
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+    <>
+      <Button onClick={() => setOpen(true)} className="h-12 px-6 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20">
+        <Plus className="mr-2 h-4 w-4" />
+        Add New Hostel
+      </Button>
+
+      <DialogShell
+        open={open}
+        onOpenChange={setOpen}
+        title="Register Hostel"
+        description="Add a new dormitory building to the campus"
+        icon={Home}
+      >
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="name">Hostel Name</Label>
-            <Input 
-              id="name" 
-              placeholder="e.g. Nile House" 
-              required 
-              value={formData.name}
-              onChange={(e) => setFormData({...formData, name: e.target.value})}
-            />
+            <Label htmlFor="h_name" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Building Name</Label>
+            <div className="relative group">
+                <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
+                <Input 
+                    id="h_name" 
+                    required 
+                    placeholder="e.g. Nile House"
+                    className="h-12 pl-12 rounded-xl border-2 border-slate-50 focus:ring-blue-600/10 font-bold"
+                    value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                />
+            </div>
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="type">Hostel Type</Label>
-            <select 
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm"
-              value={formData.type}
-              required
-              onChange={(e) => setFormData({...formData, type: e.target.value})}
+            <Label htmlFor="h_type" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Allocation Type</Label>
+            <FormSelect 
+                id="h_type" 
+                icon={<Layers className="h-4 w-4" />}
+                value={formData.type}
+                onChange={(e) => setFormData({...formData, type: e.target.value})}
+                required
             >
-              <option value="">Select Type...</option>
-              <option value="BOYS">Boys Only</option>
-              <option value="GIRLS">Girls Only</option>
-              <option value="MIXED">Mixed</option>
-            </select>
+                <option value="">Select Type...</option>
+                <option value="BOYS">Boys Only</option>
+                <option value="GIRLS">Girls Only</option>
+                <option value="MIXED">Mixed</option>
+            </FormSelect>
           </div>
-          <Button type="submit" className="w-full" disabled={createMutation.isPending}>
-            {createMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            Register Building
+
+          <Button type="submit" className="w-full h-14 rounded-2xl shadow-2xl shadow-blue-600/20" variant="premium" disabled={createMutation.isPending}>
+            {createMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
+            Confirm Registration
           </Button>
         </form>
-      </DialogContent>
-    </Dialog>
+      </DialogShell>
+    </>
   );
 }
