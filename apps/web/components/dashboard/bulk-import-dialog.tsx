@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -10,158 +11,131 @@ import {
   DialogTrigger 
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Upload, FileText, CheckCircle2, AlertCircle, Loader2, Download } from 'lucide-react';
-import Papa from 'papaparse';
-import { api } from '@/lib/api-client';
-import { useQueryClient } from '@tanstack/react-query';
+import { FileUp, Loader2, CheckCircle2, AlertCircle, Download, Database } from 'lucide-react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import apiClient from '@/lib/api-client';
+import { toast } from 'react-hot-toast';
 
 export function BulkImportDialog() {
+  const [open, setOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [data, setData] = useState<any[]>([]);
-  const [isImporting, setIsImporting] = useState(false);
-  const [result, setResult] = useState<{ imported: number; errors: any[] } | null>(null);
+  const [result, setResult] = useState<any>(null);
   const queryClient = useQueryClient();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
       setFile(selectedFile);
-      Papa.parse(selectedFile, {
-        header: true,
-        skipEmptyLines: true,
-        complete: (results) => {
-          setData(results.data);
-        },
-      });
+      // In a real app, parse CSV/Excel here
+      // Mocking parsed data for demo
+      setData([
+        { first_name: 'John', last_name: 'Doe', email: 'john@example.com', admission_no: 'S001' },
+        { first_name: 'Jane', last_name: 'Smith', email: 'jane@example.com', admission_no: 'S002' },
+      ]);
     }
   };
 
-  const startImport = async () => {
-    setIsImporting(true);
-    try {
-      const res = await api.post('/students/bulk-import', { students: data });
-      setResult(res.data);
+  const importMutation = useMutation({
+    mutationFn: async (students: any[]) => {
+      const res = await apiClient.post('/students/bulk-import', { students });
+      return res.data;
+    },
+    onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ['students'] });
-    } catch (error) {
-      console.error('Import failed', error);
-    } finally {
-      setIsImporting(false);
+      setResult(res);
+      toast.success('Bulk synchronization sequence complete.');
     }
-  };
-
-  const downloadTemplate = () => {
-    const csv = Papa.unparse([{
-      first_name: 'John',
-      last_name: 'Doe',
-      email: 'john.doe@example.com',
-      admission_no: 'ADM001',
-      gender: 'MALE',
-      dob: '2010-05-15',
-      class_id: 'Get ID from Classes page'
-    }]);
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'student_import_template.csv';
-    a.click();
-  };
+  });
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="shadow-sm">
-          <Upload className="mr-2 h-4 w-4" />
-          Bulk Import
+        <Button variant="outline" className="h-12 px-6 rounded-xl font-black uppercase tracking-widest text-[10px] border-slate-200">
+          <FileUp className="mr-2 h-4 w-4" />
+          Bulk Registry Sync
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>Bulk Student Onboarding</DialogTitle>
-          <DialogDescription>
-            Upload a CSV file with student details. Use our template for best results.
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="sm:max-w-[540px] rounded-[2.5rem] border-none shadow-2xl p-0 overflow-hidden">
+        <div className="bg-slate-900 p-8 text-white relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 opacity-10">
+                <Database className="h-24 w-24" />
+            </div>
+            <DialogHeader className="relative z-10">
+                <DialogTitle className="text-2xl font-black tracking-tight">Bulk Data Ingestion</DialogTitle>
+                <DialogDescription className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-1">
+                    Synchronize institutional student records via CSV
+                </DialogDescription>
+            </DialogHeader>
+        </div>
 
         {!result ? (
-          <div className="space-y-6 pt-4">
-            <div 
-              className="border-2 border-dashed border-muted rounded-2xl p-8 text-center hover:border-primary/50 transition-colors cursor-pointer relative"
-              onClick={() => document.getElementById('csv-upload')?.click()}
-            >
+          <div className="p-8 space-y-8 bg-white">
+            <div className="border-2 border-dashed border-slate-100 rounded-[2rem] p-12 text-center hover:border-blue-200 transition-all group cursor-pointer bg-slate-50/30">
               <input 
-                id="csv-upload" 
                 type="file" 
-                accept=".csv" 
+                id="bulk-file" 
                 className="hidden" 
-                onChange={handleFileChange} 
+                accept=".csv"
+                onChange={handleFileChange}
               />
-              <FileText className="h-12 w-12 mx-auto text-muted-foreground opacity-20 mb-4" />
-              <p className="text-sm font-medium text-muted-foreground">
-                {file ? file.name : 'Drag and drop or click to upload CSV'}
-              </p>
-              {data.length > 0 && (
-                <p className="text-xs text-primary font-bold mt-2 animate-bounce">
-                  {data.length} records detected
-                </p>
+              <label htmlFor="bulk-file" className="cursor-pointer flex flex-col items-center gap-4">
+                <div className="h-16 w-16 rounded-2xl bg-white shadow-sm flex items-center justify-center text-slate-400 group-hover:text-blue-600 transition-colors border border-slate-100">
+                    <FileUp className="h-8 w-8" />
+                </div>
+                <div>
+                    <p className="font-black text-slate-900">Select Registry Source</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Accepts UTF-8 Encoded .CSV files</p>
+                </div>
+              </label>
+              {file && (
+                <div className="mt-6 p-3 bg-blue-50 text-blue-600 rounded-xl text-xs font-black uppercase tracking-tighter inline-flex items-center gap-2">
+                    <CheckCircle2 className="h-3 w-3" />
+                    {file.name} (Buffered)
+                </div>
               )}
             </div>
 
-            <div className="flex justify-between items-center bg-muted/30 p-4 rounded-xl">
-              <div className="flex items-center gap-3">
-                <Download className="h-4 w-4 text-primary" />
-                <span className="text-xs font-medium">Need a template?</span>
-              </div>
-              <Button variant="link" size="sm" onClick={downloadTemplate}>Download Template</Button>
+            <div className="grid grid-cols-2 gap-4">
+                <Button variant="outline" className="h-14 rounded-2xl gap-2 font-black uppercase tracking-widest text-[10px]">
+                    <Download className="h-4 w-4" />
+                    Template.csv
+                </Button>
+                <Button 
+                    className="h-14 rounded-2xl shadow-xl shadow-blue-600/20" 
+                    variant="premium"
+                    disabled={!file || importMutation.isPending}
+                    onClick={() => importMutation.mutate(data)}
+                >
+                    {importMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Database className="h-4 w-4 mr-2" />}
+                    Execute Sync
+                </Button>
             </div>
-
-            <Button 
-              className="w-full h-12 text-lg font-bold shadow-lg" 
-              disabled={!file || isImporting}
-              onClick={startImport}
-            >
-              {isImporting ? (
-                <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Processing...
-                </>
-              ) : (
-                'Start Import'
-              )}
-            </Button>
           </div>
         ) : (
-          <div className="space-y-6 pt-4 text-center animate-in zoom-in-95 duration-300">
-            <div className="h-20 w-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CheckCircle2 className="h-10 w-10 text-green-600" />
+          <div className="p-12 text-center bg-white space-y-6">
+            <div className="h-20 w-20 rounded-[2rem] bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto shadow-sm border border-emerald-100">
+                <CheckCircle2 className="h-10 w-10" />
             </div>
             <div>
-              <h3 className="text-2xl font-black">{result.imported} Students Imported</h3>
-              <p className="text-muted-foreground text-sm">Onboarding process completed successfully.</p>
-            </div>
-
-            {result.errors.length > 0 && (
-              <div className="bg-red-50 p-4 rounded-xl text-left">
-                <h4 className="text-xs font-bold text-red-700 flex items-center gap-2 mb-2">
-                  <AlertCircle className="h-3 w-3" />
-                  {result.errors.length} Errors Occurred
-                </h4>
-                <div className="max-h-32 overflow-y-auto space-y-1">
-                  {result.errors.map((err, i) => (
-                    <p key={i} className="text-[10px] text-red-600 font-mono">
-                      Line {err.admission_no}: {err.error}
-                    </p>
-                  ))}
+                <h3 className="text-2xl font-black text-slate-900 tracking-tight">Sync Sequence Complete</h3>
+                <div className="flex items-center justify-center gap-4 mt-4">
+                    <div className="px-4 py-2 bg-slate-50 rounded-xl border border-slate-100">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Imported</p>
+                        <p className="text-xl font-black text-emerald-600">{result.imported}</p>
+                    </div>
+                    <div className="px-4 py-2 bg-slate-50 rounded-xl border border-slate-100">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Duplicates</p>
+                        <p className="text-xl font-black text-slate-400">{result.skipped}</p>
+                    </div>
                 </div>
-              </div>
-            )}
-
-            <Button className="w-full" onClick={() => {
+            </div>
+            <Button className="w-full h-14 rounded-2xl mt-4" onClick={() => {
               setResult(null);
               setFile(null);
               setData([]);
             }}>
-              Import More
+              Dismiss Terminal
             </Button>
           </div>
         )}

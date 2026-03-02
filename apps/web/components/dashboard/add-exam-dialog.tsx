@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -12,7 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Loader2, Trophy } from 'lucide-react';
+import { Plus, Loader2, Trophy, Search, Calendar, TrendingUp } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
 import { toast } from 'react-hot-toast';
@@ -82,54 +83,61 @@ export function AddExamDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="shadow-md">
-          <Plus className="h-4 w-4 mr-2" />
-          Schedule New Exam
+        <Button className="h-12 px-6 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20">
+          <Plus className="mr-2 h-4 w-4" />
+          Schedule Assessment
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Trophy className="h-5 w-5 text-primary" />
-            Schedule Academic Assessment
-          </DialogTitle>
-          <DialogDescription>
-            Register a new examination or assessment for a subject.
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+      <DialogContent className="sm:max-w-[480px] rounded-[2.5rem] border-none shadow-2xl p-0 overflow-hidden">
+        <div className="bg-slate-900 p-8 text-white relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 opacity-10">
+                <Trophy className="h-24 w-24" />
+            </div>
+            <DialogHeader className="relative z-10">
+                <DialogTitle className="text-2xl font-black tracking-tight">Schedule Assessment</DialogTitle>
+                <DialogDescription className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-1">
+                    Academic Evaluation Registry
+                </DialogDescription>
+            </DialogHeader>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-8 space-y-6 bg-white">
           <div className="space-y-2">
-            <Label htmlFor="name">Assessment Name</Label>
+            <Label htmlFor="e_name" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Assessment Name</Label>
             <Input 
-              id="name" 
+              id="e_name" 
               placeholder="e.g. End of Term One Math" 
               required 
+              className="h-12 rounded-xl border-2 border-slate-50 focus:ring-blue-600/10 font-bold"
               value={formData.name}
               onChange={(e) => setFormData({...formData, name: e.target.value})}
             />
           </div>
           
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
-                <Label htmlFor="subject_id">Subject</Label>
-                <select 
-                    id="subject_id" 
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    value={formData.subject_id}
-                    onChange={(e) => setFormData({...formData, subject_id: e.target.value})}
-                    required
-                >
-                    <option value="">Select Subject</option>
-                    {subjects?.map((s: any) => (
-                        <option key={s.id} value={s.id}>{s.name}</option>
-                    ))}
-                </select>
+                <Label htmlFor="e_subject_id" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Subject</Label>
+                <div className="relative group">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
+                    <select 
+                        id="e_subject_id" 
+                        className="flex h-12 w-full rounded-xl border-2 border-slate-50 bg-white pl-12 pr-3 text-sm font-bold outline-none appearance-none"
+                        value={formData.subject_id}
+                        onChange={(e) => setFormData({...formData, subject_id: e.target.value})}
+                        required
+                    >
+                        <option value="">Select Subject</option>
+                        {subjects?.map((s: any) => (
+                            <option key={s.id} value={s.id}>{s.name}</option>
+                        ))}
+                    </select>
+                </div>
             </div>
             <div className="space-y-2">
-                <Label htmlFor="term_id">Term</Label>
+                <Label htmlFor="e_term_id" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Academic Term</Label>
                 <select 
-                    id="term_id" 
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    id="e_term_id" 
+                    className="flex h-12 w-full rounded-xl border-2 border-slate-50 bg-white px-4 text-sm font-bold outline-none appearance-none"
                     value={formData.term_id}
                     onChange={(e) => setFormData({...formData, term_id: e.target.value})}
                     required
@@ -143,43 +151,49 @@ export function AddExamDialog() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="date">Exam Date</Label>
-            <Input 
-              id="date" 
-              type="date" 
-              required 
-              value={formData.date}
-              onChange={(e) => setFormData({...formData, date: e.target.value})}
-            />
+            <Label htmlFor="e_date" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Assessment Date</Label>
+            <div className="relative group">
+                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
+                <Input 
+                    id="e_date" 
+                    type="date" 
+                    required 
+                    className="h-12 pl-12 rounded-xl border-2 border-slate-50 font-bold"
+                    value={formData.date}
+                    onChange={(e) => setFormData({...formData, date: e.target.value})}
+                />
+            </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="max_marks">Max Marks</Label>
+              <Label htmlFor="max_marks" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Max Marks</Label>
               <Input 
                 id="max_marks" 
                 type="number" 
                 required 
+                className="h-12 rounded-xl border-2 border-slate-50 font-black text-center"
                 value={formData.max_marks}
                 onChange={(e) => setFormData({...formData, max_marks: e.target.value})}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="weightage">Weightage (0.0 - 1.0)</Label>
+              <Label htmlFor="weightage" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Weightage (0-1)</Label>
               <Input 
                 id="weightage" 
                 type="number" 
                 step="0.1"
                 required 
+                className="h-12 rounded-xl border-2 border-slate-50 font-black text-center"
                 value={formData.weightage}
                 onChange={(e) => setFormData({...formData, weightage: e.target.value})}
               />
             </div>
           </div>
 
-          <Button type="submit" className="w-full" disabled={createMutation.isPending}>
-            {createMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            Schedule Assessment
+          <Button type="submit" className="w-full h-14 rounded-2xl shadow-2xl shadow-blue-600/20" variant="premium" disabled={createMutation.isPending}>
+            {createMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <TrendingUp className="mr-2 h-4 w-4" />}
+            Confirm Schedule
           </Button>
         </form>
       </DialogContent>
