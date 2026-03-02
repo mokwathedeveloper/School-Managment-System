@@ -60,10 +60,7 @@ export async function POST(req: NextRequest) {
     const validated = createInvoiceSchema.safeParse(body);
     if (!validated.success) throw new ApiError('Invalid input', 400);
 
-    const result = await FinanceService.createInvoice({
-      ...validated.data,
-      school_id: session.schoolId,
-    });
+    const result = await FinanceService.createInvoice(session.schoolId, validated.data);
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
     return handleApiError(error);

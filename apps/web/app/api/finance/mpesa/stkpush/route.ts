@@ -1,8 +1,14 @@
-
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/server/auth';
 import { FinanceService } from '@/lib/services/finance.service';
 import { handleApiError, ApiError } from '@/lib/server/api-utils';
+import { z } from 'zod';
+
+const stkPushSchema = z.object({
+  invoice_id: z.string().min(1),
+  phone_number: z.string().min(10),
+  amount: z.number().min(1),
+});
 
 export async function POST(req: NextRequest) {
   try {
@@ -10,11 +16,18 @@ export async function POST(req: NextRequest) {
     if (!session) throw new ApiError('Unauthorized', 401);
 
     const body = await req.json();
-    if (!body.invoice_id || !body.phone_number) {
-      throw new ApiError('Invoice ID and Phone Number are required', 400);
+    const validated = stkPushSchema.safeParse(body);
+    
+    if (!validated.success) {
+        throw new ApiError('Invalid input: ' + validated.error.message, 400);
     }
 
-    const result = await FinanceService.initiateStkPush(session.schoolId, body);
+    const result = await FinanceService.initiateStkPush(session.schoolId, {
+        phone: validated.data.phone_number,
+        amount: validated.data.amount,
+        invoiceId: validated.data.invoice_id
+    });
+    
     return NextResponse.json(result);
   } catch (error) {
     return handleApiError(error);
