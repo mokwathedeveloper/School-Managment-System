@@ -17,7 +17,11 @@ import {
   LineChart as LineChartIcon,
   Activity,
   Filter,
-  Download
+  Download,
+  BookOpen,
+  DollarSign,
+  TrendingDown,
+  Trophy
 } from 'lucide-react';
 import { 
   ResponsiveContainer, 
@@ -31,7 +35,10 @@ import {
   Pie, 
   Cell,
   BarChart,
-  Bar
+  Bar,
+  Legend,
+  ComposedChart,
+  Line
 } from 'recharts';
 import { PremiumLoader } from '@/components/ui/premium-loader';
 import { InsightCard } from '@/components/dashboard/insight-card';
@@ -53,11 +60,13 @@ export default function AnalyticsPage() {
   if (isLoading) return <PremiumLoader message="Synthesizing Institutional Intelligence" />;
 
   const enrollmentData = stats?.enrollment?.trend.map((val: number, i: number) => ({
-    month: ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb'][i],
+    month: stats?.enrollment?.months[i] || '',
     students: val
   }));
 
   const gradeDistribution = stats?.academics?.distribution || [];
+  const financialData = stats?.finance?.monthlyTrends || [];
+  const topSubjects = stats?.academics?.topSubjects || [];
 
   return (
     <DashboardShell className="animate-in fade-in duration-700">
@@ -80,7 +89,7 @@ export default function AnalyticsPage() {
       <div className="grid gap-6 md:grid-cols-4">
         <InsightCard 
           title="Consolidated Growth" 
-          value={stats?.enrollment?.total || 0} 
+          value={stats?.overview?.totalStudents || 0} 
           subValue="Active Registry"
           icon={Users}
           trend="+12.4%"
@@ -90,27 +99,27 @@ export default function AnalyticsPage() {
         <InsightCard 
           title="Revenue Velocity" 
           value={`${Math.round(stats?.finance?.collectionRate || 0)}%`} 
-          subValue="Invoiced Settlement"
+          subValue="Settlement Rate"
           icon={CreditCard}
           trend="+2.1%"
           trendType="up"
           color="emerald"
         />
         <InsightCard 
-          title="Academic Momentum" 
-          value="B+" 
-          subValue="Global institutional GPA"
-          icon={GraduationCap}
+          title="Presence Rate" 
+          value={`${stats?.overview?.attendanceRate || 0}%`} 
+          subValue="Institutional Presence"
+          icon={Activity}
           trend="Stable"
           trendType="neutral"
           color="indigo"
         />
         <InsightCard 
-          title="Operational Uptime" 
-          value="99.9%" 
-          subValue="System Infrastructure"
-          icon={Activity}
-          trend="Operational"
+          title="Library Circulations" 
+          value={stats?.overview?.activeBorrows || 0} 
+          subValue="Active Sessions"
+          icon={BookOpen}
+          trend="High"
           trendType="up"
           color="slate"
         />
@@ -177,69 +186,23 @@ export default function AnalyticsPage() {
           </CardContent>
         </Card>
 
-        {/* Grade Distribution Chart */}
+        {/* Financial Matrix Chart */}
         <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2.5rem] overflow-hidden group">
           <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
             <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center transition-all group-hover:scale-110 shadow-sm border border-indigo-100">
-                    <PieChartIcon className="h-5 w-5" />
+                <div className="h-10 w-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center transition-all group-hover:scale-110 shadow-sm border border-emerald-100">
+                    <DollarSign className="h-5 w-5" />
                 </div>
                 <div>
-                    <CardTitle className="text-xl font-black text-slate-900">Academic Bell Curve</CardTitle>
-                    <CardDescription className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Consolidated grade distribution matrix</CardDescription>
+                    <CardTitle className="text-xl font-black text-slate-900">Financial Matrix</CardTitle>
+                    <CardDescription className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Consolidated revenue vs expense flow</CardDescription>
                 </div>
             </div>
           </CardHeader>
-          <CardContent className="p-8 flex items-center justify-center">
-            <div className="h-[350px] w-full max-w-[400px]">
+          <CardContent className="p-8">
+            <div className="h-[350px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                        <Pie
-                            data={gradeDistribution}
-                            cx="50%"
-                            cy="50%"
-                            innerRadius={80}
-                            outerRadius={120}
-                            paddingAngle={8}
-                            dataKey="value"
-                            animationDuration={1500}
-                        >
-                            {gradeDistribution.map((entry: any, index: number) => (
-                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                            ))}
-                        </Pie>
-                        <Tooltip 
-                            contentStyle={{ 
-                                borderRadius: '20px', 
-                                border: 'none', 
-                                boxShadow: '0 20px 40px -12px rgb(0 0 0 / 0.1)',
-                                padding: '12px 16px'
-                            }}
-                        />
-                    </PieChart>
-                </ResponsiveContainer>
-                <div className="flex flex-wrap justify-center gap-4 mt-4">
-                    {gradeDistribution.map((d: any, i: number) => (
-                        <div key={i} className="flex items-center gap-2">
-                            <div className="h-2 w-2 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{d.name} ({d.value})</span>
-                        </div>
-                    ))}
-                </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2.5rem] overflow-hidden">
-        <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
-            <CardTitle className="text-xl font-black text-slate-900">Institutional Vitality Index</CardTitle>
-            <CardDescription className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Key performance metrics across multiple academic sequences</CardDescription>
-        </CardHeader>
-        <CardContent className="p-8">
-            <div className="h-[300px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={enrollmentData}>
+                    <BarChart data={financialData}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                         <XAxis 
                             dataKey="month" 
@@ -262,18 +225,123 @@ export default function AnalyticsPage() {
                                 padding: '12px 16px'
                             }}
                         />
+                        <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ paddingBottom: '20px' }} />
                         <Bar 
-                            dataKey="students" 
-                            fill="#2563eb" 
-                            radius={[8, 8, 0, 0]} 
-                            barSize={40}
-                            animationDuration={2000}
+                            dataKey="revenue" 
+                            name="Revenue"
+                            fill="#10b981" 
+                            radius={[6, 6, 0, 0]} 
+                            barSize={20}
+                        />
+                        <Bar 
+                            dataKey="expenses" 
+                            name="Expenses"
+                            fill="#ef4444" 
+                            radius={[6, 6, 0, 0]} 
+                            barSize={20}
                         />
                     </BarChart>
                 </ResponsiveContainer>
             </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-8 lg:grid-cols-3">
+        {/* Grade Distribution Chart */}
+        <Card className="lg:col-span-1 border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2.5rem] overflow-hidden group">
+          <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
+            <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center transition-all group-hover:scale-110 shadow-sm border border-indigo-100">
+                    <PieChartIcon className="h-5 w-5" />
+                </div>
+                <div>
+                    <CardTitle className="text-xl font-black text-slate-900">Academic Bell Curve</CardTitle>
+                    <CardDescription className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Grade distribution matrix</CardDescription>
+                </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-8 flex flex-col items-center justify-center">
+            <div className="h-[250px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                        <Pie
+                            data={gradeDistribution}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={60}
+                            outerRadius={80}
+                            paddingAngle={8}
+                            dataKey="value"
+                            animationDuration={1500}
+                        >
+                            {gradeDistribution.map((entry: any, index: number) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                        </Pie>
+                        <Tooltip 
+                            contentStyle={{ 
+                                borderRadius: '20px', 
+                                border: 'none', 
+                                boxShadow: '0 20px 40px -12px rgb(0 0 0 / 0.1)',
+                                padding: '12px 16px'
+                            }}
+                        />
+                    </PieChart>
+                </ResponsiveContainer>
+            </div>
+            <div className="flex flex-wrap justify-center gap-4 mt-6">
+                {gradeDistribution.map((d: any, i: number) => (
+                    <div key={i} className="flex items-center gap-2">
+                        <div className="h-2 w-2 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{d.name} ({d.value})</span>
+                    </div>
+                ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Subject Leaderboard */}
+        <Card className="lg:col-span-2 border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2.5rem] overflow-hidden">
+            <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
+                <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center transition-all group-hover:scale-110 shadow-sm border border-amber-100">
+                        <Trophy className="h-5 w-5" />
+                    </div>
+                    <div>
+                        <CardTitle className="text-xl font-black text-slate-900">Subject Performance Index</CardTitle>
+                        <CardDescription className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Top performing disciplines by academic sequence</CardDescription>
+                    </div>
+                </div>
+            </CardHeader>
+            <CardContent className="p-8">
+                <div className="space-y-6">
+                    {topSubjects.map((subject: any, idx: number) => (
+                        <div key={idx} className="space-y-2">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <span className="text-xs font-black text-slate-300">0{idx + 1}</span>
+                                    <span className="text-sm font-black text-slate-900 tracking-tight">{subject.name}</span>
+                                </div>
+                                <span className="text-sm font-black text-blue-600">{subject.average}%</span>
+                            </div>
+                            <div className="h-2 w-full bg-slate-50 rounded-full overflow-hidden border border-slate-100">
+                                <div 
+                                    className="h-full bg-blue-600 transition-all duration-1000" 
+                                    style={{ width: `${subject.average}%` }} 
+                                />
+                            </div>
+                        </div>
+                    ))}
+                    {topSubjects.length === 0 && (
+                        <div className="h-full flex items-center justify-center text-slate-400 font-bold uppercase tracking-widest text-[10px] py-12">
+                            Academic sequence data pending...
+                        </div>
+                    )}
+                </div>
+            </CardContent>
+        </Card>
+      </div>
     </DashboardShell>
   );
 }
