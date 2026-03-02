@@ -21,5 +21,20 @@ export const AdmissionsService = {
       where: { id, school_id: schoolId },
       data: { status: status as AdmissionStatus }
     });
+  },
+
+  async create(data: any) {
+    return prisma.admissionApplication.create({
+      data: {
+        school_id: data.school_id,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email,
+        phone: data.phone,
+        applied_grade_id: data.applied_grade_id,
+        notes: data.notes,
+        status: 'PENDING'
+      }
+    });
   }
 };
