@@ -22,6 +22,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'react-hot-toast';
 import { cn } from '@/lib/utils';
+import { AddStaffDialog } from '@/components/dashboard/add-staff-dialog';
 
 export default function StaffDirectoryPage() {
   const queryClient = useQueryClient();
@@ -34,38 +35,6 @@ export default function StaffDirectoryPage() {
       return res.data;
     },
   });
-
-  const createStaffMutation = useMutation({
-    mutationFn: async (data: any) => api.post('/hr/directory', data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['staff-directory'] });
-      toast.success('Institutional staff record has been successfully initialized.');
-    }
-  });
-
-  const handleAddStaff = () => {
-    const first_name = window.prompt('Enter first name:');
-    if (!first_name) return;
-    const last_name = window.prompt('Enter last name:');
-    if (!last_name) return;
-    const email = window.prompt('Enter email:');
-    if (!email) return;
-    const designation = window.prompt('Enter designation (e.g. Teacher, HOD):');
-    if (!designation) return;
-    const department = window.prompt('Enter department:');
-    if (!department) return;
-    const salary = window.prompt('Enter base salary (KES):');
-    if (!salary) return;
-
-    createStaffMutation.mutate({
-      first_name,
-      last_name,
-      email,
-      designation,
-      department,
-      base_salary: parseFloat(salary),
-    });
-  };
 
   const payrollMutation = useMutation({
     mutationFn: async () => {
@@ -90,24 +59,18 @@ export default function StaffDirectoryPage() {
           </h1>
           <p className="text-muted-foreground mt-1 text-lg">Manage employee records, contracts, and monthly payroll.</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex items-center gap-3">
           <Button 
-            variant="outline" 
-            className="shadow-sm"
+            variant="outline"
             onClick={() => payrollMutation.mutate()}
             disabled={payrollMutation.isPending}
           >
             {payrollMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Banknote className="mr-2 h-4 w-4" />}
-            Process Monthly Payroll
+            Process Payroll
           </Button>
-          <Button 
-            className="shadow-md"
-            onClick={handleAddStaff}
-            disabled={createStaffMutation.isPending}
-          >
-            {createStaffMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
-            Add Staff Member
-          </Button>
+          <AddStaffDialog />
+        </div>
+
         </div>
       </div>
 

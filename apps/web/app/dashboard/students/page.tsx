@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { BulkImportDialog } from '@/components/dashboard/bulk-import-dialog';
+import { AddStudentDialog } from '@/components/dashboard/add-student-dialog';
 import { 
   Plus, 
   Search, 
@@ -32,35 +33,6 @@ export default function StudentsPage() {
   const [search, setSearch] = useState('');
   const [skip, setSkip] = useState(0);
   const take = 10;
-
-  const createStudentMutation = useMutation({
-    mutationFn: async (data: any) => apiClient.post('/students', data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['students'] });
-      toast.success('Student record has been successfully initialized and saved.');
-    },
-    onError: (error: any) => {
-      toast.error(`Failed to add student: ${error.response?.data?.message || error.message}`);
-    }
-  });
-
-  const handleAddStudent = () => {
-    const first_name = window.prompt('Enter student first name:');
-    if (!first_name) return;
-    const last_name = window.prompt('Enter student last name:');
-    if (!last_name) return;
-    const email = window.prompt('Enter student email:');
-    if (!email) return;
-    const admission_no = window.prompt('Enter admission number:');
-    if (!admission_no) return;
-
-    createStudentMutation.mutate({
-      first_name,
-      last_name,
-      email,
-      admission_no,
-    });
-  };
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['students', search, skip],
@@ -84,10 +56,7 @@ export default function StudentsPage() {
         </div>
         <div className="flex items-center gap-3">
           <BulkImportDialog />
-          <Button size="sm" className="shadow-md" onClick={handleAddStudent} disabled={createStudentMutation.isPending}>
-            {createStudentMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
-            Add New Student
-          </Button>
+          <AddStudentDialog />
         </div>
       </div>
 

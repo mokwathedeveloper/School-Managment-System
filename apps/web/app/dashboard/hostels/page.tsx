@@ -19,6 +19,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
+import { AddHostelDialog } from '@/components/dashboard/add-hostel-dialog';
+import { AddRoomDialog } from '@/components/dashboard/add-room-dialog';
 
 export default function HostelsPage() {
   const queryClient = useQueryClient();
@@ -31,43 +33,6 @@ export default function HostelsPage() {
       return res.data;
     },
   });
-
-  const addHostelMutation = useMutation({
-    mutationFn: async (data: any) => api.post('/hostels', data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['hostels'] });
-      toast.success('New hostel building has been successfully registered.');
-    }
-  });
-
-  const addRoomMutation = useMutation({
-    mutationFn: async (data: any) => api.post(`/hostels/${selectedHostelId}/rooms`, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['hostel-rooms', selectedHostelId] });
-      toast.success('New room has been added to the dormitory.');
-    }
-  });
-
-  const handleAddHostel = () => {
-    const name = window.prompt('Enter hostel name:');
-    if (!name) return;
-    const type = window.prompt('Enter type (BOYS/GIRLS/MIXED):');
-    if (!type) return;
-
-    addHostelMutation.mutate({ name, type });
-  };
-
-  const handleAddRoom = () => {
-    const room_number = window.prompt('Enter room number:');
-    if (!room_number) return;
-    const capacity = window.prompt('Enter capacity:');
-    if (!capacity) return;
-
-    addRoomMutation.mutate({ 
-      room_number, 
-      capacity: parseInt(capacity) 
-    });
-  };
 
   const { data: rooms, isLoading: loadingRooms } = useQuery({
     queryKey: ['hostel-rooms', selectedHostelId],
@@ -89,10 +54,7 @@ export default function HostelsPage() {
           </h1>
           <p className="text-muted-foreground mt-1 text-lg">Manage dormitory buildings, room allocations, and student safety.</p>
         </div>
-        <Button onClick={handleAddHostel} disabled={addHostelMutation.isPending} className="shadow-md">
-          {addHostelMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
-          Add New Hostel
-        </Button>
+        <AddHostelDialog />
       </div>
 
       <div className="grid gap-6 md:grid-cols-4">
@@ -143,10 +105,7 @@ export default function HostelsPage() {
                   <CardTitle>Room Inventory</CardTitle>
                   <CardDescription>Capacity and student allocation for {hostels?.find((h: any) => h.id === selectedHostelId)?.name}.</CardDescription>
                 </div>
-                <Button size="sm" variant="outline" onClick={handleAddRoom} disabled={addRoomMutation.isPending}>
-                  {addRoomMutation.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Plus className="h-4 w-4 mr-2" />}
-                  Add Room
-                </Button>
+                <AddRoomDialog hostelId={selectedHostelId} />
               </CardHeader>
               <CardContent className="p-0">
                 <Table>

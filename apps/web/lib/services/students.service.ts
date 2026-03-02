@@ -106,6 +106,45 @@ export const StudentsService = {
     });
   },
 
+  async bulkImport(schoolId: string, students: any[]) {
+    const passwordHash = await argon2.hash('student123');
+    let imported = 0;
+    const errors: any[] = [];
+
+    for (const data of students) {
+      try {
+        await prisma.$transaction(async (tx) => {
+          const user = await tx.user.create({
+            data: {
+              email: data.email,
+              password: passwordHash,
+              first_name: data.first_name,
+              last_name: data.last_name,
+              role: 'STUDENT',
+              school_id: schoolId,
+            },
+          });
+
+          await tx.student.create({
+            data: {
+              user_id: user.id,
+              school_id: schoolId,
+              admission_no: data.admission_no,
+              gender: data.gender,
+              dob: data.dob ? new Date(data.dob) : null,
+              class_id: data.class_id || null,
+            },
+          });
+        });
+        imported++;
+      } catch (e: any) {
+        errors.push({ admission_no: data.admission_no, error: e.message });
+      }
+    }
+
+    return { imported, errors };
+  },
+
   async update(schoolId: string, id: string, data: Prisma.StudentUpdateInput) {
     // Ensure student belongs to school before updating
     const student = await this.findOne(schoolId, id);
