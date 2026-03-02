@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -20,15 +19,17 @@ interface DashboardHeaderProps {
   heading: string;
   text?: string;
   children?: React.ReactNode;
+  className?: string;
 }
 
 export function DashboardHeader({
   heading,
   text,
   children,
+  className
 }: DashboardHeaderProps) {
   return (
-    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+    <div className={cn("flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8", className)}>
       <div className="space-y-1">
         <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-slate-900">{heading}</h1>
         {text && <p className="text-lg text-slate-500 font-medium italic leading-none">{text}</p>}
