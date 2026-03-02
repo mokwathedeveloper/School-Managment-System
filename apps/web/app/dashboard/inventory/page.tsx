@@ -23,6 +23,7 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { toast } from 'react-hot-toast';
 
 export default function InventoryPage() {
   const queryClient = useQueryClient();
@@ -48,7 +49,7 @@ export default function InventoryPage() {
     mutationFn: async (data: any) => api.post('/inventory/assets', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['inventory-assets'] });
-      alert('Asset has been successfully registered in the institutional registry.');
+      toast.success('Asset has been successfully registered in the institutional registry.');
     }
   });
 
@@ -56,7 +57,7 @@ export default function InventoryPage() {
     mutationFn: async (data: any) => api.post('/inventory/stock', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['inventory-stock'] });
-      alert('Stock item has been successfully added to the inventory.');
+      toast.success('Stock item has been successfully added to the inventory.');
     }
   });
 

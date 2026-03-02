@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { toast } from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -29,7 +30,7 @@ export default function LMSDashboard() {
     mutationFn: async (data: any) => api.post('/lms/assignments', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['assignments'] });
-      alert('Academic assignment has been successfully published to the classroom.');
+      toast.success('Academic assignment has been successfully published to the classroom.');
     }
   });
 
@@ -37,14 +38,14 @@ export default function LMSDashboard() {
     mutationFn: async (data: any) => api.post('/lms/resources', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['resources'] });
-      alert('Learning resource has been successfully uploaded and synchronized.');
+      toast.success('Learning resource has been successfully uploaded and synchronized.');
     }
   });
 
   const handleAction = async (action: string) => {
     if (action === 'Post Assignment') {
       if (!selectedClassId) {
-        alert('Please select a class first.');
+        toast.error('Please select a class first.');
         return;
       }
       const title = window.prompt('Enter assignment title:');
@@ -192,7 +193,7 @@ export default function LMSDashboard() {
                         <h3 className="text-lg font-black">{assignment.title}</h3>
                         <p className="text-sm text-muted-foreground line-clamp-1">{assignment.description}</p>
                       </div>
-                      <Button variant="outline" size="sm" className="font-bold" onClick={() => alert(`Submissions for ${assignment.title}:\n\n- John Doe: Submitted\n- Jane Smith: Pending`)}>
+                      <Button variant="outline" size="sm" className="font-bold" onClick={() => toast.success(`Viewing submissions for ${assignment.title}:\n\n- John Doe: Submitted\n- Jane Smith: Pending`)}>
                         Manage Submissions
                       </Button>
                       </CardContent>
@@ -216,13 +217,12 @@ export default function LMSDashboard() {
                       <div className="grid gap-4 sm:grid-cols-2">
                       {resources?.map((resource: any) => (
                       <Card key={resource.id} className="shadow-sm border-muted/50 hover:shadow-md transition-shadow group cursor-pointer" onClick={() => {
-                        if (resource.file_url) {
-                          window.open(resource.file_url, '_blank');
-                        } else {
-                          alert(`Preparing to open resource: ${resource.title}. Secure document viewer is initializing.`);
-                        }
+                      if (resource.file_url) {
+                        window.open(resource.file_url, '_blank');
+                      } else {
+                        toast.success(`Preparing to open resource: ${resource.title}. Secure document viewer is initializing.`);
+                      }
                       }}>
-
                       <CardContent className="p-4 flex items-start gap-4">
                         <div className="h-12 w-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
                           {resource.category === 'VIDEO' ? <Video className="h-6 w-6" /> : <FileText className="h-6 w-6" />}

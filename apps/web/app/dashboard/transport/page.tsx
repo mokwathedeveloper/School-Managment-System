@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { toast } from 'react-hot-toast';
 
 export default function TransportPage() {
   const queryClient = useQueryClient();
@@ -43,7 +44,7 @@ export default function TransportPage() {
     mutationFn: async (data: any) => api.post('/transport/routes', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transport-routes'] });
-      alert('Transport route created successfully.');
+      toast.success('Transport route created successfully.');
     }
   });
 
@@ -51,7 +52,7 @@ export default function TransportPage() {
     mutationFn: async (data: any) => api.post('/transport/vehicles', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transport-vehicles'] });
-      alert('Vehicle added to fleet successfully.');
+      toast.success('Vehicle added to fleet successfully.');
     }
   });
 

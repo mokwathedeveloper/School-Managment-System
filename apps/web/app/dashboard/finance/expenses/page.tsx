@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { toast } from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -37,10 +38,10 @@ export default function ExpensesPage() {
     mutationFn: async (data: any) => api.post('/finance', data, { params: { type: 'expense' } }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['finance-expenses'] });
-      alert('Institutional expense has been successfully recorded and logged.');
+      toast.success('Institutional expense has been successfully recorded and logged.');
     },
     onError: (error: any) => {
-      alert(`Failed to record expense: ${error.response?.data?.message || error.message}`);
+      toast.error(`Failed to record expense: ${error.response?.data?.message || error.message}`);
     }
   });
 

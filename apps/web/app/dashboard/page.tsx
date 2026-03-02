@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { toast } from 'react-hot-toast';
 import { 
   BarChart, 
   Bar, 
@@ -37,7 +38,7 @@ export default function DashboardPage() {
   const { user } = useAuth();
 
   const handleDownloadReport = () => {
-    alert('Institutional performance report (CSV) is being generated and will be sent to your email.');
+    toast.success('Institutional performance report (CSV) is being generated and will be sent to your email.');
   };
 
   // 1. Fetch Stats

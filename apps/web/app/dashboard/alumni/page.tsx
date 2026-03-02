@@ -20,6 +20,7 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { toast } from 'react-hot-toast';
 
 export default function AlumniPage() {
   const queryClient = useQueryClient();
@@ -37,7 +38,7 @@ export default function AlumniPage() {
     mutationFn: async (data: any) => api.post('/alumni', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['alumni'] });
-      alert('Alumnus has been successfully registered in the network.');
+      toast.success('Alumnus has been successfully registered in the network.');
     }
   });
 

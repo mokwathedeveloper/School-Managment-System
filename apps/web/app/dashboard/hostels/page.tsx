@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { toast } from 'react-hot-toast';
 
 export default function HostelsPage() {
   const queryClient = useQueryClient();
@@ -35,7 +36,7 @@ export default function HostelsPage() {
     mutationFn: async (data: any) => api.post('/hostels', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['hostels'] });
-      alert('New hostel building has been successfully registered.');
+      toast.success('New hostel building has been successfully registered.');
     }
   });
 
@@ -43,7 +44,7 @@ export default function HostelsPage() {
     mutationFn: async (data: any) => api.post(`/hostels/${selectedHostelId}/rooms`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['hostel-rooms', selectedHostelId] });
-      alert('New room has been added to the dormitory.');
+      toast.success('New room has been added to the dormitory.');
     }
   });
 

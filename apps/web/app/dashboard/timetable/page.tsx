@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { toast } from 'react-hot-toast';
 
 const DAYS = [
   { id: 1, name: 'Monday' },
@@ -53,13 +54,13 @@ export default function TimetablePage() {
     mutationFn: async (data: any) => api.post('/timetable', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['timetable', selectedClassId] });
-      alert('Timetable slot successfully scheduled.');
+      toast.success('Timetable slot successfully scheduled.');
     }
   });
 
   const handleAddSlot = () => {
     if (!selectedClassId) {
-        alert('Please select a class first.');
+        toast.error('Please select a class first.');
         return;
     }
     const subject_id = window.prompt('Enter subject ID:');

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/lib/api-client';
 import Link from 'next/link';
+import { toast } from 'react-hot-toast';
 import { 
   Table, 
   TableBody, 
@@ -36,10 +37,10 @@ export default function StudentsPage() {
     mutationFn: async (data: any) => apiClient.post('/students', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['students'] });
-      alert('Student record has been successfully initialized and saved.');
+      toast.success('Student record has been successfully initialized and saved.');
     },
     onError: (error: any) => {
-      alert(`Failed to add student: ${error.response?.data?.message || error.message}`);
+      toast.error(`Failed to add student: ${error.response?.data?.message || error.message}`);
     }
   });
 

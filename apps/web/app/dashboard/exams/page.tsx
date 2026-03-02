@@ -14,6 +14,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { toast } from 'react-hot-toast';
 import { 
   FileText, 
   Plus, 
@@ -68,7 +69,7 @@ export default function ExamsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['results', selectedExamId] });
-      alert('Academic results have been processed and grades generated successfully.');
+      toast.success('Academic results have been processed and grades generated successfully.');
     }
   });
 

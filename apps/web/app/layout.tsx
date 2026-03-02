@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Providers } from "@/components/providers";
+import { Toaster } from 'react-hot-toast';
 
 export const metadata: Metadata = {
   title: "School Management System",
@@ -21,6 +22,7 @@ export default function RootLayout({
           <Providers>
             {children}
           </Providers>
+          <Toaster position="top-center" />
       </body>
     </html>
   );

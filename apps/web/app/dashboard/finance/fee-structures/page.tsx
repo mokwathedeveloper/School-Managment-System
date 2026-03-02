@@ -25,8 +25,10 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'react-hot-toast';
 
-export default function FeeStructuresPage() {
+export default function FinanceFeeStructuresPage() {
+
   const queryClient = useQueryClient();
   const [isAdding, setIsAdding] = useState(false);
   const [newStructure, setNewStructure] = useState({
@@ -77,7 +79,7 @@ export default function FeeStructuresPage() {
       return api.post('/finance/generate-bulk-invoices', { grade_id: gradeId, term_id: termId });
     },
     onSuccess: (res) => {
-      alert(`Institutional billing initialized. ${res.data.created} invoices were generated. ${res.data.skipped} existing records were preserved.`);
+      toast.success(`Institutional billing initialized. ${res.data.created} invoices were generated. ${res.data.skipped} existing records were preserved.`);
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
     }
   });

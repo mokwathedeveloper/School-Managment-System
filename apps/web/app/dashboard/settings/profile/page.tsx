@@ -23,6 +23,7 @@ import {
   Loader2,
   UserCircle
 } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 export default function UserProfilePage() {
   const queryClient = useQueryClient();
@@ -58,7 +59,7 @@ export default function UserProfilePage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-profile'] });
-      alert('Your personal profile has been successfully updated.');
+      toast.success('Your personal profile has been successfully updated.');
       setFormData(prev => ({ ...prev, password: '', confirm_password: '' }));
     }
   });
@@ -74,7 +75,7 @@ export default function UserProfilePage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.password && formData.password !== formData.confirm_password) {
-      alert('Passwords do not match.');
+      toast.error('Passwords do not match.');
       return;
     }
     updateMutation.mutate(formData);

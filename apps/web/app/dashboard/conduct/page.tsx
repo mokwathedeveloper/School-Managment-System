@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { toast } from 'react-hot-toast';
 
 export default function ConductPage() {
   const queryClient = useQueryClient();
@@ -33,7 +34,7 @@ export default function ConductPage() {
     mutationFn: async (data: any) => api.post('/discipline', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['discipline-records'] });
-      alert('Incident has been officially recorded and logged for administrative review.');
+      toast.success('Incident has been officially recorded and logged for administrative review.');
     }
   });
 

@@ -27,6 +27,7 @@ import {
   School
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'react-hot-toast';
 
 export default function PublicApplicationPage() {
   const { slug } = useParams();
@@ -65,6 +66,10 @@ export default function PublicApplicationPage() {
     },
     onSuccess: () => {
       setIsSuccess(true);
+      toast.success('Your application has been successfully submitted.');
+    },
+    onError: (error: any) => {
+      toast.error('Failed to submit application. Please check your details and try again.');
     }
   });
 

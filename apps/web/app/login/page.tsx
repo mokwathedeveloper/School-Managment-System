@@ -19,6 +19,8 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
+import { toast } from 'react-hot-toast';
+
 export default function LoginPage() {
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
@@ -83,7 +85,7 @@ export default function LoginPage() {
                 <Label htmlFor="password">Password</Label>
                 <button
                   type="button"
-                  onClick={() => alert('Password reset instructions have been sent to your email.')}
+                  onClick={() => toast.success('Password reset instructions have been sent to your email.')}
                   className="text-sm text-primary hover:underline"
                 >
                   Forgot password?
@@ -109,7 +111,7 @@ export default function LoginPage() {
               Don&apos;t have an account?{' '}
               <button 
                 type="button"
-                onClick={() => alert('Please contact your school administrator to create an account.')}
+                onClick={() => toast.success('Please contact your school administrator to create an account.')}
                 className="text-primary hover:underline"
               >
                 Contact administration

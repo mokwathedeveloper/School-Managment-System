@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { toast } from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/lib/api-client';
 import { useAuth } from '@/components/auth-provider';
@@ -55,10 +56,10 @@ export default function FinancePage() {
     mutationFn: async (data: any) => apiClient.post('/finance', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
-      alert('Invoice has been successfully generated and queued for student billing.');
+      toast.success('Invoice has been successfully generated and queued for student billing.');
     },
     onError: (error: any) => {
-      alert(`Failed to create invoice: ${error.response?.data?.message || error.message}`);
+      toast.error(`Failed to create invoice: ${error.response?.data?.message || error.message}`);
     }
   });
 
@@ -89,7 +90,7 @@ export default function FinancePage() {
     },
     onError: () => {
       setIsPaying(false);
-      alert('STK Push failed. Please check your phone number and try again.');
+      toast.error('STK Push failed. Please check your phone number and try again.');
     }
   });
 

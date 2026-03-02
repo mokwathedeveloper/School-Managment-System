@@ -22,6 +22,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { toast } from 'react-hot-toast';
 
 export default function InstitutionalCalendar() {
   const queryClient = useQueryClient();
@@ -41,7 +42,7 @@ export default function InstitutionalCalendar() {
     mutationFn: async (data: any) => api.post('/calendar', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['calendar-events'] });
-      alert('Event has been successfully scheduled and published to the institutional calendar.');
+      toast.success('Event has been successfully scheduled and published to the institutional calendar.');
     }
   });
 

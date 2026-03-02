@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'react-hot-toast';
 import { cn } from '@/lib/utils';
 
 export default function HealthPage() {
@@ -36,7 +37,7 @@ export default function HealthPage() {
     mutationFn: async (data: any) => api.post('/health/visits', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clinic-visits'] });
-      alert('Clinic visit has been successfully logged and student records updated.');
+      toast.success('Clinic visit has been successfully logged and student records updated.');
     }
   });
 

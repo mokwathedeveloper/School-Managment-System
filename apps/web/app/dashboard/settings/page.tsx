@@ -11,6 +11,7 @@ import {
   CardDescription 
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { toast } from 'react-hot-toast';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { 
@@ -45,7 +46,7 @@ export default function SettingsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['school-settings'] });
-      alert('Institutional configurations have been updated and saved successfully.');
+      toast.success('Institutional configurations have been updated and saved successfully.');
     }
   });
 

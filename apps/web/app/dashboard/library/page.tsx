@@ -22,6 +22,7 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { toast } from 'react-hot-toast';
 
 export default function LibraryPage() {
   const queryClient = useQueryClient();
@@ -47,7 +48,7 @@ export default function LibraryPage() {
     mutationFn: async (data: any) => api.post('/library/catalog', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['library-catalog'] });
-      alert('New book title has been successfully added to the catalog.');
+      toast.success('New book title has been successfully added to the catalog.');
     }
   });
 
@@ -55,7 +56,7 @@ export default function LibraryPage() {
     mutationFn: async (data: any) => api.post('/library/borrows', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['library-borrows'] });
-      alert('Borrowing transaction has been successfully recorded.');
+      toast.success('Borrowing transaction has been successfully recorded.');
     }
   });
 

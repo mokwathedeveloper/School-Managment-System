@@ -27,6 +27,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { toast } from 'react-hot-toast';
 
 export default function AttendancePage() {
   const queryClient = useQueryClient();
@@ -92,7 +93,7 @@ export default function AttendancePage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['attendance', selectedClassId, selectedDate] });
-      alert('Institutional attendance records have been updated and synchronized successfully.');
+      toast.success('Institutional attendance records have been updated and synchronized successfully.');
     },
   });
 

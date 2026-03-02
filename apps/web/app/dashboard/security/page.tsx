@@ -23,6 +23,7 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { toast } from 'react-hot-toast';
 
 export default function SecurityGatePage() {
   const queryClient = useQueryClient();
@@ -49,7 +50,7 @@ export default function SecurityGatePage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['active-visitors'] });
       queryClient.invalidateQueries({ queryKey: ['visitor-registry'] });
-      alert('Visitor has been successfully registered and checked into the campus.');
+      toast.success('Visitor has been successfully registered and checked into the campus.');
     }
   });
 
@@ -87,9 +88,9 @@ export default function SecurityGatePage() {
     },
     onSuccess: (data) => {
       if (data.verified) {
-        alert(`VERIFIED: ${data.student.name}\nClass: ${data.student.class}\nAdmission: ${data.student.admissionNo}`);
+        toast.success(`VERIFIED: ${data.student.name}\nClass: ${data.student.class}\nAdmission: ${data.student.admissionNo}`);
       } else {
-        alert(`ACCESS DENIED: ${data.message}`);
+        toast.error(`ACCESS DENIED: ${data.message}`);
       }
     }
   });

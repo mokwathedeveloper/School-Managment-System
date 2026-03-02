@@ -20,6 +20,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'react-hot-toast';
 
 export default function SuperAdminDashboard() {
   const queryClient = useQueryClient();
@@ -46,7 +47,7 @@ export default function SuperAdminDashboard() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['super-admin-schools'] });
       queryClient.invalidateQueries({ queryKey: ['super-admin-stats'] });
-      alert('New institution has been successfully integrated and onboarded to the platform.');
+      toast.success('New institution has been successfully integrated and onboarded to the platform.');
     }
   });
 

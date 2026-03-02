@@ -17,6 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Plus, Loader2, GraduationCap, Layers } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'react-hot-toast';
 
 export default function GradeLevelsPage() {
   const queryClient = useQueryClient();
@@ -42,7 +43,7 @@ export default function GradeLevelsPage() {
       queryClient.invalidateQueries({ queryKey: ['grade-levels'] });
       setIsAdding(false);
       setNewGrade({ name: '', level: '' });
-      alert('Academic grade level has been successfully established.');
+      toast.success('Academic grade level has been successfully established.');
     },
   });
 
@@ -52,7 +53,7 @@ export default function GradeLevelsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['grade-levels'] });
-      alert('New academic stream has been successfully initialized.');
+      toast.success('New academic stream has been successfully initialized.');
     }
   });
 

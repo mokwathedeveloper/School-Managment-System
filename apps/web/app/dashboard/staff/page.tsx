@@ -20,6 +20,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'react-hot-toast';
+import { cn } from '@/lib/utils';
 
 export default function StaffDirectoryPage() {
   const queryClient = useQueryClient();
@@ -37,7 +39,7 @@ export default function StaffDirectoryPage() {
     mutationFn: async (data: any) => api.post('/hr/directory', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['staff-directory'] });
-      alert('Institutional staff record has been successfully initialized.');
+      toast.success('Institutional staff record has been successfully initialized.');
     }
   });
 
@@ -74,7 +76,7 @@ export default function StaffDirectoryPage() {
       });
     },
     onSuccess: (res) => {
-      alert(`Payroll disbursement completed successfully. ${res.data.processed} staff records were processed for this period.`);
+      toast.success(`Payroll disbursement completed successfully. ${res.data.processed} staff records were processed for this period.`);
     }
   });
 
