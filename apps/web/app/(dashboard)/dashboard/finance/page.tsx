@@ -27,10 +27,15 @@ import {
   Phone, 
   Loader2, 
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  TrendingUp,
+  Wallet
 } from 'lucide-react';
 import { AddInvoiceDialog } from '@/components/dashboard/add-invoice-dialog';
 import { BulkBillDialog } from '@/components/dashboard/bulk-bill-dialog';
+import { PremiumLoader } from '@/components/ui/premium-loader';
+import { InsightCard } from '@/components/dashboard/insight-card';
+import { cn } from '@/lib/utils';
 
 export default function FinancePage() {
   const { user } = useAuth();
@@ -83,23 +88,17 @@ export default function FinancePage() {
     });
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-[60vh]">
-        <div className="flex flex-col items-center gap-4">
-            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest leading-none">Syncing Financial Terminal</p>
-        </div>
-      </div>
-    );
-  }
+  if (isLoading) return <PremiumLoader message="Syncing Financial Terminal" />;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8 animate-in fade-in duration-700">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Financial Management</h1>
-          <p className="text-muted-foreground mt-1">Track fee collection, invoices, and M-Pesa payments.</p>
+          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
+            <CreditCard className="h-8 w-8 text-blue-600" />
+            Fee Management
+          </h1>
+          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Institutional Invoicing & Automated Payments</p>
         </div>
         <div className="flex items-center gap-3">
           <BulkBillDialog />
@@ -108,25 +107,30 @@ export default function FinancePage() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
-        <FinanceStatCard 
+        <InsightCard 
           title="Total Outstanding" 
           value={`KES ${totalOutstanding.toLocaleString()}`} 
-          description={`Across ${totalStudentsWithDebt} students`} 
-          icon={<AlertCircle className="h-5 w-5 text-destructive" />} 
+          subValue={`Across ${totalStudentsWithDebt} students`} 
+          icon={AlertCircle} 
+          color="rose"
+          trend="+4.2%"
+          trendType="down"
         />
-        <StatCard 
+        <InsightCard 
           title="Total Collected" 
           value={`KES ${totalCollected.toLocaleString()}`} 
-          description="Consolidated revenue" 
-          icon={<CheckCircle2 className="h-5 w-5 text-green-500" />} 
+          subValue="Consolidated revenue" 
+          icon={CheckCircle2} 
+          color="emerald"
           trend="+14%"
           trendType="up"
         />
-        <StatCard 
+        <InsightCard 
           title="M-Pesa Volume" 
           value={`KES ${mpesaVolume.toLocaleString()}`} 
-          description="Automated collection" 
-          icon={<Phone className="h-5 w-5 text-primary" />} 
+          subValue="Automated collection" 
+          icon={Phone} 
+          color="blue"
           trend="+22%"
           trendType="up"
         />
@@ -134,11 +138,14 @@ export default function FinancePage() {
 
       <div className="grid gap-8 lg:grid-cols-3">
         {/* Invoice Table */}
-        <Card className="lg:col-span-2 shadow-sm border-none bg-card/50 backdrop-blur overflow-hidden">
-          <CardHeader className="flex flex-row items-center justify-between bg-muted/10">
-            <CardTitle className="text-xl">Recent Institutional Invoices</CardTitle>
+        <Card className="lg:col-span-2 border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2.5rem] overflow-hidden">
+          <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8 flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="text-xl font-black text-slate-900">Recent Invoices</CardTitle>
+              <CardDescription className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Institutional Billing Registry</CardDescription>
+            </div>
             <Link href="/dashboard/finance/expenses">
-                <Button variant="outline" size="sm" className="font-bold">
+                <Button variant="outline" size="sm" className="h-10 px-4">
                     <History className="mr-2 h-4 w-4" />
                     Audit Logs
                 </Button>
@@ -146,53 +153,57 @@ export default function FinancePage() {
           </CardHeader>
           <CardContent className="p-0">
             <Table>
-              <TableHeader className="bg-muted/30">
-                <TableRow>
-                  <TableHead>Invoice ID</TableHead>
-                  <TableHead>Student</TableHead>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Action</TableHead>
+              <TableHeader className="bg-slate-50/30">
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className="pl-8 py-4 font-black uppercase tracking-widest text-[10px] text-slate-400">Student Identity</TableHead>
+                  <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Title</TableHead>
+                  <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Amount</TableHead>
+                  <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Status</TableHead>
+                  <TableHead className="text-right pr-8 font-black uppercase tracking-widest text-[10px] text-slate-400">Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {invoices.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">No invoices found.</TableCell>
+                      <TableCell colSpan={5} className="h-64 text-center text-slate-300 font-bold uppercase tracking-widest text-xs italic">No Registry Entries</TableCell>
                     </TableRow>
                 ) : (
                   invoices.map((inv: any) => (
-                    <TableRow key={inv.id} className="hover:bg-muted/20 transition-colors border-b-muted/20">
-                      <TableCell className="font-medium text-primary uppercase tracking-tighter text-[10px]">#{inv.id.substring(0,8)}</TableCell>
-                      <TableCell className="font-bold text-sm">
-                        {inv.student?.user ? `${inv.student.user.first_name} ${inv.student.user.last_name}` : 'Unknown'}
+                    <TableRow key={inv.id} className="group hover:bg-slate-50/50 transition-all duration-300 border-b-slate-50">
+                      <TableCell className="pl-8 py-5">
+                        <div className="font-black text-slate-900 text-sm">
+                          {inv.student?.user ? `${inv.student.user.first_name} ${inv.student.user.last_name}` : 'Unknown'}
+                        </div>
+                        <p className="text-[10px] font-black text-blue-600 uppercase tracking-tighter mt-0.5">#{inv.id.substring(0,8)}</p>
                       </TableCell>
                       <TableCell>
                         <div className="space-y-1">
-                          <p className="font-semibold text-sm">{inv.title}</p>
-                          <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Due: {new Date(inv.due_date).toLocaleDateString()}</p>
+                          <p className="font-bold text-slate-700 text-sm">{inv.title}</p>
+                          <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest">Due: {new Date(inv.due_date).toLocaleDateString()}</p>
                         </div>
                       </TableCell>
                       <TableCell className="font-black text-slate-900">KES {Number(inv.amount).toLocaleString()}</TableCell>
                       <TableCell>
-                        <Badge variant={inv.status === 'PAID' ? 'success' : inv.status === 'UNPAID' ? 'destructive' : 'warning'}>
+                        <Badge className={cn(
+                          "font-black text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-lg border-none shadow-sm",
+                          inv.status === 'PAID' ? "bg-emerald-50 text-emerald-600" : inv.status === 'UNPAID' ? "bg-rose-50 text-rose-600" : "bg-amber-50 text-amber-600"
+                        )}>
                           {inv.status}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right pr-8">
                         {inv.status !== 'PAID' ? (
                           <Button 
                             size="sm" 
                             variant="secondary" 
-                            className="bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground font-bold px-4 rounded-lg"
+                            className="h-9 px-4 rounded-xl"
                             onClick={() => handlePay(inv)}
                           >
                             Pay Now
                           </Button>
                         ) : (
-                          <div className="flex items-center justify-end text-green-600 gap-1 font-bold text-xs">
-                              <CheckCircle2 className="h-3 w-3" />
+                          <div className="flex items-center justify-end text-emerald-600 gap-1.5 font-black text-[10px] uppercase tracking-widest">
+                              <CheckCircle2 className="h-3.5 w-3.5" />
                               Settled
                           </div>
                         )}
@@ -208,69 +219,69 @@ export default function FinancePage() {
         {/* Payment Flow */}
         <div className="space-y-6">
           <Card className={cn(
-            "transition-all duration-500 shadow-xl border-2 border-primary/20",
-            selectedInvoice ? "scale-100 opacity-100 ring-2 ring-primary ring-offset-4" : "scale-95 opacity-50 grayscale pointer-events-none"
+            "transition-all duration-700 border-none rounded-[2.5rem] overflow-hidden bg-white shadow-2xl",
+            selectedInvoice ? "scale-100 opacity-100 ring-4 ring-blue-600/5 translate-y-0" : "scale-95 opacity-50 grayscale pointer-events-none translate-y-4"
           )}>
-            <CardHeader className="bg-primary/5 border-b border-primary/10">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20">
-                  <CreditCard className="h-6 w-6" />
+            <div className="bg-slate-900 p-8 text-white relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-10">
+                    <Wallet className="h-24 w-24" />
                 </div>
-                <div>
-                  <CardTitle className="text-xl">M-Pesa Checkout</CardTitle>
-                  <CardDescription>Instant STK Push Transfer</CardDescription>
+                <div className="relative z-10 space-y-1">
+                    <CardTitle className="text-2xl font-black tracking-tight">Checkout</CardTitle>
+                    <CardDescription className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Instant M-Pesa Transfer</CardDescription>
                 </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-6 pt-6">
+            </div>
+            
+            <CardContent className="p-8 space-y-8">
               {paymentSuccess ? (
-                <div className="flex flex-col items-center justify-center py-8 text-center animate-in zoom-in-50 duration-500">
-                  <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center text-green-600 mb-4 ring-8 ring-green-50">
+                <div className="flex flex-col items-center justify-center py-12 text-center animate-in zoom-in-50 duration-700">
+                  <div className="h-20 w-20 rounded-[2rem] bg-emerald-50 text-emerald-600 flex items-center justify-center mb-6 shadow-sm border border-emerald-100 animate-bounce">
                     <CheckCircle2 className="h-10 w-10" />
                   </div>
-                  <h3 className="text-xl font-black text-green-700">Request Sent!</h3>
-                  <p className="text-sm text-muted-foreground mt-2 px-4 leading-relaxed font-medium">
-                    Authorize KES {selectedInvoice?.amount?.toLocaleString()} on your mobile device now.
+                  <h3 className="text-2xl font-black text-slate-900 tracking-tight">Request Sent!</h3>
+                  <p className="text-xs font-bold text-slate-400 mt-2 px-4 leading-relaxed uppercase tracking-widest">
+                    Authorize KES {selectedInvoice?.amount?.toLocaleString()} on your mobile device.
                   </p>
-                  <Button variant="outline" className="mt-8 w-full font-bold h-12 rounded-xl" onClick={() => setSelectedInvoice(null)}>Dismiss Terminal</Button>
+                  <Button variant="outline" className="mt-10 w-full h-14 rounded-2xl" onClick={() => setSelectedInvoice(null)}>Dismiss Terminal</Button>
                 </div>
               ) : (
                 <>
-                  <div className="rounded-2xl bg-slate-50 border border-slate-100 p-5 space-y-3">
-                    <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-slate-400">
+                  <div className="rounded-[2rem] bg-slate-50 p-6 space-y-4 shadow-inner border border-slate-100">
+                    <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
                       <span>Invoice Target</span>
-                      <span className="text-slate-900">{selectedInvoice?.title}</span>
+                      <span className="text-slate-900 truncate max-w-[150px]">{selectedInvoice?.title}</span>
                     </div>
                     <div className="h-px bg-slate-200/50" />
                     <div className="flex justify-between items-baseline">
-                      <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Payable Amount</span>
-                      <span className="text-2xl font-black text-primary">KES {selectedInvoice?.amount?.toLocaleString()}</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Amount Payable</span>
+                      <span className="text-3xl font-black text-blue-600 tracking-tighter">KES {selectedInvoice?.amount?.toLocaleString()}</span>
                     </div>
                   </div>
 
                   <div className="space-y-3">
-                    <Label htmlFor="phone" className="text-xs font-black uppercase tracking-widest flex items-center gap-2 text-slate-500">
-                      <Phone className="h-3 w-3 text-primary" /> M-Pesa Phone Number
+                    <Label htmlFor="phone" className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2 text-slate-500 ml-1">
+                      <Phone className="h-3 w-3 text-blue-600" /> M-Pesa Phone Number
                     </Label>
                     <Input 
                       id="phone" 
                       placeholder="07XX XXX XXX" 
-                      className="h-14 text-xl font-black tracking-[0.2em] text-center rounded-2xl border-2 focus:ring-primary/20"
+                      className="h-16 text-2xl font-black tracking-[0.2em] text-center rounded-2xl border-2 focus:ring-blue-600/10 transition-all bg-slate-50/50 focus:bg-white"
                       value={phoneNumber}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPhoneNumber(e.target.value)}
                     />
-                    <p className="text-[10px] font-bold text-slate-400 leading-tight text-center uppercase tracking-tighter">
-                      Secure encrypted channel. Encrypted end-to-end.
+                    <p className="text-[9px] font-bold text-slate-400 leading-tight text-center uppercase tracking-widest pt-2">
+                      Secure Encrypted Channel (Daraja Gateway)
                     </p>
                   </div>
 
                   <Button 
-                    className="w-full h-16 text-lg font-black uppercase tracking-widest shadow-2xl shadow-primary/30 active:scale-[0.98] transition-all rounded-2xl" 
+                    className="w-full h-16 shadow-2xl shadow-blue-600/20 active:scale-[0.98] transition-all rounded-2xl h-16 text-base" 
+                    variant="premium"
                     disabled={isPaying || !phoneNumber}
                     onClick={initiatePayment}
                   >
                     {isPaying ? <Loader2 className="mr-3 h-6 w-6 animate-spin" /> : <CreditCard className="mr-3 h-6 w-6" />}
-                    Initiate Pay
+                    Initialize Payment
                   </Button>
                 </>
               )}
@@ -280,53 +291,4 @@ export default function FinancePage() {
       </div>
     </div>
   );
-}
-
-function FinanceStatCard({ title, value, description, icon }: any) {
-  return (
-    <Card className="shadow-sm hover:shadow-md transition-shadow border-none bg-white">
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="h-12 w-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-600 border border-slate-100">
-            {icon}
-          </div>
-        </div>
-        <div className="text-3xl font-black tracking-tighter mb-1 text-slate-900">{value}</div>
-        <CardTitle className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">{title}</CardTitle>
-        <p className="text-xs font-bold text-slate-400 mt-2 italic">{description}</p>
-      </CardContent>
-    </Card>
-  );
-}
-
-function StatCard({ title, value, icon, trend, trendType, description }: any) {
-  return (
-    <Card className="overflow-hidden shadow-sm hover:shadow-md transition-all group border-none bg-white">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">{title}</CardTitle>
-        <div className="h-12 w-12 rounded-2xl bg-primary/5 flex items-center justify-center text-primary transition-transform group-hover:scale-110 duration-300 border border-primary/10">
-          {icon}
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="text-3xl font-black tracking-tighter text-slate-900">{value}</div>
-        <div className="flex items-center gap-2 mt-1">
-          <span className={cn(
-            "text-[10px] font-black flex items-center px-2 py-0.5 rounded-lg uppercase tracking-tighter",
-            trendType === 'up' ? "bg-emerald-50 text-emerald-600" : 
-            trendType === 'down' ? "bg-rose-50 text-red-600" : 
-            "bg-muted text-muted-foreground"
-          )}>
-            {trendType === 'up' && <ArrowUpRight className="h-3 w-3 mr-0.5" />}
-            {trend}
-          </span>
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">{description}</p>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function cn(...inputs: any[]) {
-  return inputs.filter(Boolean).join(' ');
 }
