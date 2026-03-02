@@ -22,6 +22,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'react-hot-toast';
 import { PremiumLoader } from '@/components/ui/premium-loader';
 import { InsightCard } from '@/components/dashboard/insight-card';
+import { OnboardSchoolDialog } from '@/components/dashboard/onboard-school-dialog';
 import { cn } from '@/lib/utils';
 
 export default function SuperAdminDashboard() {
@@ -43,26 +44,6 @@ export default function SuperAdminDashboard() {
     },
   });
 
-  const onboardMutation = useMutation({
-    mutationFn: async (data: any) => api.post('/super-admin/schools', data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['super-admin-schools'] });
-      queryClient.invalidateQueries({ queryKey: ['super-admin-stats'] });
-      toast.success('New institution has been successfully integrated.');
-    }
-  });
-
-  const handleOnboard = () => {
-    const name = window.prompt('Enter school name:');
-    if (!name) return;
-    const slug = window.prompt('Enter school slug:');
-    if (!slug) return;
-    const email = window.prompt('Enter contact email:');
-    if (!email) return;
-
-    onboardMutation.mutate({ name, slug, email });
-  };
-
   if (loadingStats || loadingSchools) return <PremiumLoader message="Syncing Platform Nodes" />;
 
   return (
@@ -75,10 +56,7 @@ export default function SuperAdminDashboard() {
           </h1>
           <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Global Ecosystem Management</p>
         </div>
-        <Button onClick={handleOnboard} disabled={onboardMutation.isPending} variant="premium" className="h-12 px-8">
-          {onboardMutation.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Plus className="h-4 w-4 mr-2" />}
-          Onboard Institution
-        </Button>
+        <OnboardSchoolDialog />
       </div>
 
       {/* Global Metrics */}

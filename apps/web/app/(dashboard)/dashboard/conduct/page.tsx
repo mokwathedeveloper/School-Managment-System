@@ -23,6 +23,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
 import { PremiumLoader } from '@/components/ui/premium-loader';
+import { ReportIncidentDialog } from '@/components/dashboard/report-incident-dialog';
 
 export default function ConductPage() {
   const queryClient = useQueryClient();
@@ -33,30 +34,6 @@ export default function ConductPage() {
       return res.data;
     },
   });
-
-  const reportMutation = useMutation({
-    mutationFn: async (data: any) => api.post('/discipline', data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['discipline-records'] });
-      toast.success('Incident has been officially recorded.');
-    }
-  });
-
-  const handleReport = () => {
-    const student_id = window.prompt('Enter student UUID:');
-    if (!student_id) return;
-    const title = window.prompt('Enter incident title:');
-    if (!title) return;
-    const severity = window.prompt('Enter severity (LOW, MEDIUM, HIGH, CRITICAL):');
-    if (!severity) return;
-
-    reportMutation.mutate({
-      student_id,
-      title,
-      severity: severity.toUpperCase(),
-      incident_date: new Date().toISOString(),
-    });
-  };
 
   if (isLoading) return <PremiumLoader message="Syncing Compliance Registry" />;
 
@@ -70,10 +47,7 @@ export default function ConductPage() {
           </h1>
           <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Behavioral Analytics & Compliance</p>
         </div>
-        <Button variant="danger" onClick={handleReport} disabled={reportMutation.isPending} className="h-12 px-8 shadow-rose-500/20">
-          {reportMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <AlertTriangle className="mr-2 h-4 w-4" />}
-          Report Incident
-        </Button>
+        <ReportIncidentDialog />
       </div>
 
       <div className="flex items-center gap-4 bg-white p-4 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.02)] border-none">
