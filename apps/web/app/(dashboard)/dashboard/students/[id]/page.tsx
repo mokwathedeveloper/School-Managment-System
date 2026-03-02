@@ -41,6 +41,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { PremiumLoader } from '@/components/ui/premium-loader';
 import { FormSelect } from '@/components/ui/form-select';
+import { toast } from 'react-hot-toast';
 
 export default function StudentDetailPage() {
   const { id } = useParams();
@@ -71,6 +72,30 @@ export default function StudentDetailPage() {
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleExportPDF = async () => {
+    const element = document.getElementById('academic-report-content');
+    if (!element) return;
+    
+    try {
+        const html2pdf = (await import('html2pdf.js')).default;
+        
+        const opt = {
+          margin:       0.5,
+          filename:     `Academic_Report_${report?.studentInfo.name.replace(/\s+/g, '_')}_${report?.termName.replace(/\s+/g, '_')}.pdf`,
+          image:        { type: 'jpeg' as const, quality: 0.98 },
+          html2canvas:  { scale: 2, useCORS: true },
+          jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' as const }
+        };
+        
+        toast.loading('Synthesizing Institutional PDF...', { id: 'pdf-gen' });
+        html2pdf().from(element).set(opt).save().then(() => {
+            toast.success('Transcript successfully generated.', { id: 'pdf-gen' });
+        });
+    } catch (error) {
+        toast.error('Failed to export PDF.', { id: 'pdf-gen' });
+    }
   };
 
   return (
@@ -105,7 +130,7 @@ export default function StudentDetailPage() {
             <Printer className="h-4 w-4 mr-2" />
             Print Report
           </Button>
-          <Button variant="premium" className="h-12 px-8 rounded-xl shadow-xl shadow-blue-600/20">
+          <Button variant="premium" onClick={handleExportPDF} className="h-12 px-8 rounded-xl shadow-xl shadow-blue-600/20">
             <Download className="h-4 w-4 mr-2" />
             Export PDF
           </Button>
@@ -113,7 +138,7 @@ export default function StudentDetailPage() {
       </div>
 
       {/* Printable Report Card Content */}
-      <div className="print:block print:p-0 space-y-8">
+      <div id="academic-report-content" className="print:block print:p-0 space-y-8">
         {/* School Header (Print Only) */}
         <div className="hidden print:flex items-center justify-between mb-12 border-b-4 border-slate-900 pb-8">
           <div className="flex items-center gap-6">

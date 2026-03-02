@@ -28,7 +28,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
           // If we have a token, we should verify it with the backend
           // Assuming an endpoint that returns the current user context
-          const response = await apiClient.get('/auth/me');
+          const response = await apiClient.get('/users/profile');
           setUser(response.data);
           localStorage.setItem('user', JSON.stringify(response.data));
         } catch (error) {
