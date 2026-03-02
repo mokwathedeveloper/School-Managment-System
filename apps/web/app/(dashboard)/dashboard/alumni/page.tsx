@@ -24,9 +24,9 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
 import { PremiumLoader } from '@/components/ui/premium-loader';
+import { RegisterAlumnusDialog } from '@/components/dashboard/register-alumnus-dialog';
 
 export default function AlumniPage() {
-  const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
 
   const { data: alumni, isLoading } = useQuery({
@@ -36,32 +36,6 @@ export default function AlumniPage() {
       return res.data;
     },
   });
-
-  const registerMutation = useMutation({
-    mutationFn: async (data: any) => api.post('/alumni', data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['alumni'] });
-      toast.success('Alumnus has been successfully registered in the network.');
-    }
-  });
-
-  const handleRegister = () => {
-    const first_name = window.prompt('Enter first name:');
-    if (!first_name) return;
-    const last_name = window.prompt('Enter last name:');
-    if (!last_name) return;
-    const graduation_year = window.prompt('Enter graduation year (e.g. 2023):');
-    if (!graduation_year) return;
-    const email = window.prompt('Enter email:');
-    if (!email) return;
-
-    registerMutation.mutate({ 
-      first_name, 
-      last_name, 
-      graduation_year: parseInt(graduation_year), 
-      email 
-    });
-  };
 
   if (isLoading) return <PremiumLoader message="Syncing Alumni Network" />;
 
@@ -75,10 +49,7 @@ export default function AlumniPage() {
           </h1>
           <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Institutional Legacy & Community</p>
         </div>
-        <Button variant="premium" onClick={handleRegister} disabled={registerMutation.isPending} className="h-12 px-8">
-          {registerMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
-          Register Alumnus
-        </Button>
+        <RegisterAlumnusDialog />
       </div>
 
       <div className="flex items-center gap-4 bg-white p-4 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.02)] border-none">
@@ -163,7 +134,7 @@ export default function AlumniPage() {
                       </div>
                     </TableCell>
                     <TableCell className="text-right pr-8">
-                      <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-premium">
+                      <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-300 hover:text-blue-600 hover:bg-blue-50 transition-premium">
                         <ChevronRight className="h-5 w-5" />
                       </Button>
                     </TableCell>
