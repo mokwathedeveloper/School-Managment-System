@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -9,6 +10,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
 import { toast } from 'react-hot-toast';
 import { DialogShell } from '@/components/ui/dialog-shell';
+import { FormSelect } from '@/components/ui/form-select';
 
 export function AddExamDialog() {
   const [open, setOpen] = useState(false);
@@ -96,7 +98,6 @@ export function AddExamDialog() {
               id="e_name" 
               placeholder="e.g. End of Term One Math" 
               required 
-              className="h-12 rounded-xl border-2 border-slate-50 focus:ring-blue-600/10 font-bold"
               value={formData.name}
               onChange={(e) => setFormData({...formData, name: e.target.value})}
             />
@@ -105,27 +106,23 @@ export function AddExamDialog() {
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
                 <Label htmlFor="e_subject_id" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Subject</Label>
-                <div className="relative group">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
-                    <select 
-                        id="e_subject_id" 
-                        className="flex h-12 w-full rounded-xl border-2 border-slate-50 bg-white pl-12 pr-3 text-sm font-bold outline-none appearance-none"
-                        value={formData.subject_id}
-                        onChange={(e) => setFormData({...formData, subject_id: e.target.value})}
-                        required
-                    >
-                        <option value="">Select Subject</option>
-                        {subjects?.map((s: any) => (
-                            <option key={s.id} value={s.id}>{s.name}</option>
-                        ))}
-                    </select>
-                </div>
+                <FormSelect 
+                    id="e_subject_id" 
+                    icon={<Search className="h-4 w-4" />}
+                    value={formData.subject_id}
+                    onChange={(e) => setFormData({...formData, subject_id: e.target.value})}
+                    required
+                >
+                    <option value="">Select Subject</option>
+                    {subjects?.map((s: any) => (
+                        <option key={s.id} value={s.id}>{s.name}</option>
+                    ))}
+                </FormSelect>
             </div>
             <div className="space-y-2">
                 <Label htmlFor="e_term_id" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Academic Term</Label>
-                <select 
+                <FormSelect 
                     id="e_term_id" 
-                    className="flex h-12 w-full rounded-xl border-2 border-slate-50 bg-white px-4 text-sm font-bold outline-none appearance-none"
                     value={formData.term_id}
                     onChange={(e) => setFormData({...formData, term_id: e.target.value})}
                     required
@@ -134,7 +131,7 @@ export function AddExamDialog() {
                     {terms?.map((t: any) => (
                         <option key={t.id} value={t.id}>{t.name}</option>
                     ))}
-                </select>
+                </FormSelect>
             </div>
           </div>
 
@@ -146,7 +143,7 @@ export function AddExamDialog() {
                     id="e_date" 
                     type="date" 
                     required 
-                    className="h-12 pl-12 rounded-xl border-2 border-slate-50 font-bold"
+                    className="pl-12"
                     value={formData.date}
                     onChange={(e) => setFormData({...formData, date: e.target.value})}
                 />
@@ -160,7 +157,7 @@ export function AddExamDialog() {
                 id="max_marks" 
                 type="number" 
                 required 
-                className="h-12 rounded-xl border-2 border-slate-50 font-black text-center"
+                className="text-center"
                 value={formData.max_marks}
                 onChange={(e) => setFormData({...formData, max_marks: e.target.value})}
               />
@@ -172,7 +169,7 @@ export function AddExamDialog() {
                 type="number" 
                 step="0.1"
                 required 
-                className="h-12 rounded-xl border-2 border-slate-50 font-black text-center"
+                className="text-center"
                 value={formData.weightage}
                 onChange={(e) => setFormData({...formData, weightage: e.target.value})}
               />
@@ -180,7 +177,7 @@ export function AddExamDialog() {
           </div>
 
           <Button type="submit" className="w-full h-14 rounded-2xl shadow-2xl shadow-blue-600/20" variant="premium" disabled={createMutation.isPending}>
-            {createMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <TrendingUp className="mr-2 h-4 w-4" />}
+            {createMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
             Confirm Schedule
           </Button>
         </form>

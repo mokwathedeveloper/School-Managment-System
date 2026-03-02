@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -9,6 +10,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/lib/api-client';
 import { toast } from 'react-hot-toast';
 import { DialogShell } from '@/components/ui/dialog-shell';
+import { FormSelect } from '@/components/ui/form-select';
 
 export function AddInvoiceDialog() {
   const [open, setOpen] = useState(false);
@@ -79,21 +81,18 @@ export function AddInvoiceDialog() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="f_student_id" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Target Student</Label>
-            <div className="relative group">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
-                <select 
-                    id="f_student_id" 
-                    className="flex h-12 w-full rounded-xl border-2 border-slate-50 bg-white pl-12 pr-3 text-sm font-bold focus:ring-blue-600/10 outline-none appearance-none"
-                    value={formData.student_id}
-                    onChange={(e) => setFormData({...formData, student_id: e.target.value})}
-                    required
-                >
-                    <option value="">Select Student</option>
-                    {students?.map((s: any) => (
-                        <option key={s.id} value={s.id}>{s.user.first_name} {s.user.last_name} ({s.admission_no})</option>
-                    ))}
-                </select>
-            </div>
+            <FormSelect 
+                id="f_student_id" 
+                icon={<User className="h-4 w-4" />}
+                value={formData.student_id}
+                onChange={(e) => setFormData({...formData, student_id: e.target.value})}
+                required
+            >
+                <option value="">Select Student</option>
+                {students?.map((s: any) => (
+                    <option key={s.id} value={s.id}>{s.user.first_name} {s.user.last_name} ({s.admission_no})</option>
+                ))}
+            </FormSelect>
           </div>
           
           <div className="space-y-2">
@@ -102,7 +101,6 @@ export function AddInvoiceDialog() {
               id="f_title" 
               placeholder="e.g. Term 1 Tuition Fees" 
               required 
-              className="h-12 rounded-xl border-2 border-slate-50 focus:ring-blue-600/10 font-bold"
               value={formData.title}
               onChange={(e) => setFormData({...formData, title: e.target.value})}
             />
@@ -112,12 +110,12 @@ export function AddInvoiceDialog() {
             <div className="space-y-2">
               <Label htmlFor="f_amount" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Amount (KES)</Label>
               <div className="relative group">
-                <Wallet className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
+                <Wallet className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
                 <Input 
                     id="f_amount" 
                     type="number" 
                     required 
-                    className="h-12 pl-12 rounded-xl border-2 border-slate-50 font-black"
+                    className="pl-12 font-black"
                     value={formData.amount}
                     onChange={(e) => setFormData({...formData, amount: e.target.value})}
                 />
@@ -131,7 +129,7 @@ export function AddInvoiceDialog() {
                     id="f_due_date" 
                     type="date" 
                     required 
-                    className="h-12 pl-12 rounded-xl border-2 border-slate-50 font-bold"
+                    className="pl-12 font-bold"
                     value={formData.due_date}
                     onChange={(e) => setFormData({...formData, due_date: e.target.value})}
                 />

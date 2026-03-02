@@ -1,13 +1,15 @@
+
 'use client';
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Layers, Loader2, Database, Search } from 'lucide-react';
+import { Layers, Loader2, Database, Search, Calendar } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/lib/api-client';
 import { toast } from 'react-hot-toast';
 import { DialogShell } from '@/components/ui/dialog-shell';
+import { FormSelect } from '@/components/ui/form-select';
 
 export function BulkBillDialog() {
   const [open, setOpen] = useState(false);
@@ -75,28 +77,25 @@ export function BulkBillDialog() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="b_grade_id" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Target Grade Level</Label>
-            <div className="relative group">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
-                <select 
-                    id="b_grade_id" 
-                    className="flex h-12 w-full rounded-xl border-2 border-slate-50 bg-white pl-12 pr-3 text-sm font-bold focus:ring-blue-600/10 outline-none appearance-none"
-                    value={formData.grade_id}
-                    onChange={(e) => setFormData({...formData, grade_id: e.target.value})}
-                    required
-                >
-                    <option value="">Select Target Grade</option>
-                    {grades?.map((g: any) => (
-                        <option key={g.id} value={g.id}>{g.name}</option>
-                    ))}
-                </select>
-            </div>
+            <FormSelect 
+                id="b_grade_id" 
+                icon={<Search className="h-4 w-4" />}
+                value={formData.grade_id}
+                onChange={(e) => setFormData({...formData, grade_id: e.target.value})}
+                required
+            >
+                <option value="">Select Target Grade</option>
+                {grades?.map((g: any) => (
+                    <option key={g.id} value={g.id}>{g.name}</option>
+                ))}
+            </FormSelect>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="b_term_id" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Academic Term</Label>
-            <select 
+            <FormSelect 
               id="b_term_id" 
-              className="flex h-12 w-full rounded-xl border-2 border-slate-50 bg-white px-4 text-sm font-bold outline-none appearance-none"
+              icon={<Calendar className="h-4 w-4" />}
               value={formData.term_id}
               onChange={(e) => setFormData({...formData, term_id: e.target.value})}
               required
@@ -105,7 +104,7 @@ export function BulkBillDialog() {
               {terms?.map((t: any) => (
                 <option key={t.id} value={t.id}>{t.name} ({new Date(t.start_date).getFullYear()})</option>
               ))}
-            </select>
+            </FormSelect>
           </div>
 
           <Button type="submit" className="w-full h-16 rounded-2xl shadow-2xl shadow-blue-600/20" variant="premium" disabled={bulkMutation.isPending}>

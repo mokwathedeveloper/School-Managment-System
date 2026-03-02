@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -9,6 +10,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
 import { toast } from 'react-hot-toast';
 import { DialogShell } from '@/components/ui/dialog-shell';
+import { FormSelect } from '@/components/ui/form-select';
 
 export function AddClassDialog() {
   const [open, setOpen] = useState(false);
@@ -77,21 +79,18 @@ export function AddClassDialog() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="grade_id" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Grade Level</Label>
-            <div className="relative group">
-                <Layers className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
-                <select 
-                    id="grade_id" 
-                    className="flex h-12 w-full rounded-xl border-2 border-slate-50 bg-white pl-12 pr-3 text-sm font-bold focus:ring-blue-600/10 focus:border-primary outline-none transition-all appearance-none"
-                    value={formData.grade_id}
-                    onChange={(e) => setFormData({...formData, grade_id: e.target.value})}
-                    required
-                >
-                    <option value="">Select Target Level</option>
-                    {grades?.map((grade: any) => (
-                        <option key={grade.id} value={grade.id}>{grade.name}</option>
-                    ))}
-                </select>
-            </div>
+            <FormSelect 
+                id="grade_id" 
+                icon={<Layers className="h-4 w-4" />}
+                value={formData.grade_id}
+                onChange={(e) => setFormData({...formData, grade_id: e.target.value})}
+                required
+            >
+                <option value="">Select Target Level</option>
+                {grades?.map((grade: any) => (
+                    <option key={grade.id} value={grade.id}>{grade.name}</option>
+                ))}
+            </FormSelect>
           </div>
           
           <div className="space-y-2">
@@ -100,7 +99,6 @@ export function AddClassDialog() {
               id="name" 
               placeholder="e.g. West, Alpha, Red" 
               required 
-              className="h-12 rounded-xl border-2 border-slate-50 focus:ring-blue-600/10 font-bold"
               value={formData.name}
               onChange={(e) => setFormData({...formData, name: e.target.value})}
             />
@@ -108,22 +106,19 @@ export function AddClassDialog() {
 
           <div className="space-y-2">
             <Label htmlFor="form_teacher_id" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Head of Stream (Teacher)</Label>
-            <div className="relative group">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
-                <select 
-                    id="form_teacher_id" 
-                    className="flex h-12 w-full rounded-xl border-2 border-slate-50 bg-white pl-12 pr-3 text-sm font-bold focus:ring-blue-600/10 outline-none transition-all appearance-none"
-                    value={formData.form_teacher_id}
-                    onChange={(e) => setFormData({...formData, form_teacher_id: e.target.value})}
-                >
-                    <option value="">Unassigned (Mobile)</option>
-                    {staff?.map((member: any) => (
-                        <option key={member.id} value={member.id}>
-                        {member.user.first_name} {member.user.last_name} ({member.designation})
-                        </option>
-                    ))}
-                </select>
-            </div>
+            <FormSelect 
+                id="form_teacher_id" 
+                icon={<User className="h-4 w-4" />}
+                value={formData.form_teacher_id}
+                onChange={(e) => setFormData({...formData, form_teacher_id: e.target.value})}
+            >
+                <option value="">Unassigned (Mobile)</option>
+                {staff?.map((member: any) => (
+                    <option key={member.id} value={member.id}>
+                    {member.user.first_name} {member.user.last_name} ({member.designation})
+                    </option>
+                ))}
+            </FormSelect>
           </div>
 
           <Button type="submit" className="w-full h-14 rounded-2xl shadow-2xl shadow-blue-600/20" variant="premium" disabled={createClassMutation.isPending}>
