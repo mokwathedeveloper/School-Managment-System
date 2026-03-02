@@ -27,13 +27,20 @@ import {
   Calendar, 
   CreditCard,
   User,
-  Loader2,
   CheckCircle2,
   AlertTriangle,
-  TrendingUp
+  TrendingUp,
+  GraduationCap,
+  Sparkles,
+  ArrowRight,
+  ChevronRight,
+  MapPin,
+  Clock
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { PremiumLoader } from '@/components/ui/premium-loader';
+import { FormSelect } from '@/components/ui/form-select';
 
 export default function StudentDetailPage() {
   const { id } = useParams();
@@ -60,49 +67,45 @@ export default function StudentDetailPage() {
     enabled: !!selectedTermId,
   });
 
-  if (isLoading || !report) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
+  if (isLoading || !report) return <PremiumLoader message="Synthesizing Academic Transcript" />;
 
   const handlePrint = () => {
     window.print();
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700 max-w-5xl mx-auto pb-20">
+    <div className="space-y-8 animate-in fade-in duration-700 max-w-5xl mx-auto pb-24">
       {/* Action Header */}
-      <div className="flex items-center justify-between border-b pb-6 print:hidden">
-        <div className="flex items-center gap-4">
-          <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-2xl border-4 border-white shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-slate-100 pb-8 print:hidden">
+        <div className="flex items-center gap-6">
+          <div className="h-20 w-20 rounded-[2rem] bg-blue-600 text-white shadow-2xl shadow-blue-600/20 flex items-center justify-center font-black text-3xl transition-premium hover:scale-110 hover:rotate-3">
             {report?.studentInfo.name.split(' ').map((n: string) => n[0]).join('')}
           </div>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">{report?.studentInfo.name}</h1>
-            <div className="flex items-center gap-3 mt-1">
-              <Badge variant="outline" className="font-mono">{report?.studentInfo.admissionNo}</Badge>
-              <span className="text-muted-foreground">•</span>
-              <span className="font-medium text-foreground">{report?.studentInfo.class}</span>
-              <span className="text-muted-foreground">•</span>
-              <select 
-                className="bg-transparent text-sm font-bold text-primary focus:outline-none cursor-pointer"
+          <div className="space-y-1.5">
+            <h1 className="text-3xl font-black tracking-tighter text-slate-900">{report?.studentInfo.name}</h1>
+            <div className="flex items-center gap-3">
+              <Badge variant="secondary" className="font-black text-[10px] px-3 py-1 bg-blue-50 text-blue-600 border-none rounded-lg shadow-sm">
+                {report?.studentInfo.admissionNo}
+              </Badge>
+              <div className="h-1 w-1 rounded-full bg-slate-200" />
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{report?.studentInfo.class}</span>
+              <div className="h-1 w-1 rounded-full bg-slate-200" />
+              <FormSelect 
+                className="h-8 border-none bg-transparent font-black text-[10px] uppercase tracking-widest text-blue-600 min-w-[120px]"
                 value={selectedTermId}
                 onChange={(e) => setSelectedTermId(e.target.value)}
               >
                 {terms?.map((t: any) => <option key={t.id} value={t.id}>{t.name}</option>)}
-              </select>
+              </FormSelect>
             </div>
           </div>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" onClick={handlePrint} className="shadow-sm">
+          <Button variant="outline" onClick={handlePrint} className="h-12 px-6 rounded-xl border-slate-100 font-black uppercase tracking-widest text-[10px]">
             <Printer className="h-4 w-4 mr-2" />
             Print Report
           </Button>
-          <Button className="shadow-md">
+          <Button variant="premium" className="h-12 px-8 rounded-xl shadow-xl shadow-blue-600/20">
             <Download className="h-4 w-4 mr-2" />
             Export PDF
           </Button>
@@ -112,65 +115,75 @@ export default function StudentDetailPage() {
       {/* Printable Report Card Content */}
       <div className="print:block print:p-0 space-y-8">
         {/* School Header (Print Only) */}
-        <div className="hidden print:flex items-center justify-between mb-10 border-b-2 border-primary pb-6">
-          <div className="flex items-center gap-4">
-            <div className="h-16 w-16 bg-primary rounded-xl flex items-center justify-center text-white font-black text-2xl">S</div>
+        <div className="hidden print:flex items-center justify-between mb-12 border-b-4 border-slate-900 pb-8">
+          <div className="flex items-center gap-6">
+            <div className="h-20 w-20 bg-slate-900 rounded-3xl flex items-center justify-center text-white font-black text-3xl shadow-xl">S</div>
             <div>
-              <h2 className="text-2xl font-bold uppercase tracking-tighter">Official Academic Report</h2>
-              <p className="text-sm font-medium text-muted-foreground">Institutional Multi-Tenant SaaS Platform • 2024 Academic Year</p>
+              <h2 className="text-3xl font-black uppercase tracking-tighter text-slate-900">Institutional Academic Transcript</h2>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mt-1">Enterprise Multi-Tenant Node v1.4 • Nairobi</p>
             </div>
           </div>
-          <div className="text-right">
-            <p className="font-bold">{report?.termName}</p>
-            <p className="text-xs text-muted-foreground">Generated on {new Date().toLocaleDateString()}</p>
+          <div className="text-right space-y-1">
+            <p className="font-black text-slate-900 uppercase tracking-widest">{report?.termName}</p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter italic">Released: {new Date().toLocaleDateString()}</p>
           </div>
         </div>
 
         {/* Academics Grid */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          <Card className="lg:col-span-2 shadow-sm border-muted/50">
-            <CardHeader className="bg-muted/10 pb-4">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <FileText className="h-5 w-5 text-primary" />
-                Performance Summary
-              </CardTitle>
+        <div className="grid gap-8 lg:grid-cols-3">
+          <Card className="lg:col-span-2 border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2.5rem] overflow-hidden group">
+            <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shadow-sm transition-all group-hover:scale-110">
+                    <FileText className="h-5 w-5" />
+                </div>
+                <div>
+                    <CardTitle className="text-xl font-black text-slate-900">Academic Trajectory</CardTitle>
+                    <CardDescription className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Summative assessment and grading summary</CardDescription>
+                </div>
+              </div>
             </CardHeader>
             <CardContent className="p-0">
               {report?.academics.length === 0 ? (
-                <div className="h-48 flex flex-col items-center justify-center text-muted-foreground">
-                  <TrendingUp className="h-12 w-12 opacity-10 mb-2" />
-                  <p>No examination results recorded for this term.</p>
+                <div className="h-64 flex flex-col items-center justify-center text-center p-12">
+                  <TrendingUp className="h-12 w-12 text-slate-100 mb-4" />
+                  <p className="font-black text-slate-300 uppercase tracking-widest text-[10px] italic">No results recorded for this terminal sequence.</p>
                 </div>
               ) : (
                 <Table>
-                  <TableHeader>
-                    <TableRow className="bg-muted/30 hover:bg-muted/30">
-                      <TableHead className="font-bold">Subject</TableHead>
-                      <TableHead className="text-center font-bold">Raw Score</TableHead>
-                      <TableHead className="text-center font-bold">Percentage</TableHead>
-                      <TableHead className="text-right font-bold">Grade</TableHead>
+                  <TableHeader className="bg-slate-50/30">
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead className="pl-8 py-4 font-black uppercase tracking-widest text-[10px] text-slate-400">Subject Discipline</TableHead>
+                      <TableHead className="text-center font-black uppercase tracking-widest text-[10px] text-slate-400">Raw Performance</TableHead>
+                      <TableHead className="text-center font-black uppercase tracking-widest text-[10px] text-slate-400">Efficiency</TableHead>
+                      <TableHead className="text-right pr-8 font-black uppercase tracking-widest text-[10px] text-slate-400">Grade</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {report?.academics.map((subj: any) => {
                       const percentage = (subj.totalMarks / subj.maxPossible) * 100;
                       return (
-                        <TableRow key={subj.subject} className="hover:bg-muted/10 transition-colors">
-                          <TableCell className="font-semibold">{subj.subject}</TableCell>
-                          <TableCell className="text-center text-muted-foreground">
-                            {subj.totalMarks} <span className="text-[10px]">/ {subj.maxPossible}</span>
+                        <TableRow key={subj.subject} className="group hover:bg-slate-50/50 transition-all duration-300 border-b-slate-50">
+                          <TableCell className="pl-8 py-5 font-black text-slate-900 text-sm tracking-tight">{subj.subject}</TableCell>
+                          <TableCell className="text-center">
+                            <span className="font-black text-slate-900">{subj.totalMarks}</span>
+                            <span className="text-[10px] font-bold text-slate-300 uppercase ml-1">/ {subj.maxPossible}</span>
                           </TableCell>
-                          <TableCell className="text-center font-medium">
-                            {percentage.toFixed(1)}%
+                          <TableCell className="text-center">
+                            <span className={cn(
+                                "font-black text-xs px-2 py-1 rounded-lg",
+                                percentage >= 80 ? "text-emerald-600 bg-emerald-50" : "text-blue-600 bg-blue-50"
+                            )}>
+                                {percentage.toFixed(1)}%
+                            </span>
                           </TableCell>
-                          <TableCell className="text-right">
+                          <TableCell className="text-right pr-8">
                             <Badge 
-                              variant="secondary" 
                               className={cn(
-                                "font-bold px-3 py-1",
-                                percentage >= 80 ? "bg-green-100 text-green-700" :
-                                percentage >= 60 ? "bg-blue-100 text-blue-700" :
-                                "bg-orange-100 text-orange-700"
+                                "font-black px-4 py-1.5 rounded-xl text-[10px] shadow-sm uppercase tracking-widest border-none transition-all group-hover:scale-110",
+                                percentage >= 80 ? "bg-emerald-500 text-white shadow-emerald-500/20" :
+                                percentage >= 60 ? "bg-blue-600 text-white shadow-blue-600/20" :
+                                "bg-amber-500 text-white shadow-amber-500/20"
                               )}
                             >
                               {subj.exams[0]?.grade || '-'}
@@ -186,28 +199,26 @@ export default function StudentDetailPage() {
           </Card>
 
           {/* Side Metrics */}
-          <div className="space-y-6">
+          <div className="space-y-8">
             {/* Attendance */}
-            <Card className="shadow-sm border-muted/50">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  Attendance
-                </CardTitle>
+            <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2rem] overflow-hidden group">
+              <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-6 flex flex-row items-center justify-between">
+                <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Attendance</CardTitle>
+                <Calendar className="h-4 w-4 text-slate-300" />
               </CardHeader>
-              <CardContent>
-                <div className="flex items-end justify-between mb-4">
-                  <div className="text-3xl font-bold">{((report?.attendance.PRESENT / report?.attendance.total) * 100).toFixed(1)}%</div>
-                  <div className="text-xs text-muted-foreground pb-1">Term attendance</div>
+              <CardContent className="p-8">
+                <div className="flex items-baseline justify-between mb-6">
+                  <div className="text-4xl font-black text-slate-900 tracking-tighter">{((report?.attendance.PRESENT / report?.attendance.total) * 100).toFixed(1)}%</div>
+                  <div className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Target Met</div>
                 </div>
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <div className="bg-green-50 text-green-700 p-2 rounded-lg text-center">
-                    <p className="font-bold">{report?.attendance.PRESENT}</p>
-                    <p className="opacity-70">Present</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-center transition-premium hover:bg-white hover:shadow-md group/stat">
+                    <p className="text-xl font-black text-emerald-600 group-hover/stat:scale-110 transition-transform">{report?.attendance.PRESENT}</p>
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">Present</p>
                   </div>
-                  <div className="bg-red-50 text-red-700 p-2 rounded-lg text-center">
-                    <p className="font-bold">{report?.attendance.ABSENT}</p>
-                    <p className="opacity-70">Absent</p>
+                  <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-center transition-premium hover:bg-white hover:shadow-md group/stat">
+                    <p className="text-xl font-black text-rose-600 group-hover/stat:scale-110 transition-transform">{report?.attendance.ABSENT}</p>
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">Absent</p>
                   </div>
                 </div>
               </CardContent>
@@ -215,40 +226,45 @@ export default function StudentDetailPage() {
 
             {/* Finance Status */}
             <Card className={cn(
-                "shadow-sm border-muted/50",
-                report?.finance.balance > 0 ? "border-l-4 border-l-destructive" : "border-l-4 border-l-green-500"
+                "border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2rem] overflow-hidden group",
+                report?.finance.balance > 0 ? "ring-2 ring-rose-500/10" : "ring-2 ring-emerald-500/10"
             )}>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                  <CreditCard className="h-4 w-4" />
-                  Fee Status
-                </CardTitle>
+              <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-6 flex flex-row items-center justify-between">
+                <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Financial Clearance</CardTitle>
+                <CreditCard className="h-4 w-4 text-slate-300" />
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
+              <CardContent className="p-8">
+                <div className="space-y-6">
                   <div>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-muted-foreground italic">Balance Due</span>
-                      <span className={cn("font-bold", report?.finance.balance > 0 ? "text-destructive" : "text-green-600")}>
+                    <div className="flex justify-between items-baseline mb-2">
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Balance Remaining</span>
+                      <span className={cn("text-2xl font-black tracking-tighter", report?.finance.balance > 0 ? "text-rose-600" : "text-emerald-600")}>
                         KES {report?.finance.balance.toLocaleString()}
                       </span>
                     </div>
-                    <div className="h-2 bg-muted rounded-full overflow-hidden">
+                    <div className="h-2 w-full bg-slate-50 rounded-full overflow-hidden shadow-inner border border-slate-100">
                       <div 
-                        className="h-full bg-primary transition-all duration-1000" 
+                        className={cn(
+                            "h-full transition-all duration-[2000ms] ease-out",
+                            report?.finance.balance > 0 ? "bg-rose-500" : "bg-emerald-500"
+                        )} 
                         style={{ width: `${report?.finance.totalInvoiced > 0 ? (report?.finance.totalPaid / report?.finance.totalInvoiced) * 100 : 0}%` }}
                       ></div>
                     </div>
                   </div>
                   {report?.finance.balance > 0 ? (
-                    <div className="bg-destructive/10 text-destructive text-[10px] p-2 rounded-md flex items-center gap-2">
-                      <AlertTriangle className="h-3 w-3" />
-                      Outstanding balance requires immediate attention.
+                    <div className="bg-rose-50/50 border border-rose-100 p-4 rounded-2xl flex items-start gap-3">
+                      <AlertTriangle className="h-4 w-4 text-rose-600 mt-0.5" />
+                      <p className="text-[10px] font-bold text-rose-700/70 uppercase leading-relaxed tracking-tighter">
+                        Arrears identified. Please initialize settlement protocol to maintain registry active status.
+                      </p>
                     </div>
                   ) : (
-                    <div className="bg-green-50 text-green-700 text-[10px] p-2 rounded-md flex items-center gap-2">
-                      <CheckCircle2 className="h-3 w-3" />
-                      All fees for this term are cleared.
+                    <div className="bg-emerald-50/50 border border-emerald-100 p-4 rounded-2xl flex items-start gap-3">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-600 mt-0.5" />
+                      <p className="text-[10px] font-bold text-emerald-700/70 uppercase leading-relaxed tracking-tighter">
+                        Institutional accounts synchronized. No outstanding terminal liability identified.
+                      </p>
                     </div>
                   )}
                 </div>
@@ -258,22 +274,22 @@ export default function StudentDetailPage() {
         </div>
 
         {/* Remarks Section */}
-        <Card className="shadow-sm border-muted/50">
-          <CardHeader>
-            <CardTitle className="text-lg">Class Teacher&apos;s Remarks</CardTitle>
+        <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2.5rem] overflow-hidden group">
+          <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8">
+            <CardTitle className="text-xl font-black text-slate-900 tracking-tight">Institutional Observations</CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground italic min-h-[80px] border-l-2 pl-4 border-primary/20">
-              &quot;Student performance records synchronized with institutional database. Academic trajectory remains consistent with termly objectives.&quot;
-            </p>
-            <div className="mt-8 flex justify-between items-end">
-              <div className="text-center">
-                <div className="w-40 border-b border-muted-foreground/30 mb-1"></div>
-                <p className="text-[10px] font-bold uppercase tracking-widest">Class Teacher</p>
+          <CardContent className="p-8">
+            <div className="min-h-[120px] border-l-4 border-blue-600 bg-slate-50/50 p-6 rounded-r-3xl italic text-slate-600 font-medium leading-relaxed text-sm">
+              &quot;Student performance records successfully synchronized with the primary institutional database. Academic trajectory remains consistent with termly objectives and curriculum benchmarks.&quot;
+            </div>
+            <div className="mt-12 flex flex-col md:flex-row justify-between items-center gap-8 px-4">
+              <div className="text-center group/sign cursor-default">
+                <div className="w-48 h-0.5 bg-slate-200 mb-2 transition-all group-hover/sign:bg-blue-600 group-hover/sign:w-56" />
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Class Instructor</p>
               </div>
-              <div className="text-center">
-                <div className="w-40 border-b border-muted-foreground/30 mb-1"></div>
-                <p className="text-[10px] font-bold uppercase tracking-widest">Principal</p>
+              <div className="text-center group/sign cursor-default">
+                <div className="w-48 h-0.5 bg-slate-200 mb-2 transition-all group-hover/sign:bg-blue-600 group-hover/sign:w-56" />
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Principal Commandant</p>
               </div>
             </div>
           </CardContent>
