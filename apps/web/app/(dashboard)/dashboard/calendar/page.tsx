@@ -1,191 +1,169 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { 
   Calendar, 
+  ChevronLeft, 
+  ChevronRight, 
   Plus, 
   Clock, 
   MapPin, 
-  Users, 
+  Tag, 
+  Search, 
   Loader2,
-  ChevronLeft,
-  ChevronRight,
-  Sparkles,
-  BookOpen,
-  Coffee,
-  Trophy,
-  Bell
+  Bell,
+  Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { toast } from 'react-hot-toast';
+import { PremiumLoader } from '@/components/ui/premium-loader';
+import { AddEventDialog } from '@/components/dashboard/add-event-dialog';
 
-export default function InstitutionalCalendar() {
-  const queryClient = useQueryClient();
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-
+export default function CalendarPage() {
   const { data: events, isLoading } = useQuery({
-    queryKey: ['calendar-events', currentMonth.getMonth(), currentMonth.getFullYear()],
+    queryKey: ['calendar-events'],
     queryFn: async () => {
-      const start = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).toISOString();
-      const end = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).toISOString();
-      const res = await api.get(`/calendar?start=${start}&end=${end}`);
+      const res = await api.get('/calendar');
       return res.data;
     },
   });
 
-  const scheduleMutation = useMutation({
-    mutationFn: async (data: any) => api.post('/calendar', data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['calendar-events'] });
-      toast.success('Event has been successfully scheduled and published to the institutional calendar.');
-    }
-  });
+  if (isLoading) return <PremiumLoader message="Syncing Institutional Calendar" />;
 
-  const handleSchedule = () => {
-    const title = window.prompt('Enter event title:');
-    if (!title) return;
-    const category = window.prompt('Enter category (ACADEMIC, HOLIDAY, SPORTS, EXAM, OTHER):');
-    if (!category) return;
-    const start_date = window.prompt('Enter start date (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
-    if (!start_date) return;
-
-    scheduleMutation.mutate({
-      title,
-      category: category.toUpperCase(),
-      start_date: new Date(start_date).toISOString(),
-      end_date: new Date(start_date).toISOString(),
-      description: 'Institutional event',
-    });
-  };
-
-  const categoryColors: any = {
-    ACADEMIC: "bg-blue-100 text-blue-700 border-blue-200",
-    HOLIDAY: "bg-emerald-100 text-emerald-700 border-emerald-200",
-    SPORTS: "bg-orange-100 text-orange-700 border-orange-200",
-    EXAM: "bg-rose-100 text-rose-700 border-rose-200",
-    OTHER: "bg-slate-100 text-slate-700 border-slate-200",
-  };
-
-  const categoryIcons: any = {
-    ACADEMIC: <BookOpen className="h-4 w-4" />,
-    HOLIDAY: <Coffee className="h-4 w-4" />,
-    SPORTS: <Trophy className="h-4 w-4" />,
-    EXAM: <Sparkles className="h-4 w-4" />,
-    OTHER: <Bell className="h-4 w-4" />,
-  };
+  const upcomingEvents = events?.filter((e: any) => new Date(e.start_date) >= new Date())
+    .sort((a: any, b: any) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime())
+    .slice(0, 5);
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8 animate-in fade-in duration-700">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
-            <Calendar className="h-8 w-8 text-primary" />
-            School Calendar
+          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
+            <Calendar className="h-8 w-8 text-blue-600" />
+            Institutional Calendar
           </h1>
-          <p className="text-muted-foreground mt-1 text-lg">Central schedule for term dates, holidays, and events.</p>
+          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Academic Events & Operational Milestones</p>
         </div>
-        <Button onClick={handleSchedule} disabled={scheduleMutation.isPending} className="shadow-md">
-          {scheduleMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
-          Schedule Event
-        </Button>
+        <AddEventDialog />
       </div>
 
       <div className="grid gap-8 lg:grid-cols-3">
-        {/* Monthly Summary sidebar */}
+        {/* Main Calendar View Placeholder */}
+        <Card className="lg:col-span-2 border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2.5rem] overflow-hidden p-1">
+          <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-8 flex flex-row items-center justify-between">
+            <div className="flex items-center gap-4">
+                <Button variant="outline" size="icon" className="h-10 w-10 rounded-xl">
+                    <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <h2 className="text-xl font-black text-slate-900 uppercase tracking-tighter">March 2026</h2>
+                <Button variant="outline" size="icon" className="h-10 w-10 rounded-xl">
+                    <ChevronRight className="h-4 w-4" />
+                </Button>
+            </div>
+            <div className="flex bg-slate-100 p-1 rounded-xl">
+                <Button variant="ghost" size="sm" className="bg-white text-slate-900 shadow-sm rounded-lg px-4 font-black text-[10px] uppercase tracking-widest">Month</Button>
+                <Button variant="ghost" size="sm" className="text-slate-400 rounded-lg px-4 font-black text-[10px] uppercase tracking-widest">Week</Button>
+            </div>
+          </CardHeader>
+          <CardContent className="p-8">
+            <div className="grid grid-cols-7 gap-4 mb-4">
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                    <div key={day} className="text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">{day}</div>
+                ))}
+            </div>
+            <div className="grid grid-cols-7 gap-4">
+                {Array.from({ length: 31 }).map((_, i) => (
+                    <div key={i} className={cn(
+                        "h-24 rounded-2xl border-2 border-slate-50 p-2 transition-all hover:border-blue-100 hover:bg-blue-50/30 group relative cursor-pointer",
+                        i + 1 === 2 && "border-blue-600/20 bg-blue-50/50 shadow-inner ring-2 ring-blue-600/5"
+                    )}>
+                        <span className={cn(
+                            "text-xs font-black text-slate-400 group-hover:text-blue-600",
+                            i + 1 === 2 && "text-blue-600"
+                        )}>{i + 1}</span>
+                        {i === 14 && (
+                            <div className="mt-2 p-1 bg-emerald-50 text-emerald-600 rounded-lg text-[8px] font-black uppercase truncate border border-emerald-100">
+                                Half Term
+                            </div>
+                        )}
+                        {i === 24 && (
+                            <div className="mt-2 p-1 bg-rose-50 text-rose-600 rounded-lg text-[8px] font-black uppercase truncate border border-rose-100">
+                                Finals
+                            </div>
+                        )}
+                    </div>
+                ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Upcoming Events Sidebar */}
         <div className="space-y-6">
-          <Card className="shadow-sm border-muted/50">
-            <CardHeader className="flex flex-row items-center justify-between pb-4">
-              <CardTitle className="text-xl font-black">
-                {currentMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}
-              </CardTitle>
-              <div className="flex gap-1">
-                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() - 1)))}>
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() + 1)))}>
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
+          <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2rem] overflow-hidden">
+            <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-6 flex flex-row items-center justify-between">
+              <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Upcoming Highlights</CardTitle>
+              <Bell className="h-4 w-4 text-slate-300" />
             </CardHeader>
-            <CardContent>
-               <div className="space-y-4">
-                  <div className="flex items-center justify-between text-xs font-bold uppercase text-muted-foreground tracking-widest border-b pb-2">
-                    <span>Quick Stats</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="bg-blue-50 p-3 rounded-xl border border-blue-100">
-                      <p className="text-[10px] font-bold text-blue-600 uppercase tracking-tight">Academic</p>
-                      <p className="text-xl font-black text-blue-900">{events?.filter((e: any) => e.category === 'ACADEMIC').length || 0}</p>
-                    </div>
-                    <div className="bg-emerald-50 p-3 rounded-xl border border-emerald-100">
-                      <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-tight">Holidays</p>
-                      <p className="text-xl font-black text-emerald-900">{events?.filter((e: any) => e.category === 'HOLIDAY').length || 0}</p>
-                    </div>
-                  </div>
-               </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-sm border-muted/50 bg-primary/5 border-primary/10">
-            <CardHeader>
-              <CardTitle className="text-sm font-bold flex items-center gap-2">
-                <Users className="h-4 w-4 text-primary" />
-                Stakeholder Visibility
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-xs text-muted-foreground leading-relaxed italic">
-                All events scheduled here are automatically visible on Parent and Student portals. Term dates sync with automated fee invoicing.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Interactive Event List */}
-        <div className="lg:col-span-2 space-y-4">
-          {isLoading ? (
-            <div className="h-64 flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
-          ) : events?.length === 0 ? (
-            <Card className="h-64 flex flex-col items-center justify-center border-dashed text-muted-foreground">
-              <Calendar className="h-12 w-12 opacity-10 mb-4" />
-              <p>No events scheduled for this month.</p>
-            </Card>
-          ) : (
-            events?.map((event: any) => (
-              <Card key={event.id} className="shadow-sm hover:shadow-md transition-shadow group overflow-hidden border-muted/50">
-                <div className="flex h-full">
-                  <div className={cn("w-2", categoryColors[event.category].split(' ')[0].replace('bg-', 'bg-'))} />
-                  <CardContent className="p-6 flex-1 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline" className={cn("text-[10px] font-bold shadow-sm", categoryColors[event.category])}>
-                          {categoryIcons[event.category]}
-                          <span className="ml-1.5">{event.category}</span>
-                        </Badge>
-                        <span className="text-xs font-bold text-muted-foreground">{new Date(event.start_date).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' })}</span>
-                      </div>
-                      <h3 className="text-lg font-bold group-hover:text-primary transition-colors">{event.title}</h3>
-                      <p className="text-sm text-muted-foreground line-clamp-1 italic">{event.description}</p>
-                    </div>
-                    <div className="flex flex-col md:items-end gap-1">
-                      <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700">
-                        <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-                        {event.is_all_day ? 'All Day' : `${new Date(event.start_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(event.end_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
-                      </div>
-                      <Button variant="ghost" size="sm" className="h-8 text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">
-                        View Details
-                      </Button>
-                    </div>
-                  </CardContent>
+            <CardContent className="p-4 space-y-4">
+              {upcomingEvents?.length === 0 ? (
+                <div className="py-12 text-center space-y-2">
+                    <Sparkles className="h-8 w-8 text-slate-100 mx-auto" />
+                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest italic">No events scheduled</p>
                 </div>
-              </Card>
-            ))
-          )}
+              ) : (
+                upcomingEvents?.map((event: any) => (
+                  <div key={event.id} className="p-4 rounded-2xl bg-slate-50 border border-transparent hover:border-blue-100 hover:bg-white transition-all duration-300 group cursor-pointer shadow-sm hover:shadow-md">
+                    <div className="flex justify-between items-start mb-2">
+                        <Badge className={cn(
+                            "font-black text-[8px] uppercase tracking-widest border-none px-2 h-4 rounded-md",
+                            event.category === 'EXAM' ? "bg-rose-50 text-rose-600" : 
+                            event.category === 'ACADEMIC' ? "bg-blue-50 text-blue-600" : "bg-emerald-50 text-emerald-600"
+                        )}>
+                            {event.category}
+                        </Badge>
+                        <span className="text-[9px] font-black text-slate-400 font-mono">{new Date(event.start_date).toLocaleDateString()}</span>
+                    </div>
+                    <h4 className="font-black text-slate-900 text-sm group-hover:text-blue-600 transition-colors leading-tight">{event.title}</h4>
+                    <div className="flex items-center gap-3 mt-3">
+                        <div className="flex items-center gap-1.5 text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
+                            <Clock className="h-3 w-3 text-slate-300" />
+                            All Day
+                        </div>
+                        <div className="flex items-center gap-1.5 text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
+                            <MapPin className="h-3 w-3 text-slate-300" />
+                            Main Hall
+                        </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="bg-slate-900 border-none rounded-[2rem] p-8 text-white relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-4 opacity-10">
+                <Calendar className="h-20 w-20 text-white" />
+            </div>
+            <div className="relative z-10 space-y-4">
+                <div className="h-12 w-12 rounded-2xl bg-blue-600 flex items-center justify-center shadow-xl group-hover:scale-110 transition-premium">
+                    <Sparkles className="h-6 w-6" />
+                </div>
+                <div>
+                    <h4 className="text-xl font-black tracking-tight">Sync Academic Term</h4>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Automatic Google/iCal Integration</p>
+                </div>
+                <p className="text-xs font-medium text-slate-400 leading-relaxed italic pt-2">
+                    Distribute institutional milestones directly to parent and staff personal devices with one-click synchronization.
+                </p>
+                <Button variant="ghost" className="w-full bg-white/5 hover:bg-white/10 text-white border-none h-12 text-[10px] font-black uppercase tracking-widest mt-4">
+                    Initialize External Sync
+                </Button>
+            </div>
+          </Card>
         </div>
       </div>
     </div>
