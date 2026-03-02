@@ -11,7 +11,9 @@ import {
   Plus, 
   User, 
   Loader2,
-  Navigation
+  Navigation,
+  ChevronRight,
+  Filter
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,6 +21,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
+import { PremiumLoader } from '@/components/ui/premium-loader';
+import { AddTransportRouteDialog } from '@/components/dashboard/add-transport-route-dialog';
+import { AddVehicleDialog } from '@/components/dashboard/add-vehicle-dialog';
 
 export default function TransportPage() {
   const queryClient = useQueryClient();
@@ -40,181 +45,162 @@ export default function TransportPage() {
     },
   });
 
-  const createRouteMutation = useMutation({
-    mutationFn: async (data: any) => api.post('/transport/routes', data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['transport-routes'] });
-      toast.success('Transport route created successfully.');
-    }
-  });
-
-  const createVehicleMutation = useMutation({
-    mutationFn: async (data: any) => api.post('/transport/vehicles', data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['transport-vehicles'] });
-      toast.success('Vehicle added to fleet successfully.');
-    }
-  });
-
-  const handleAdd = () => {
-    if (view === 'routes') {
-      const name = window.prompt('Enter route name:');
-      if (!name) return;
-      const cost = window.prompt('Enter cost per term (KES):');
-      if (!cost) return;
-      const stops = window.prompt('Enter stops (comma separated):');
-
-      createRouteMutation.mutate({ name, cost: parseFloat(cost), stops });
-    } else {
-      const reg_number = window.prompt('Enter vehicle registration number:');
-      if (!reg_number) return;
-      const capacity = window.prompt('Enter passenger capacity:');
-      if (!capacity) return;
-
-      createVehicleMutation.mutate({ reg_number, capacity: parseInt(capacity) });
-    }
-  };
+  if (loadingRoutes || loadingVehicles) return <PremiumLoader message="Syncing Fleet Intelligence" />;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8 animate-in fade-in duration-700">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
-            <Bus className="h-8 w-8 text-primary" />
-            Transport & Logistics
+          <h1 className="text-3xl font-black tracking-tighter text-slate-900 flex items-center gap-3">
+            <Bus className="h-8 w-8 text-blue-600" />
+            Transport Logistics
           </h1>
-          <p className="text-muted-foreground mt-1 text-lg">Manage bus routes, fleet assignments, and student transport.</p>
+          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">Fleet Management & Zone Optimization</p>
         </div>
-        <Button onClick={handleAdd} disabled={createRouteMutation.isPending || createVehicleMutation.isPending} className="shadow-md">
-          {createRouteMutation.isPending || createVehicleMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
-          {view === 'routes' ? 'Create Route' : 'Add Vehicle'}
-        </Button>
+        <div className="flex items-center gap-3">
+            {view === 'routes' ? <AddTransportRouteDialog /> : <AddVehicleDialog />}
+        </div>
       </div>
 
-      <div className="flex p-1 bg-muted/50 rounded-xl w-fit border shadow-inner">
+      <div className="flex p-1 bg-white border shadow-sm rounded-2xl w-fit">
         <button 
           onClick={() => setView('routes')}
           className={cn(
-            "px-6 py-2 text-sm font-bold rounded-lg transition-all flex items-center gap-2",
-            view === 'routes' ? "bg-white text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"
+            "px-8 py-2.5 text-xs font-black uppercase tracking-widest rounded-xl transition-all duration-300",
+            view === 'routes' ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
           )}
         >
-          <Map className="h-4 w-4" />
           Routes & Zones
         </button>
         <button 
           onClick={() => setView('vehicles')}
           className={cn(
-            "px-6 py-2 text-sm font-bold rounded-lg transition-all flex items-center gap-2",
-            view === 'vehicles' ? "bg-white text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"
+            "px-8 py-2.5 text-xs font-black uppercase tracking-widest rounded-xl transition-all duration-300",
+            view === 'vehicles' ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
           )}
         >
-          <Bus className="h-4 w-4" />
           Vehicle Fleet
         </button>
       </div>
 
       {view === 'routes' ? (
-        <Card className="shadow-sm border-muted/50 overflow-hidden">
-          <Table>
-            <TableHeader className="bg-muted/30">
-              <TableRow>
-                <TableHead>Route Name</TableHead>
-                <TableHead>Cost (Termly)</TableHead>
-                <TableHead>Stops</TableHead>
-                <TableHead className="text-center">Assigned Students</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loadingRoutes ? (
-                <TableRow><TableCell colSpan={5} className="text-center h-32"><Loader2 className="h-6 w-6 animate-spin mx-auto text-primary"/></TableCell></TableRow>
-              ) : routes?.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center h-48">
-                    <div className="flex flex-col items-center justify-center text-muted-foreground">
-                      <Map className="h-12 w-12 opacity-20 mb-4" />
-                      <p className="font-bold text-lg text-slate-900">No transport routes defined.</p>
-                      <p className="text-sm max-w-sm mx-auto mb-4">Create routes to manage student zones and automate transport fee billing.</p>
-                      <Button variant="outline">Create First Route</Button>
-                    </div>
-                  </TableCell>
+        <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2.5rem] overflow-hidden">
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader className="bg-slate-50/30">
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className="pl-8 py-4 font-black uppercase tracking-widest text-[10px] text-slate-400">Route Identity</TableHead>
+                  <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Operational Cost</TableHead>
+                  <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Coverage Stops</TableHead>
+                  <TableHead className="text-center font-black uppercase tracking-widest text-[10px] text-slate-400">Enrollment</TableHead>
+                  <TableHead className="text-right pr-8 font-black uppercase tracking-widest text-[10px] text-slate-400">Actions</TableHead>
                 </TableRow>
-              ) : (
-                routes?.map((route: any) => (
-                  <TableRow key={route.id} className="hover:bg-muted/20 transition-colors">
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div className="h-9 w-9 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
-                          <Navigation className="h-5 w-5" />
+              </TableHeader>
+              <TableBody>
+                {routes?.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="h-64 text-center">
+                        <div className="flex flex-col items-center gap-2 text-slate-300">
+                            <Map className="h-12 w-12 opacity-20" />
+                            <p className="font-black uppercase tracking-widest text-xs">No Routes Defined</p>
                         </div>
-                        <span className="font-bold text-sm">{route.name}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="font-mono text-sm">KES {parseFloat(route.cost).toLocaleString()}</TableCell>
-                    <TableCell className="text-xs text-muted-foreground max-w-[200px] truncate">{route.stops || 'Direct Route'}</TableCell>
-                    <TableCell className="text-center font-black">{route._count.students}</TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="ghost" size="sm" className="font-bold">Edit Route</Button>
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : (
+                  routes?.map((route: any) => (
+                    <TableRow key={route.id} className="group hover:bg-slate-50/50 transition-all duration-300 border-b-slate-50">
+                      <TableCell className="pl-8 py-5">
+                        <div className="flex items-center gap-4">
+                          <div className="h-12 w-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shadow-sm transition-all group-hover:scale-110">
+                            <Navigation className="h-6 w-6" />
+                          </div>
+                          <span className="font-black text-slate-900 text-sm tracking-tight">{route.name}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="font-black text-slate-900">
+                        <span className="text-[10px] text-slate-400 mr-1">KES</span>
+                        {parseFloat(route.cost).toLocaleString()}
+                      </TableCell>
+                      <TableCell>
+                        <p className="text-[10px] font-bold text-slate-500 uppercase leading-relaxed max-w-[200px] truncate">{route.stops || 'Direct Route'}</p>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Badge variant="secondary" className="font-black text-[10px] bg-slate-50 text-slate-600 px-3 py-1 rounded-lg">
+                            {route._count.students} Students
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right pr-8">
+                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-300 hover:text-blue-600">
+                            <ChevronRight className="h-5 w-5" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
         </Card>
       ) : (
-        <Card className="shadow-sm border-muted/50 overflow-hidden">
-          <Table>
-            <TableHeader className="bg-muted/30">
-              <TableRow>
-                <TableHead>Registration No.</TableHead>
-                <TableHead>Assigned Route</TableHead>
-                <TableHead>Driver</TableHead>
-                <TableHead className="text-center">Capacity</TableHead>
-                <TableHead className="text-right">Manage</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loadingVehicles ? (
-                <TableRow><TableCell colSpan={5} className="text-center h-32"><Loader2 className="h-6 w-6 animate-spin mx-auto text-primary"/></TableCell></TableRow>
-              ) : vehicles?.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center h-48">
-                    <div className="flex flex-col items-center justify-center text-muted-foreground">
-                      <Bus className="h-12 w-12 opacity-20 mb-4" />
-                      <p className="font-bold text-lg text-slate-900">Fleet is empty.</p>
-                      <p className="text-sm max-w-sm mx-auto mb-4">Register school buses and vans to track capacity and driver assignments.</p>
-                      <Button variant="outline">Add Vehicle</Button>
-                    </div>
-                  </TableCell>
+        <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white rounded-[2.5rem] overflow-hidden">
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader className="bg-slate-50/30">
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className="pl-8 py-4 font-black uppercase tracking-widest text-[10px] text-slate-400">Vehicle Unit</TableHead>
+                  <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Assigned Zone</TableHead>
+                  <TableHead className="font-black uppercase tracking-widest text-[10px] text-slate-400">Personnel</TableHead>
+                  <TableHead className="text-center font-black uppercase tracking-widest text-[10px] text-slate-400">Capacity</TableHead>
+                  <TableHead className="text-right pr-8 font-black uppercase tracking-widest text-[10px] text-slate-400">Management</TableHead>
                 </TableRow>
-              ) : (
-                vehicles?.map((vehicle: any) => (
-                  <TableRow key={vehicle.id}>
-                    <TableCell>
-                      <Badge variant="outline" className="font-mono text-xs bg-slate-50">{vehicle.reg_number}</Badge>
-                    </TableCell>
-                    <TableCell className="font-medium text-sm">
-                      {vehicle.route?.name || <span className="text-muted-foreground italic">Unassigned</span>}
-                    </TableCell>
-                    <TableCell>
-                      {vehicle.driver ? (
-                        <div className="flex items-center gap-2">
-                          <User className="h-3 w-3 opacity-50" />
-                          <span className="text-sm">{vehicle.driver.user.first_name} {vehicle.driver.user.last_name}</span>
+              </TableHeader>
+              <TableBody>
+                {vehicles?.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="h-64 text-center">
+                        <div className="flex flex-col items-center gap-2 text-slate-300">
+                            <Bus className="h-12 w-12 opacity-20" />
+                            <p className="font-black uppercase tracking-widest text-xs">Fleet Empty</p>
                         </div>
-                      ) : <span className="text-xs text-rose-500 font-bold">No Driver</span>}
-                    </TableCell>
-                    <TableCell className="text-center font-bold text-slate-700">{vehicle.capacity} Seats</TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="outline" size="sm">Manage</Button>
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : (
+                  vehicles?.map((vehicle: any) => (
+                    <TableRow key={vehicle.id} className="group hover:bg-slate-50/50 transition-all duration-300 border-b-slate-50">
+                      <TableCell className="pl-8 py-5">
+                        <div className="flex items-center gap-4">
+                            <div className="h-12 w-12 rounded-2xl bg-slate-900 flex items-center justify-center text-white shadow-lg">
+                                <Bus className="h-6 w-6" />
+                            </div>
+                            <span className="font-black text-slate-900 font-mono tracking-widest">{vehicle.reg_number}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="font-bold text-sm text-slate-700">
+                        {vehicle.route?.name || <Badge variant="outline" className="text-[9px] uppercase border-dashed opacity-50">Unassigned</Badge>}
+                      </TableCell>
+                      <TableCell>
+                        {vehicle.driver ? (
+                          <div className="flex items-center gap-2 text-xs font-bold text-slate-600">
+                            <div className="h-2 w-2 rounded-full bg-blue-600" />
+                            {vehicle.driver.user.first_name} {vehicle.driver.user.last_name}
+                          </div>
+                        ) : <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest">Awaiting Pilot</span>}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <div className="flex flex-col items-center">
+                            <span className="font-black text-slate-900">{vehicle.capacity}</span>
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Seats</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right pr-8">
+                        <Button variant="outline" size="sm" className="h-9 px-4 rounded-xl border-slate-100 font-black uppercase tracking-widest text-[9px]">Edit Node</Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
         </Card>
       )}
     </div>
