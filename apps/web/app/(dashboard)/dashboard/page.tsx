@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -6,34 +5,28 @@ import { useAuth } from '@/components/auth-provider';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
 import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
   ResponsiveContainer,
   AreaChart,
-  Area 
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip
 } from 'recharts';
-import Link from 'next/link';
 import { 
-  Building2, 
-  TrendingUp, 
-  Loader2, 
-  LayoutDashboard,
-  Sparkles
+  Sparkles,
+  Loader2
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Insights } from '@/components/dashboard/insights';
 import { ActionCenter } from '@/components/dashboard/action-center';
 import { ActivityFeed } from '@/components/dashboard/activity-feed';
 import { InvoicesTable } from '@/components/dashboard/tables/invoices-table';
+import { DashboardShell, DashboardHeader } from '@/components/dashboard/shell';
 
 export default function DashboardPage() {
   const { user } = useAuth();
 
-  // 1. Fetch Stats
   const { data: stats, isLoading: loadingStats } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
@@ -78,33 +71,23 @@ export default function DashboardPage() {
       <div className="flex items-center justify-center h-[60vh]">
         <div className="flex flex-col items-center gap-4">
             <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Aggregating Institutional Data</p>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest leading-none">Aggregating Institutional Data</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-10">
-      {/* Dynamic Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2 text-blue-600 mb-1">
-            <Sparkles className="h-4 w-4" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em]">Live Intelligence</span>
-          </div>
-          <h1 className="text-4xl font-black tracking-tighter text-slate-900">
-            Welcome, {user?.first_name}.
-          </h1>
-          <p className="text-lg text-slate-500 font-medium italic">Your institutional dashboard is synchronized and operational.</p>
+    <DashboardShell>
+      <DashboardHeader 
+        heading={`Welcome, ${user?.first_name}.`}
+        text="Your institutional dashboard is synchronized and operational."
+      >
+        <div className="bg-white px-4 py-2 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3">
+            <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-xs font-bold text-slate-600 uppercase tracking-widest">Global Terminal Active</span>
         </div>
-        <div className="flex items-center gap-3">
-            <div className="bg-white px-4 py-2 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3">
-                <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-xs font-bold text-slate-600 uppercase tracking-widest">Global Terminal Active</span>
-            </div>
-        </div>
-      </div>
+      </DashboardHeader>
 
       {/* KPI Section */}
       <Insights stats={stats} />
@@ -118,8 +101,8 @@ export default function DashboardPage() {
             <div className="bg-white p-8 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.02)] space-y-6">
                 <div className="flex items-center justify-between">
                     <div className="space-y-1">
-                        <h3 className="text-xl font-black text-slate-900 tracking-tight">Attendance Momentum</h3>
-                        <p className="text-xs font-medium text-slate-500 italic">Weekly institutional presence tracking.</p>
+                        <h3 className="text-xl font-black text-slate-900 tracking-tight leading-none">Attendance Momentum</h3>
+                        <p className="text-xs font-medium text-slate-500 italic leading-none">Weekly institutional presence tracking.</p>
                     </div>
                     <Badge variant="outline" className="rounded-xl font-bold">This Week</Badge>
                 </div>
@@ -164,6 +147,6 @@ export default function DashboardPage() {
             <ActivityFeed />
         </div>
       </div>
-    </div>
+    </DashboardShell>
   );
 }
