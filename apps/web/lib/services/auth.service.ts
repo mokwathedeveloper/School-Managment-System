@@ -21,7 +21,8 @@ export const AuthService = {
       email: user.email, 
       sub: user.id, 
       role: user.role, 
-      school_id: user.school_id 
+      school_id: user.school_id,
+      password_changed: user.password_changed 
     };
 
     const token = await new SignJWT(payload)
@@ -38,7 +39,8 @@ export const AuthService = {
           role: user.role,
           first_name: user.first_name,
           last_name: user.last_name,
-          school_id: user.school_id
+          school_id: user.school_id,
+          password_changed: user.password_changed
       }
     };
   },

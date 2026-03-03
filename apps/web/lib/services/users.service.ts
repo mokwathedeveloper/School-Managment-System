@@ -30,6 +30,7 @@ export const UsersService = {
     
     if (data.password) {
       updateData.password = await argon2.hash(data.password);
+      updateData.password_changed = true;
     }
 
     return prisma.user.update({
