@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/server/auth';
+import { enforceRole, enforceTenant, ROLE_GROUPS, ROLES } from '@/lib/authz';
 import { FinanceService } from '@/lib/services/finance.service';
 import { handleApiError, ApiError } from '@/lib/server/api-utils';
 import { z } from 'zod';
@@ -23,17 +24,17 @@ const recordExpenseSchema = z.object({
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession(req);
-    if (!session) throw new ApiError('Unauthorized', 401);
+    const tenantId = enforceTenant(session);
 
     const { searchParams } = new URL(req.url);
     const type = searchParams.get('type');
 
     if (type === 'expenses') {
-      const result = await FinanceService.getExpenses(session.schoolId);
+      const result = await FinanceService.getExpenses(tenantId);
       return NextResponse.json(result);
     }
 
-    const result = await FinanceService.findAll(session.schoolId);
+    const result = await FinanceService.findAll(tenantId);
     return NextResponse.json(result);
   } catch (error) {
     return handleApiError(error);
@@ -53,14 +54,14 @@ export async function POST(req: NextRequest) {
       const validated = recordExpenseSchema.safeParse(body);
       if (!validated.success) throw new ApiError('Invalid input', 400);
       
-      const result = await FinanceService.recordExpense(session.schoolId, session.userId, validated.data);
+      const result = await FinanceService.recordExpense(tenantId, session.userId, validated.data);
       return NextResponse.json(result, { status: 201 });
     }
 
     const validated = createInvoiceSchema.safeParse(body);
     if (!validated.success) throw new ApiError('Invalid input', 400);
 
-    const result = await FinanceService.createInvoice(session.schoolId, validated.data);
+    const result = await FinanceService.createInvoice(tenantId, validated.data);
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
     return handleApiError(error);

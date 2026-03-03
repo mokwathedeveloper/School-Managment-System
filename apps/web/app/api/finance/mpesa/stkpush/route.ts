@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/server/auth';
+import { enforceRole, enforceTenant, ROLE_GROUPS, ROLES } from '@/lib/authz';
 import { FinanceService } from '@/lib/services/finance.service';
 import { handleApiError, ApiError } from '@/lib/server/api-utils';
 import { z } from 'zod';
@@ -13,7 +14,7 @@ const stkPushSchema = z.object({
 export async function POST(req: NextRequest) {
   try {
     const session = await getSession(req);
-    if (!session) throw new ApiError('Unauthorized', 401);
+    const tenantId = enforceTenant(session);
 
     const body = await req.json();
     const validated = stkPushSchema.safeParse(body);
@@ -22,7 +23,7 @@ export async function POST(req: NextRequest) {
         throw new ApiError('Invalid input: ' + validated.error.message, 400);
     }
 
-    const result = await FinanceService.initiateStkPush(session.schoolId, {
+    const result = await FinanceService.initiateStkPush(tenantId, {
         phone: validated.data.phone_number,
         amount: validated.data.amount,
         invoiceId: validated.data.invoice_id

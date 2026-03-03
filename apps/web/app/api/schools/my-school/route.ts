@@ -1,6 +1,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/server/auth';
+import { enforceRole, enforceTenant, ROLE_GROUPS, ROLES } from '@/lib/authz';
 import { SchoolsService } from '@/lib/services/schools.service';
 import { handleApiError, ApiError } from '@/lib/server/api-utils';
 
@@ -29,9 +30,7 @@ export async function PATCH(req: NextRequest) {
       throw new ApiError('Unauthorized', 401);
     }
 
-    if (session.role !== 'SUPER_ADMIN' && session.role !== 'SCHOOL_ADMIN') {
-      throw new ApiError('Forbidden', 403);
-    }
+    enforceRole(session, ROLE_GROUPS.ADMIN);
 
     const body = await req.json();
     const updatedSchool = await SchoolsService.update(session.schoolId, body);

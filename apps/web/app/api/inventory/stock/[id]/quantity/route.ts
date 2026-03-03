@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/server/auth';
+import { enforceRole, enforceTenant, ROLE_GROUPS, ROLES } from '@/lib/authz';
 import { InventoryService } from '@/lib/services/extended.service';
 import { handleApiError, ApiError } from '@/lib/server/api-utils';
 import { z } from 'zod';
@@ -14,7 +15,7 @@ export async function PATCH(
 ) {
   try {
     const session = await getSession(req);
-    if (!session) throw new ApiError('Unauthorized', 401);
+    const tenantId = enforceTenant(session);
     
     const body = await req.json();
     const validated = updateQuantitySchema.safeParse(body);
@@ -24,7 +25,7 @@ export async function PATCH(
     }
     
     const result = await InventoryService.updateStockQuantity(
-        session.schoolId, 
+        tenantId, 
         params.id, 
         validated.data.change
     );

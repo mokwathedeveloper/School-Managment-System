@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/server/auth';
+import { enforceRole, enforceTenant, ROLE_GROUPS, ROLES } from '@/lib/authz';
 import { ConductService } from '@/lib/services/extended.service';
 import { handleApiError, ApiError } from '@/lib/server/api-utils';
 import { z } from 'zod';
@@ -15,11 +16,11 @@ const createConductRecordSchema = z.object({
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession(req);
-    if (!session) throw new ApiError('Unauthorized', 401);
+    const tenantId = enforceTenant(session);
     
     // Check role here if needed
     
-    const result = await ConductService.findAll(session.schoolId);
+    const result = await ConductService.findAll(tenantId);
     return NextResponse.json(result);
   } catch (error) { 
     return handleApiError(error); 
@@ -32,9 +33,7 @@ export async function POST(req: NextRequest) {
     if (!session) throw new ApiError('Unauthorized', 401);
     
     // Only Staff/Admins can report conduct issues
-    if (session.role !== 'SUPER_ADMIN' && session.role !== 'ADMIN' && session.role !== 'STAFF') {
-        throw new ApiError('Forbidden: Only staff members can record discipline events.', 403);
-    }
+    enforceRole(session, ROLE_GROUPS.STAFF);
     
     const body = await req.json();
     const validated = createConductRecordSchema.safeParse(body);
@@ -43,7 +42,7 @@ export async function POST(req: NextRequest) {
       throw new ApiError('Invalid input', 400);
     }
     
-    const result = await ConductService.create(session.schoolId, validated.data, session.userId);
+    const result = await ConductService.create(tenantId, validated.data, session.userId);
     return NextResponse.json(result, { status: 201 });
   } catch (error) { 
     return handleApiError(error); 

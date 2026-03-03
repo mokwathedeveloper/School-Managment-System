@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/server/auth';
+import { enforceRole, enforceTenant, ROLE_GROUPS, ROLES } from '@/lib/authz';
 import { AdmissionsService } from '@/lib/services/admissions.service';
 import { handleApiError, ApiError } from '@/lib/server/api-utils';
 import { z } from 'zod';
@@ -14,12 +15,10 @@ export async function PATCH(
 ) {
   try {
     const session = await getSession(req);
-    if (!session) throw new ApiError('Unauthorized', 401);
+    const tenantId = enforceTenant(session);
     
     // RBAC: Only admin/staff can update admission status
-    if (session.role !== 'SUPER_ADMIN' && session.role !== 'ADMIN' && session.role !== 'STAFF') {
-        throw new ApiError('Forbidden: Only staff members can update application status.', 403);
-    }
+    enforceRole(session, ROLE_GROUPS.STAFF);
     
     const body = await req.json();
     const validated = updateStatusSchema.safeParse(body);
@@ -29,7 +28,7 @@ export async function PATCH(
     }
     
     const result = await AdmissionsService.updateStatus(
-        session.schoolId, 
+        tenantId, 
         params.id, 
         validated.data.status
     );

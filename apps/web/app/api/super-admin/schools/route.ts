@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/server/auth';
+import { enforceRole, enforceTenant, ROLE_GROUPS, ROLES } from '@/lib/authz';
 import { SuperAdminService } from '@/lib/services/super-admin.service';
 import { handleApiError, ApiError } from '@/lib/server/api-utils';
 import { z } from 'zod';
@@ -17,9 +18,7 @@ const onboardSchoolSchema = z.object({
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession(req);
-    if (!session || session.role !== 'SUPER_ADMIN') {
-      throw new ApiError('Forbidden: Super Admin access required', 403);
-    }
+    enforceRole(session, [ROLES.SUPER_ADMIN]);
 
     const result = await SuperAdminService.getSchools();
     return NextResponse.json(result);
@@ -31,9 +30,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const session = await getSession(req);
-    if (!session || session.role !== 'SUPER_ADMIN') {
-      throw new ApiError('Forbidden: Super Admin access required', 403);
-    }
+    enforceRole(session, [ROLES.SUPER_ADMIN]);
 
     const body = await req.json();
     const validated = onboardSchoolSchema.safeParse(body);

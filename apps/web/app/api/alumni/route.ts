@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/server/auth';
+import { enforceRole, enforceTenant, ROLE_GROUPS, ROLES } from '@/lib/authz';
 import { AlumniService } from '@/lib/services/extended.service';
 import { handleApiError, ApiError } from '@/lib/server/api-utils';
 import { z } from 'zod';
@@ -19,10 +20,10 @@ const createAlumnusSchema = z.object({
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession(req);
-    if (!session) throw new ApiError('Unauthorized', 401);
+    const tenantId = enforceTenant(session);
     
     // In a real application, you might add pagination here
-    const result = await AlumniService.findAll(session.schoolId);
+    const result = await AlumniService.findAll(tenantId);
     return NextResponse.json(result);
   } catch (error) { 
     return handleApiError(error); 
@@ -41,7 +42,7 @@ export async function POST(req: NextRequest) {
       throw new ApiError('Invalid input', 400);
     }
     
-    const result = await AlumniService.create(session.schoolId, validated.data);
+    const result = await AlumniService.create(tenantId, validated.data);
     return NextResponse.json(result, { status: 201 });
   } catch (error) { 
     return handleApiError(error); 

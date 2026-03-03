@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/server/auth';
+import { enforceRole, enforceTenant, ROLE_GROUPS, ROLES } from '@/lib/authz';
 import prisma from '@/lib/db/prisma';
 import { handleApiError, ApiError } from '@/lib/server/api-utils';
 import { z } from 'zod';
@@ -13,10 +14,10 @@ const createSubjectSchema = z.object({
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession(req);
-    if (!session) throw new ApiError('Unauthorized', 401);
+    const tenantId = enforceTenant(session);
 
     const subjects = await prisma.subject.findMany({
-      where: { school_id: session.schoolId },
+      where: { school_id: tenantId },
       orderBy: { name: 'asc' }
     });
 
@@ -32,9 +33,7 @@ export async function POST(req: NextRequest) {
     if (!session) throw new ApiError('Unauthorized', 401);
     
     // RBAC: Only admin/staff can create subjects
-    if (session.role !== 'SUPER_ADMIN' && session.role !== 'ADMIN') {
-        throw new ApiError('Forbidden: Only admins can create subjects.', 403);
-    }
+    enforceRole(session, ROLE_GROUPS.ADMIN);
     
     const body = await req.json();
     const validated = createSubjectSchema.safeParse(body);
@@ -46,7 +45,7 @@ export async function POST(req: NextRequest) {
     const subject = await prisma.subject.create({
       data: {
         ...validated.data,
-        school_id: session.schoolId
+        school_id: tenantId
       }
     });
     

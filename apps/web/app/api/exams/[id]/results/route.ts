@@ -1,6 +1,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/server/auth';
+import { enforceRole, enforceTenant, ROLE_GROUPS, ROLES } from '@/lib/authz';
 import { ExamsService } from '@/lib/services/exams.service';
 import { handleApiError, ApiError } from '@/lib/server/api-utils';
 
@@ -10,9 +11,9 @@ export async function GET(
 ) {
   try {
     const session = await getSession(req);
-    if (!session) throw new ApiError('Unauthorized', 401);
+    const tenantId = enforceTenant(session);
 
-    const exam = await ExamsService.findOne(session.schoolId, params.id);
+    const exam = await ExamsService.findOne(tenantId, params.id);
     if (!exam) throw new ApiError('Exam not found', 404);
 
     return NextResponse.json(exam.results);
@@ -34,7 +35,7 @@ export async function POST(
       throw new ApiError('Records are required', 400);
     }
 
-    const result = await ExamsService.saveResults(session.schoolId, params.id, records);
+    const result = await ExamsService.saveResults(tenantId, params.id, records);
     return NextResponse.json(result);
   } catch (error) {
     return handleApiError(error);

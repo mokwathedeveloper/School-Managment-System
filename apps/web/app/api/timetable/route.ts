@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/server/auth';
+import { enforceRole, enforceTenant, ROLE_GROUPS, ROLES } from '@/lib/authz';
 import { TimetableService } from '@/lib/services/timetable.service';
 import { handleApiError, ApiError } from '@/lib/server/api-utils';
 import { z } from 'zod';
@@ -22,12 +23,12 @@ const createSlotSchema = z.object({
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession(req);
-    if (!session) throw new ApiError('Unauthorized', 401);
+    const tenantId = enforceTenant(session);
 
     const { pathname } = new URL(req.url);
 
     if (pathname.endsWith('/rooms')) {
-      const result = await TimetableService.getRooms(session.schoolId);
+      const result = await TimetableService.getRooms(tenantId);
       return NextResponse.json(result);
     }
 
@@ -49,14 +50,14 @@ export async function POST(req: NextRequest) {
       const validated = createRoomSchema.safeParse(body);
       if (!validated.success) throw new ApiError('Invalid input: ' + validated.error.message, 400);
       
-      const result = await TimetableService.createRoom(session.schoolId, validated.data);
+      const result = await TimetableService.createRoom(tenantId, validated.data);
       return NextResponse.json(result, { status: 201 });
     }
 
     const validated = createSlotSchema.safeParse(body);
     if (!validated.success) throw new ApiError('Invalid input: ' + validated.error.message, 400);
 
-    const result = await TimetableService.createSlot(session.schoolId, validated.data);
+    const result = await TimetableService.createSlot(tenantId, validated.data);
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
     return handleApiError(error);

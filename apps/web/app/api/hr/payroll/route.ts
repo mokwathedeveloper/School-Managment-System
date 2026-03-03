@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/server/auth';
+import { enforceRole, enforceTenant, ROLE_GROUPS, ROLES } from '@/lib/authz';
 import { StaffService } from '@/lib/services/staff.service';
 import { handleApiError, ApiError } from '@/lib/server/api-utils';
 import { z } from 'zod';
@@ -13,7 +14,7 @@ const processPayrollSchema = z.object({
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession(req);
-    if (!session) throw new ApiError('Unauthorized', 401);
+    const tenantId = enforceTenant(session);
 
     const { searchParams } = new URL(req.url);
     const month = parseInt(searchParams.get('month') || '');
@@ -22,7 +23,7 @@ export async function GET(req: NextRequest) {
     if (isNaN(month) || isNaN(year)) {
         // Return recent payroll records
         const result = await prisma.payrollRecord.findMany({
-            where: { school_id: session.schoolId },
+            where: { school_id: tenantId },
             include: { staff: { include: { user: true } } },
             orderBy: { created_at: 'desc' },
             take: 50
@@ -31,7 +32,7 @@ export async function GET(req: NextRequest) {
     }
 
     const result = await prisma.payrollRecord.findMany({
-      where: { school_id: session.schoolId, month, year },
+      where: { school_id: tenantId, month, year },
       include: { staff: { include: { user: true } } },
     });
     return NextResponse.json(result);
@@ -52,7 +53,7 @@ export async function POST(req: NextRequest) {
     if (!validated.success) throw new ApiError('Invalid input', 400);
 
     const result = await StaffService.processPayroll(
-        session.schoolId, 
+        tenantId, 
         validated.data.month, 
         validated.data.year
     );

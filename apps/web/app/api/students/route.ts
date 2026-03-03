@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/server/auth';
+import { enforceRole, enforceTenant, ROLE_GROUPS, ROLES } from '@/lib/authz';
 import { StudentsService } from '@/lib/services/students.service';
 import { handleApiError, ApiError } from '@/lib/server/api-utils';
 import { z } from 'zod';
@@ -19,7 +20,7 @@ const createStudentSchema = z.object({
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession(req);
-    if (!session) throw new ApiError('Unauthorized', 401);
+    const tenantId = enforceTenant(session);
 
     const { searchParams } = new URL(req.url);
     const search = searchParams.get('search') || undefined;
@@ -27,7 +28,7 @@ export async function GET(req: NextRequest) {
     const skip = parseInt(searchParams.get('skip') || '0');
     const take = parseInt(searchParams.get('take') || '10');
 
-    const result = await StudentsService.findAll(session.schoolId, {
+    const result = await StudentsService.findAll(tenantId, {
       search,
       classId,
       skip,
@@ -52,7 +53,7 @@ export async function POST(req: NextRequest) {
       throw new ApiError('Invalid input', 400);
     }
 
-    const student = await StudentsService.create(session.schoolId, validated.data);
+    const student = await StudentsService.create(tenantId, validated.data);
     return NextResponse.json(student, { status: 201 });
   } catch (error) {
     return handleApiError(error);

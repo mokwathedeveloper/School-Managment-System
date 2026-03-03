@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/server/auth';
+import { enforceRole, enforceTenant, ROLE_GROUPS, ROLES } from '@/lib/authz';
 import { AttendanceService } from '@/lib/services/attendance.service';
 import { handleApiError, ApiError } from '@/lib/server/api-utils';
 import { z } from 'zod';
@@ -17,12 +18,10 @@ const markAttendanceSchema = z.object({
 export async function POST(req: NextRequest) {
   try {
     const session = await getSession(req);
-    if (!session) throw new ApiError('Unauthorized', 401);
+    const tenantId = enforceTenant(session);
 
     // RBAC: Only admin or staff (teachers) can mark attendance
-    if (session.role !== 'SUPER_ADMIN' && session.role !== 'ADMIN' && session.role !== 'STAFF') {
-        throw new ApiError('Forbidden: Only staff members can record attendance.', 403);
-    }
+    enforceRole(session, ROLE_GROUPS.STAFF);
 
     const body = await req.json();
     const validated = markAttendanceSchema.safeParse(body);
@@ -32,7 +31,7 @@ export async function POST(req: NextRequest) {
     }
 
     const result = await AttendanceService.markAttendance({
-      school_id: session.schoolId,
+      school_id: tenantId,
       ...validated.data,
     });
 

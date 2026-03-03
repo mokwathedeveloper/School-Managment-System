@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/server/auth';
+import { enforceRole, enforceTenant, ROLE_GROUPS, ROLES } from '@/lib/authz';
 import { LmsService } from '@/lib/services/lms.service';
 import { handleApiError, ApiError } from '@/lib/server/api-utils';
 import { z } from 'zod';
@@ -16,7 +17,7 @@ const createAssignmentSchema = z.object({
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession(req);
-    if (!session) throw new ApiError('Unauthorized', 401);
+    const tenantId = enforceTenant(session);
 
     // If student, return assignments for their class
     if (session.role === 'STUDENT') {
@@ -25,13 +26,13 @@ export async function GET(req: NextRequest) {
         });
         if (!student?.class_id) return NextResponse.json([]);
         
-        const result = await LmsService.getAssignmentsByClass(session.schoolId, student.class_id);
+        const result = await LmsService.getAssignmentsByClass(tenantId, student.class_id);
         return NextResponse.json(result);
     }
 
     // Otherwise return all for the school (simplified for staff)
     const result = await prisma.assignment.findMany({
-        where: { school_id: session.schoolId },
+        where: { school_id: tenantId },
         include: { subject: true, class: true },
         orderBy: { created_at: 'desc' }
     });
@@ -62,17 +63,17 @@ export async function POST(req: NextRequest) {
     let subjectId = validated.data.subject_id;
     if (!subjectId) {
       let defaultSubject = await prisma.subject.findFirst({
-        where: { school_id: session.schoolId }
+        where: { school_id: tenantId }
       });
       if (!defaultSubject) {
         defaultSubject = await prisma.subject.create({
-          data: { name: 'General', school_id: session.schoolId }
+          data: { name: 'General', school_id: tenantId }
         });
       }
       subjectId = defaultSubject.id;
     }
 
-    const result = await LmsService.createAssignment(session.schoolId, {
+    const result = await LmsService.createAssignment(tenantId, {
       ...validated.data,
       subject_id: subjectId
     });

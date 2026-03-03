@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/server/auth';
+import { enforceRole, enforceTenant, ROLE_GROUPS, ROLES } from '@/lib/authz';
 import { CalendarService } from '@/lib/services/extended.service';
 import { handleApiError, ApiError } from '@/lib/server/api-utils';
 import { z } from 'zod';
@@ -16,7 +17,7 @@ const createEventSchema = z.object({
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession(req);
-    if (!session) throw new ApiError('Unauthorized', 401);
+    const tenantId = enforceTenant(session);
     
     const { searchParams } = new URL(req.url);
     const start = searchParams.get('start');
@@ -27,7 +28,7 @@ export async function GET(req: NextRequest) {
     }
     
     const result = await CalendarService.getEvents(
-      session.schoolId, 
+      tenantId, 
       new Date(start), 
       new Date(end)
     );
@@ -54,7 +55,7 @@ export async function POST(req: NextRequest) {
       throw new ApiError('End date must be after start date', 400);
     }
     
-    const result = await CalendarService.create(session.schoolId, validated.data);
+    const result = await CalendarService.create(tenantId, validated.data);
     return NextResponse.json(result, { status: 201 });
   } catch (error) { 
     return handleApiError(error); 

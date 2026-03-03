@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/server/auth';
+import { enforceRole, enforceTenant, ROLE_GROUPS, ROLES } from '@/lib/authz';
 import { StaffService } from '@/lib/services/staff.service';
 import { handleApiError, ApiError } from '@/lib/server/api-utils';
 import { z } from 'zod';
@@ -19,10 +20,10 @@ const updateLeaveSchema = z.object({
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession(req);
-    if (!session) throw new ApiError('Unauthorized', 401);
+    const tenantId = enforceTenant(session);
 
     // If staff, might only want to see their own? For now return all for admins/staff view
-    const result = await StaffService.getLeaves(session.schoolId);
+    const result = await StaffService.getLeaves(tenantId);
     return NextResponse.json(result);
   } catch (error) {
     return handleApiError(error);
@@ -41,7 +42,7 @@ export async function POST(req: NextRequest) {
     const validated = leaveRequestSchema.safeParse(body);
     if (!validated.success) throw new ApiError('Invalid input', 400);
 
-    const result = await StaffService.requestLeave(session.schoolId, staff.id, validated.data);
+    const result = await StaffService.requestLeave(tenantId, staff.id, validated.data);
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
     return handleApiError(error);
@@ -66,7 +67,7 @@ export async function PATCH(req: NextRequest) {
     const validated = updateLeaveSchema.safeParse(body);
     if (!validated.success) throw new ApiError('Invalid input', 400);
 
-    const result = await StaffService.updateLeaveStatus(session.schoolId, id, validated.data.status);
+    const result = await StaffService.updateLeaveStatus(tenantId, id, validated.data.status);
     return NextResponse.json(result);
   } catch (error) {
     return handleApiError(error);
