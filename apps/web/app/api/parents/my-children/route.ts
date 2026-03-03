@@ -7,9 +7,9 @@ import { handleApiError, ApiError } from '@/lib/server/api-utils';
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession(req);
-    const tenantId = enforceTenant(session);
+    const tenantId = enforceTenant(session) as string;
 
-    const children = await ParentsService.getChildren(session.userId);
+    const children = await ParentsService.getChildren(session!.userId);
     return NextResponse.json(children);
   } catch (error) {
     return handleApiError(error);

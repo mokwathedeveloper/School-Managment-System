@@ -20,7 +20,7 @@ const updateLeaveSchema = z.object({
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession(req);
-    const tenantId = enforceTenant(session);
+    const tenantId = enforceTenant(session) as string;
 
     // If staff, might only want to see their own? For now return all for admins/staff view
     const result = await StaffService.getLeaves(tenantId);
@@ -33,6 +33,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const session = await getSession(req);
+    const tenantId = enforceTenant(session) as string;
     if (!session) throw new ApiError('Unauthorized', 401);
 
     const staff = await prisma.staff.findUnique({ where: { user_id: session.userId } });
@@ -52,6 +53,7 @@ export async function POST(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   try {
     const session = await getSession(req);
+    const tenantId = enforceTenant(session) as string;
     if (!session) throw new ApiError('Unauthorized', 401);
 
     // Only Admin/SuperAdmin can approve/reject

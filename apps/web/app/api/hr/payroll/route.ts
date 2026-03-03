@@ -14,7 +14,7 @@ const processPayrollSchema = z.object({
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession(req);
-    const tenantId = enforceTenant(session);
+    const tenantId = enforceTenant(session) as string;
 
     const { searchParams } = new URL(req.url);
     const month = parseInt(searchParams.get('month') || '');
@@ -44,6 +44,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const session = await getSession(req);
+    const tenantId = enforceTenant(session) as string;
     if (!session || (session.role !== 'ADMIN' && session.role !== 'SUPER_ADMIN')) {
       throw new ApiError('Forbidden', 403);
     }

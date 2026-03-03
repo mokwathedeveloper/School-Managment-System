@@ -15,9 +15,9 @@ const updateProfileSchema = z.object({
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession(req);
-    const tenantId = enforceTenant(session);
+    const tenantId = enforceTenant(session) as string;
 
-    const user = await UsersService.findById(session.userId);
+    const user = await UsersService.findById(session!.userId);
     if (!user) throw new ApiError('User not found', 404);
 
     // Remove sensitive data
@@ -40,7 +40,7 @@ export async function PATCH(req: NextRequest) {
       throw new ApiError('Invalid input: ' + validated.error.message, 400);
     }
 
-    const updatedUser = await UsersService.update(session.userId, validated.data);
+    const updatedUser = await UsersService.update(session!.userId, validated.data);
     
     const { password, ...safeUser } = updatedUser;
     return NextResponse.json(safeUser);

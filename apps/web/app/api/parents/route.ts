@@ -16,7 +16,7 @@ const createParentSchema = z.object({
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession(req);
-    const tenantId = enforceTenant(session);
+    const tenantId = enforceTenant(session) as string;
 
     const { searchParams } = new URL(req.url);
     const search = searchParams.get('search') || undefined;
@@ -31,6 +31,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const session = await getSession(req);
+    const tenantId = enforceTenant(session) as string;
     if (!session) throw new ApiError('Unauthorized', 401);
 
     // Only Admin/HeadTeacher/Deputy can register parents

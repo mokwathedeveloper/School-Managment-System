@@ -24,7 +24,7 @@ export async function GET(
 ) {
   try {
     const session = await getSession(req);
-    const tenantId = enforceTenant(session);
+    const tenantId = enforceTenant(session) as string;
 
     const student = await StudentsService.findOne(tenantId, params.id);
     if (!student) throw new ApiError('Student not found', 404);
@@ -41,6 +41,7 @@ export async function PATCH(
 ) {
   try {
     const session = await getSession(req);
+    const tenantId = enforceTenant(session) as string;
     if (!session) throw new ApiError('Unauthorized', 401);
     
     // RBAC: Only staff/admin can update student records
@@ -79,6 +80,7 @@ export async function DELETE(
 ) {
   try {
     const session = await getSession(req);
+    const tenantId = enforceTenant(session) as string;
     if (!session) throw new ApiError('Unauthorized', 401);
     
     // RBAC: Only admin can delete students
