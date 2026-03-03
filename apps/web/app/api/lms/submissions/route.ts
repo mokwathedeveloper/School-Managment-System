@@ -25,9 +25,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const validated = submitAssignmentSchema.safeParse(body);
 
-    if (!validated.success) {
-      throw new ApiError('Invalid input: ' + validated.error.message, 400);
-    }
+    if (!validated.success) { throw validated.error; }
 
     // Find student ID linked to this user
     const student = await prisma.student.findUnique({

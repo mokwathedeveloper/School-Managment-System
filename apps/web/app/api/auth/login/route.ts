@@ -13,9 +13,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const validated = loginSchema.safeParse(body);
 
-    if (!validated.success) {
-      throw new ApiError('Invalid input', 400);
-    }
+    if (!validated.success) { throw validated.error; }
 
     const { email, password } = validated.data;
     const user = await AuthService.validateUser(email, password);

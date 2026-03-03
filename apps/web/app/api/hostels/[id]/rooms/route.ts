@@ -40,9 +40,7 @@ export async function POST(
     const body = await req.json();
     const validated = createRoomSchema.safeParse(body);
     
-    if (!validated.success) {
-      throw new ApiError('Invalid input: ' + validated.error.message, 400);
-    }
+    if (!validated.success) { throw validated.error; }
 
     const result = await HostelsService.createRoom(tenantId, params.id, validated.data);
     return NextResponse.json(result, { status: 201 });

@@ -19,9 +19,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const validated = applicationSchema.safeParse(body);
 
-    if (!validated.success) {
-      throw new ApiError('Invalid application data', 400);
-    }
+    if (!validated.success) { throw validated.error; }
 
     const result = await AdmissionsService.create(validated.data);
     return NextResponse.json(result, { status: 201 });

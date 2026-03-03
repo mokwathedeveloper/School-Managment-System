@@ -26,9 +26,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const validated = markAttendanceSchema.safeParse(body);
 
-    if (!validated.success) {
-      throw new ApiError('Invalid input: ' + validated.error.message, 400);
-    }
+    if (!validated.success) { throw validated.error; }
 
     const result = await AttendanceService.markAttendance({
       school_id: tenantId,

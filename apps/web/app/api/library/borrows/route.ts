@@ -19,9 +19,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const validated = createBorrowSchema.safeParse(body);
     
-    if (!validated.success) {
-      throw new ApiError('Invalid input: ' + validated.error.message, 400);
-    }
+    if (!validated.success) { throw validated.error; }
     
     const result = await LibraryService.createBorrow(tenantId, validated.data);
     return NextResponse.json(result, { status: 201 });

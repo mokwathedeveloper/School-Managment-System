@@ -46,9 +46,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const validated = createEventSchema.safeParse(body);
     
-    if (!validated.success) {
-      throw new ApiError('Invalid input', 400);
-    }
+    if (!validated.success) { throw validated.error; }
     
     // Validate date logic
     if (validated.data.start_date > validated.data.end_date) {

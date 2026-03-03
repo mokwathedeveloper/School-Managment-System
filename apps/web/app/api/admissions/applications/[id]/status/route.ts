@@ -23,9 +23,7 @@ export async function PATCH(
     const body = await req.json();
     const validated = updateStatusSchema.safeParse(body);
     
-    if (!validated.success) {
-      throw new ApiError('Invalid input: ' + validated.error.message, 400);
-    }
+    if (!validated.success) { throw validated.error; }
     
     const result = await AdmissionsService.updateStatus(
         tenantId, 

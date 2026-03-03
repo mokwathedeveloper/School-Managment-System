@@ -27,9 +27,7 @@ export async function PATCH(
     const body = await req.json();
     const validated = gradeSchema.safeParse(body);
 
-    if (!validated.success) {
-      throw new ApiError('Invalid input: ' + validated.error.message, 400);
-    }
+    if (!validated.success) { throw validated.error; }
 
     // Find staff ID linked to this user
     const staff = await prisma.staff.findUnique({

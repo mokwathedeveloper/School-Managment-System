@@ -57,9 +57,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const validated = createAssignmentSchema.safeParse(body);
 
-    if (!validated.success) {
-      throw new ApiError('Invalid input: ' + validated.error.message, 400);
-    }
+    if (!validated.success) { throw validated.error; }
 
     let subjectId = validated.data.subject_id;
     if (!subjectId) {

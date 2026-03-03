@@ -38,9 +38,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const validated = createSubjectSchema.safeParse(body);
     
-    if (!validated.success) {
-      throw new ApiError('Invalid input: ' + validated.error.message, 400);
-    }
+    if (!validated.success) { throw validated.error; }
     
     const subject = await prisma.subject.create({
       data: {

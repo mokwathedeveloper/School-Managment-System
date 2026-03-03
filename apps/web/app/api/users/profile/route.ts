@@ -36,9 +36,7 @@ export async function PATCH(req: NextRequest) {
     const body = await req.json();
     const validated = updateProfileSchema.safeParse(body);
     
-    if (!validated.success) {
-      throw new ApiError('Invalid input: ' + validated.error.message, 400);
-    }
+    if (!validated.success) { throw validated.error; }
 
     const updatedUser = await UsersService.update(session!.userId, validated.data);
     
