@@ -17,6 +17,12 @@ import {
 import { Activity } from 'lucide-react';
 
 export function AdminView({ stats }: { stats: any }) {
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const attendanceData = [
     { name: 'Mon', rate: 92 },
     { name: 'Tue', rate: 95 },
@@ -53,38 +59,42 @@ export function AdminView({ stats }: { stats: any }) {
                     </div>
                 </div>
                 <div className="h-[320px] w-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={attendanceData}>
-                            <defs>
-                                <linearGradient id="colorRate" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#2563eb" stopOpacity={0.15}/>
-                                    <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
-                                </linearGradient>
-                            </defs>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                            <XAxis 
-                                dataKey="name" 
-                                axisLine={false} 
-                                tickLine={false} 
-                                tick={{ fontSize: 10, fontWeight: 800, fill: '#94a3b8' }}
-                                dy={15}
-                            />
-                            <YAxis hide domain={[0, 100]} />
-                            <Tooltip 
-                                cursor={{ stroke: '#2563eb', strokeWidth: 2, strokeDasharray: '5 5' }}
-                                contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 20px 40px -12px rgb(0 0 0 / 0.1)' }}
-                            />
-                            <Area 
-                                type="monotone" 
-                                dataKey="rate" 
-                                stroke="#2563eb" 
-                                strokeWidth={5}
-                                fillOpacity={1} 
-                                fill="url(#colorRate)" 
-                                animationDuration={2000}
-                            />
-                        </AreaChart>
-                    </ResponsiveContainer>
+                    {mounted ? (
+                        <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={attendanceData}>
+                                <defs>
+                                    <linearGradient id="colorRate" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#2563eb" stopOpacity={0.15}/>
+                                        <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                <XAxis 
+                                    dataKey="name" 
+                                    axisLine={false} 
+                                    tickLine={false} 
+                                    tick={{ fontSize: 10, fontWeight: 800, fill: '#94a3b8' }}
+                                    dy={15}
+                                />
+                                <YAxis hide domain={[0, 100]} />
+                                <Tooltip 
+                                    cursor={{ stroke: '#2563eb', strokeWidth: 2, strokeDasharray: '5 5' }}
+                                    contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 20px 40px -12px rgb(0 0 0 / 0.1)' }}
+                                />
+                                <Area 
+                                    type="monotone" 
+                                    dataKey="rate" 
+                                    stroke="#2563eb" 
+                                    strokeWidth={5}
+                                    fillOpacity={1} 
+                                    fill="url(#colorRate)" 
+                                    animationDuration={2000}
+                                />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    ) : (
+                        <div className="w-full h-full bg-slate-50 animate-pulse rounded-[2rem]" />
+                    )}
                 </div>
             </div>
         </div>

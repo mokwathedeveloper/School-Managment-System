@@ -24,7 +24,12 @@ import {
 } from 'recharts';
 
 export function SuperAdminView({ stats }: { stats: any }) {
+  const [mounted, setMounted] = React.useState(false);
   const overview = stats?.overview;
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
   
   const insights = [
     {
@@ -97,38 +102,42 @@ export function SuperAdminView({ stats }: { stats: any }) {
                     <Badge className="bg-blue-50 text-blue-600 border-blue-100 rounded-full px-4 py-1 text-[10px] font-black uppercase tracking-widest">Platform Stats</Badge>
                 </div>
                 <div className="h-[320px] w-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={stats?.finance?.monthlyTrends || []}>
-                            <defs>
-                                <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#2563eb" stopOpacity={0.15}/>
-                                    <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
-                                </linearGradient>
-                            </defs>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                            <XAxis 
-                                dataKey="month" 
-                                axisLine={false} 
-                                tickLine={false} 
-                                tick={{ fontSize: 10, fontWeight: 800, fill: '#94a3b8' }}
-                                dy={15}
-                            />
-                            <YAxis hide />
-                            <Tooltip 
-                                cursor={{ stroke: '#2563eb', strokeWidth: 2, strokeDasharray: '5 5' }}
-                                contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 20px 40px -12px rgb(0 0 0 / 0.1)' }}
-                            />
-                            <Area 
-                                type="monotone" 
-                                dataKey="revenue" 
-                                stroke="#2563eb" 
-                                strokeWidth={5}
-                                fillOpacity={1} 
-                                fill="url(#colorRev)" 
-                                animationDuration={2000}
-                            />
-                        </AreaChart>
-                    </ResponsiveContainer>
+                    {mounted ? (
+                        <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={stats?.finance?.monthlyTrends || []}>
+                                <defs>
+                                    <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#2563eb" stopOpacity={0.15}/>
+                                        <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                <XAxis 
+                                    dataKey="month" 
+                                    axisLine={false} 
+                                    tickLine={false} 
+                                    tick={{ fontSize: 10, fontWeight: 800, fill: '#94a3b8' }}
+                                    dy={15}
+                                />
+                                <YAxis hide />
+                                <Tooltip 
+                                    cursor={{ stroke: '#2563eb', strokeWidth: 2, strokeDasharray: '5 5' }}
+                                    contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 20px 40px -12px rgb(0 0 0 / 0.1)' }}
+                                />
+                                <Area 
+                                    type="monotone" 
+                                    dataKey="revenue" 
+                                    stroke="#2563eb" 
+                                    strokeWidth={5}
+                                    fillOpacity={1} 
+                                    fill="url(#colorRev)" 
+                                    animationDuration={2000}
+                                />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    ) : (
+                        <div className="w-full h-full bg-slate-50 animate-pulse rounded-[2rem]" />
+                    )}
                 </div>
             </div>
         </div>
