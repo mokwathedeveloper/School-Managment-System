@@ -7,7 +7,7 @@ import { handleApiError, ApiError } from '@/lib/server/api-utils';
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession(req);
-    const tenantId = enforceTenant(session);
+    const tenantId = enforceTenant(session) as string;
     
     // RBAC: Only Admin/Staff can view reports
     enforceRole(session, ROLE_GROUPS.STAFF);

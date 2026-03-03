@@ -16,7 +16,7 @@ const createConductRecordSchema = z.object({
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession(req);
-    const tenantId = enforceTenant(session);
+    const tenantId = enforceTenant(session) as string;
     
     // Check role here if needed
     
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const session = await getSession(req);
-    if (!session) throw new ApiError('Unauthorized', 401);
+    const tenantId = enforceTenant(session) as string;
     
     // Only Staff/Admins can report conduct issues
     enforceRole(session, ROLE_GROUPS.STAFF);
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
       throw new ApiError('Invalid input', 400);
     }
     
-    const result = await ConductService.create(tenantId, validated.data, session.userId);
+    const result = await ConductService.create(tenantId, validated.data, session!.userId);
     return NextResponse.json(result, { status: 201 });
   } catch (error) { 
     return handleApiError(error); 

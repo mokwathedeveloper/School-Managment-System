@@ -15,7 +15,7 @@ const createClassSchema = z.object({
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession(req);
-    const tenantId = enforceTenant(session);
+    const tenantId = enforceTenant(session) as string;
 
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
@@ -36,10 +36,10 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const session = await getSession(req);
-    if (!session) throw new ApiError('Unauthorized', 401);
-    
+    const tenantId = enforceTenant(session) as string;
+
     // RBAC: Only Admin/SuperAdmin/HeadTeacher can create classes
-    enforceRole(session, ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'HEAD_TEACHER', 'DEPUTY_HEAD_TEACHER']);
+    enforceRole(session, ROLE_GROUPS.LEADERSHIP);
 
     const body = await req.json();
     const validated = createClassSchema.safeParse(body);
@@ -54,3 +54,4 @@ export async function POST(req: NextRequest) {
     return handleApiError(error);
   }
 }
+

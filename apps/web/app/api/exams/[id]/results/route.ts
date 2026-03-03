@@ -11,7 +11,7 @@ export async function GET(
 ) {
   try {
     const session = await getSession(req);
-    const tenantId = enforceTenant(session);
+    const tenantId = enforceTenant(session) as string;
 
     const exam = await ExamsService.findOne(tenantId, params.id);
     if (!exam) throw new ApiError('Exam not found', 404);
@@ -28,6 +28,7 @@ export async function POST(
 ) {
   try {
     const session = await getSession(req);
+    const tenantId = enforceTenant(session) as string;
     if (!session) throw new ApiError('Unauthorized', 401);
 
     const { records } = await req.json();

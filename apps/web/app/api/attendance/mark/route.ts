@@ -18,7 +18,7 @@ const markAttendanceSchema = z.object({
 export async function POST(req: NextRequest) {
   try {
     const session = await getSession(req);
-    const tenantId = enforceTenant(session);
+    const tenantId = enforceTenant(session) as string;
 
     // RBAC: Only admin or staff (teachers) can mark attendance
     enforceRole(session, ROLE_GROUPS.STAFF);

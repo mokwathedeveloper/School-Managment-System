@@ -10,7 +10,7 @@ export async function GET(
 ) {
   try {
     const session = await getSession(req);
-    const tenantId = enforceTenant(session);
+    const tenantId = enforceTenant(session) as string;
 
     const { searchParams } = new URL(req.url);
     const dateStr = searchParams.get('date');
