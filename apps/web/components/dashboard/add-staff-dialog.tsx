@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Loader2, UserCog, Mail, User, Briefcase, Shield } from 'lucide-react';
+import { Plus, Loader2, UserCog, Mail, User, Briefcase, Shield, Lock } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
 import { toast } from 'react-hot-toast';
@@ -20,7 +20,8 @@ export function AddStaffDialog() {
     email: '',
     designation: '',
     department: '',
-    role: 'TEACHER'
+    role: 'TEACHER',
+    password: '',
   });
 
   const createStaffMutation = useMutation({
@@ -35,7 +36,8 @@ export function AddStaffDialog() {
         email: '', 
         designation: '', 
         department: '', 
-        role: 'TEACHER' 
+        role: 'TEACHER',
+        password: '',
       });
     },
     onError: (error: any) => {
@@ -174,6 +176,24 @@ export function AddStaffDialog() {
                 onChange={(e) => setFormData({...formData, department: e.target.value})}
               />
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="staff_password" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Temporal Password</Label>
+            <div className="relative group">
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
+              <Input 
+                  id="staff_password" 
+                  type="password"
+                  placeholder="••••••••"
+                  className="h-12 pl-12 rounded-xl border-2 border-slate-50 focus:ring-blue-600/10 font-bold"
+                  value={formData.password}
+                  onChange={(e) => setFormData({...formData, password: e.target.value})}
+              />
+            </div>
+            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter ml-1 italic">
+                Leave blank to use default (staff123)
+            </p>
           </div>
 
           <Button type="submit" className="w-full h-14 rounded-2xl shadow-2xl shadow-blue-600/20" variant="premium" disabled={createStaffMutation.isPending}>

@@ -13,6 +13,7 @@ const createStaffSchema = z.object({
   id_number: z.string().optional().or(z.literal('')),
   base_salary: z.number().min(0).optional(),
   role: z.string().optional(),
+  password: z.string().min(6, 'Password must be at least 6 characters').optional(),
 });
 
 export async function GET(req: NextRequest) {
@@ -36,7 +37,7 @@ export async function POST(req: NextRequest) {
     if (!session) throw new ApiError('Unauthorized', 401);
     
     // RBAC: Only Admin/SuperAdmin/HeadTeacher can add staff
-    const allowedRoles = ['SUPER_ADMIN', 'ADMIN', 'HEAD_TEACHER', 'SCHOOL_ADMIN'];
+    const allowedRoles = ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'HEAD_TEACHER', 'DEPUTY_HEAD_TEACHER'];
     if (!allowedRoles.includes(session.role)) {
         throw new ApiError('Forbidden: Insufficient privileges.', 403);
     }

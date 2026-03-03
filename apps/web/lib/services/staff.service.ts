@@ -38,7 +38,7 @@ export const StaffService = {
   },
 
   async create(schoolId: string, data: any) {
-    const passwordHash = await argon2.hash('staff123'); // Default staff password
+    const passwordHash = await argon2.hash(data.password || 'staff123'); // Default staff password if not provided
 
     return prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
