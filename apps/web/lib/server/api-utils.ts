@@ -26,9 +26,3 @@ export function getTenantId(req: NextRequest) {
   // For now, we primarily rely on JWT session schoolId or header
   return null;
 }
-
-export function checkRole(session: any, allowedRoles: string[]) {
-  if (!session || !allowedRoles.includes(session.role)) {
-    throw new ApiError('Forbidden: Insufficient permissions', 403);
-  }
-}
