@@ -42,9 +42,12 @@ export const NotificationService = {
     return notification;
   },
 
-  async getByUser(userId: string, schoolId: string) {
+  async getByUser(userId: string, schoolId?: string) {
     return prisma.notification.findMany({
-      where: { user_id: userId, school_id: schoolId },
+      where: { 
+        user_id: userId,
+        ...(schoolId ? { school_id: schoolId } : {})
+      },
       orderBy: { created_at: 'desc' },
       take: 20,
     });
@@ -57,9 +60,13 @@ export const NotificationService = {
     });
   },
 
-  async markAllAsRead(userId: string, schoolId: string) {
+  async markAllAsRead(userId: string, schoolId?: string) {
     return prisma.notification.updateMany({
-      where: { user_id: userId, school_id: schoolId, is_read: false },
+      where: { 
+        user_id: userId, 
+        ...(schoolId ? { school_id: schoolId } : {}),
+        is_read: false 
+      },
       data: { is_read: true },
     });
   }

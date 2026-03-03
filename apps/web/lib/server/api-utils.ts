@@ -28,6 +28,17 @@ export function handleApiError(error: unknown) {
     }, { status: error.status });
   }
 
+  // Handle Prisma Unique Constraint Errors
+  if (typeof error === 'object' && error !== null && 'code' in error && (error as any).code === 'P2002') {
+    const target = (error as any).meta?.target || ['field'];
+    const field = Array.isArray(target) ? target[target.length - 1] : target;
+    return NextResponse.json({
+      success: false,
+      message: `Conflict: A record with this ${field} already exists.`,
+      fieldErrors: { [field]: [`This ${field} is already in use.`] }
+    }, { status: 409 });
+  }
+
   return NextResponse.json({ 
     success: false, 
     message: error instanceof Error ? error.message : 'Internal Server Error' 
