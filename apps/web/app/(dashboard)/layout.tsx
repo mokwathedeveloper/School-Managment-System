@@ -21,8 +21,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   useEffect(() => {
-    if (!isLoading && !user) {
-      router.push('/login');
+    if (!isLoading) {
+      if (!user) {
+        router.push('/login');
+      } else if (!user.password_changed) {
+        router.push('/setup/password');
+      }
     }
   }, [user, isLoading, router]);
 

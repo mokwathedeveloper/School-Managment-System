@@ -9,6 +9,7 @@ interface AuthContextType {
   user: any;
   login: (credentials: any) => Promise<void>;
   logout: () => void;
+  refreshUser: () => Promise<void>;
   isLoading: boolean;
 }
 
@@ -19,31 +20,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
-    const verifyAuth = async () => {
-      const savedUser = localStorage.getItem('user');
-      const token = Cookies.get('access_token');
-      
-      if (token && savedUser) {
-        try {
-          // If we have a token, we should verify it with the backend
-          // Assuming an endpoint that returns the current user context
-          const response = await apiClient.get('/users/profile');
-          setUser(response.data);
-          localStorage.setItem('user', JSON.stringify(response.data));
-        } catch (error) {
-          console.error('Session validation failed:', error);
-          // If validation fails (e.g., token expired), clear everything
-          logout();
-        }
-      } else {
-        setUser(null);
+  const verifyAuth = async () => {
+    const savedUser = localStorage.getItem('user');
+    const token = Cookies.get('access_token');
+    
+    if (token && savedUser) {
+      try {
+        const response = await apiClient.get('/users/profile');
+        setUser(response.data);
+        localStorage.setItem('user', JSON.stringify(response.data));
+      } catch (error) {
+        console.error('Session validation failed:', error);
+        logout();
       }
-      setIsLoading(false);
-    };
+    } else {
+      setUser(null);
+    }
+    setIsLoading(false);
+  };
 
+  useEffect(() => {
     verifyAuth();
   }, []);
+
+  const refreshUser = async () => {
+    await verifyAuth();
+  };
 
   const login = async (credentials: any) => {
     try {
@@ -61,7 +63,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem('user', JSON.stringify(user));
       setUser(user);
       
-      router.push('/dashboard');
+      if (!user.password_changed) {
+        router.push('/setup/password');
+      } else {
+        router.push('/dashboard');
+      }
     } catch (error: any) {
       if (error.response) {
         console.error('Login API error:', error.response.status, error.response.data);
@@ -82,7 +88,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, login, logout, refreshUser, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
