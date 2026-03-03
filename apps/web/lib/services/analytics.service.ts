@@ -1,16 +1,22 @@
 import prisma from '../db/prisma';
 
 export const AnalyticsService = {
-  async getDashboardStats(schoolId: string) {
+  async getDashboardStats(schoolId: string | null) {
     const now = new Date();
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(now.getMonth() - 5);
     sixMonthsAgo.setDate(1);
     sixMonthsAgo.setHours(0, 0, 0, 0);
 
+    const filterId = schoolId || undefined;
+    const where: any = { school_id: filterId };
+    const whereNested: any = { student: { school_id: filterId } };
+    const whereBooks: any = { copy: { book: { school_id: filterId } } };
+
     const [
       studentCount, 
       staffCount,
+      schoolCount,
       invoices, 
       expenses,
       results,
@@ -18,27 +24,28 @@ export const AnalyticsService = {
       books,
       borrows
     ] = await Promise.all([
-      prisma.student.count({ where: { school_id: schoolId } }),
-      prisma.staff.count({ where: { school_id: schoolId } }),
+      prisma.student.count({ where }),
+      prisma.staff.count({ where }),
+      !schoolId ? prisma.school.count() : Promise.resolve(0),
       prisma.invoice.findMany({ 
-        where: { school_id: schoolId, created_at: { gte: sixMonthsAgo } },
+        where: { ...where, created_at: { gte: sixMonthsAgo } },
         select: { amount: true, status: true, created_at: true }
       }),
       prisma.expense.findMany({
-        where: { school_id: schoolId, date: { gte: sixMonthsAgo } },
+        where: { ...where, date: { gte: sixMonthsAgo } },
         select: { amount: true, date: true }
       }),
       prisma.result.findMany({ 
-        where: { student: { school_id: schoolId } },
+        where: whereNested,
         include: { exam: { include: { subject: true } } }
       }),
       prisma.attendance.findMany({
-        where: { school_id: schoolId, date: { gte: sixMonthsAgo } },
+        where: { ...where, date: { gte: sixMonthsAgo } },
         select: { status: true, date: true }
       }),
-      prisma.book.count({ where: { school_id: schoolId } }),
+      prisma.book.count({ where }),
       prisma.borrowRecord.count({ 
-        where: { copy: { book: { school_id: schoolId } }, status: 'BORROWED' } 
+        where: { ...whereBooks, status: 'BORROWED' } 
       })
     ]);
 
@@ -76,7 +83,7 @@ export const AnalyticsService = {
     // Enrollment Trend
     const recentStudents = await prisma.student.findMany({
       where: { 
-        school_id: schoolId,
+        school_id: filterId,
         created_at: { gte: sixMonthsAgo }
       },
       select: { created_at: true }
@@ -127,6 +134,7 @@ export const AnalyticsService = {
       overview: {
         totalStudents: studentCount,
         totalStaff: staffCount,
+        totalSchools: schoolCount,
         staffStudentRatio: studentCount > 0 ? (staffCount / studentCount).toFixed(2) : 0,
         attendanceRate: Math.round(attendanceRate),
         libraryAssets: books,

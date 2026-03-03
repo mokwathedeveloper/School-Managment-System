@@ -10,6 +10,7 @@ import { ActionCenter } from '@/components/dashboard/action-center';
 import { ActivityFeed } from '@/components/dashboard/activity-feed';
 
 // Role-specific views
+import { SuperAdminView } from '@/components/dashboard/role-views/super-admin-view';
 import { AdminView } from '@/components/dashboard/role-views/admin-view';
 import { TeacherView } from '@/components/dashboard/role-views/teacher-view';
 import { LibrarianView } from '@/components/dashboard/role-views/librarian-view';
@@ -36,6 +37,7 @@ export default function DashboardPage() {
   const renderRoleView = () => {
     switch (user?.role) {
       case 'SUPER_ADMIN':
+        return <SuperAdminView stats={stats} />;
       case 'SCHOOL_ADMIN':
       case 'HEAD_TEACHER':
       case 'DEPUTY_HEAD_TEACHER':

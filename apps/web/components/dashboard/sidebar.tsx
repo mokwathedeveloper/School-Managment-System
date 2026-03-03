@@ -63,6 +63,7 @@ export function Sidebar({ collapsed = false, onClose, onToggle }: SidebarProps) 
     { name: 'Terminal Home', href: '/dashboard', icon: LayoutDashboard, roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'HEAD_TEACHER', 'DEPUTY_HEAD_TEACHER', 'TEACHER', 'CLASS_TEACHER', 'PARENT', 'STUDENT', 'LIBRARIAN', 'NURSE', 'MATRON', 'SECURITY', 'DRIVER', 'SUBORDINATE', 'ACCOUNTANT'] },
     { name: 'Platform Admin', href: '/dashboard/super-admin', icon: ShieldCheck, roles: ['SUPER_ADMIN'] },
     { name: 'Student Enrollment', href: '/dashboard/students', icon: GraduationCap, roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'HEAD_TEACHER', 'DEPUTY_HEAD_TEACHER', 'TEACHER', 'CLASS_TEACHER'] },
+    { name: 'Guardian Registry', href: '/dashboard/parents', icon: Users, roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'HEAD_TEACHER', 'DEPUTY_HEAD_TEACHER', 'TEACHER', 'CLASS_TEACHER'] },
     { name: 'Academic Hierarchy', href: '/dashboard/grade-levels', icon: Layers, roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'HEAD_TEACHER', 'DEPUTY_HEAD_TEACHER'] },
     { name: 'Class Management', href: '/dashboard/classes', icon: BookOpen, roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'HEAD_TEACHER', 'DEPUTY_HEAD_TEACHER', 'TEACHER', 'CLASS_TEACHER'] },
     { name: 'Admissions Pipeline', href: '/dashboard/admissions', icon: ClipboardList, roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'HEAD_TEACHER'] },
