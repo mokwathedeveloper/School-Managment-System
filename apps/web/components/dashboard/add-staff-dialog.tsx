@@ -24,12 +24,15 @@ export function AddStaffDialog() {
     password: '',
   });
 
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+
   const createStaffMutation = useMutation({
     mutationFn: async (data: any) => api.post('/hr/directory', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['hr-directory'] });
       toast.success('Personnel record has been successfully onboarded.');
       setOpen(false);
+      setFieldErrors({});
       setFormData({ 
         first_name: '', 
         last_name: '', 
@@ -41,12 +44,18 @@ export function AddStaffDialog() {
       });
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to onboard staff');
+      if (error.response?.data?.fieldErrors) {
+        setFieldErrors(error.response.data.fieldErrors);
+        toast.error('Validation failed. Please check the highlighted fields.');
+      } else {
+        toast.error(error.response?.data?.message || 'Failed to onboard staff');
+      }
     }
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setFieldErrors({});
     createStaffMutation.mutate(formData);
   };
 
@@ -91,54 +100,57 @@ export function AddStaffDialog() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="s_first_name" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">First Name</Label>
+              <Label htmlFor="s_first_name" className={`text-[10px] font-black uppercase tracking-widest ml-1 ${fieldErrors.first_name ? 'text-rose-500' : 'text-slate-400'}`}>First Name</Label>
               <div className="relative group">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
+                <User className={`absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors ${fieldErrors.first_name ? 'text-rose-500' : 'text-slate-300 group-focus-within:text-blue-600'}`} />
                 <Input 
                     id="s_first_name" 
                     required 
-                    className="h-12 pl-12 rounded-xl border-2 border-slate-50 focus:ring-blue-600/10 font-bold"
+                    className={`h-12 pl-12 rounded-xl border-2 font-bold ${fieldErrors.first_name ? 'border-rose-500/50 bg-rose-50/50 focus:ring-rose-500/20' : 'border-slate-50 focus:ring-blue-600/10'}`}
                     value={formData.first_name}
                     onChange={(e) => setFormData({...formData, first_name: e.target.value})}
                 />
               </div>
+              {fieldErrors.first_name && <p className="text-[10px] font-bold text-rose-500 mt-1 ml-1">{fieldErrors.first_name[0]}</p>}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="s_last_name" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Last Name</Label>
+              <Label htmlFor="s_last_name" className={`text-[10px] font-black uppercase tracking-widest ml-1 ${fieldErrors.last_name ? 'text-rose-500' : 'text-slate-400'}`}>Last Name</Label>
               <Input 
                 id="s_last_name" 
                 required 
-                className="h-12 rounded-xl border-2 border-slate-50 focus:ring-blue-600/10 font-bold"
+                className={`h-12 rounded-xl border-2 font-bold ${fieldErrors.last_name ? 'border-rose-500/50 bg-rose-50/50 focus:ring-rose-500/20' : 'border-slate-50 focus:ring-blue-600/10'}`}
                 value={formData.last_name}
                 onChange={(e) => setFormData({...formData, last_name: e.target.value})}
               />
+              {fieldErrors.last_name && <p className="text-[10px] font-bold text-rose-500 mt-1 ml-1">{fieldErrors.last_name[0]}</p>}
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
-                <Label htmlFor="s_email" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Official Email</Label>
+                <Label htmlFor="s_email" className={`text-[10px] font-black uppercase tracking-widest ml-1 ${fieldErrors.email ? 'text-rose-500' : 'text-slate-400'}`}>Official Email</Label>
                 <div className="relative group">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
+                    <Mail className={`absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors ${fieldErrors.email ? 'text-rose-500' : 'text-slate-300 group-focus-within:text-blue-600'}`} />
                     <Input 
                         id="s_email" 
                         type="email" 
                         required 
                         placeholder="name@school.com"
-                        className="h-12 pl-12 rounded-xl border-2 border-slate-50 focus:ring-blue-600/10 font-bold"
+                        className={`h-12 pl-12 rounded-xl border-2 font-bold ${fieldErrors.email ? 'border-rose-500/50 bg-rose-50/50 focus:ring-rose-500/20' : 'border-slate-50 focus:ring-blue-600/10'}`}
                         value={formData.email}
                         onChange={(e) => setFormData({...formData, email: e.target.value})}
                     />
                 </div>
+                {fieldErrors.email && <p className="text-[10px] font-bold text-rose-500 mt-1 ml-1">{fieldErrors.email[0]}</p>}
             </div>
             <div className="space-y-2">
-                <Label htmlFor="s_role" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Access Role</Label>
+                <Label htmlFor="s_role" className={`text-[10px] font-black uppercase tracking-widest ml-1 ${fieldErrors.role ? 'text-rose-500' : 'text-slate-400'}`}>Access Role</Label>
                 <div className="relative group">
-                    <Shield className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors z-10" />
+                    <Shield className={`absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors z-10 ${fieldErrors.role ? 'text-rose-500' : 'text-slate-300 group-focus-within:text-blue-600'}`} />
                     <FormSelect 
                         id="s_role"
                         required
-                        className="h-12 pl-12 rounded-xl border-2 border-slate-50 focus:ring-blue-600/10 font-bold"
+                        className={`h-12 pl-12 rounded-xl border-2 font-bold ${fieldErrors.role ? 'border-rose-500/50 bg-rose-50/50 focus:ring-rose-500/20' : 'border-slate-50 focus:ring-blue-600/10'}`}
                         value={formData.role}
                         onChange={(e) => setFormData({...formData, role: e.target.value})}
                     >
@@ -147,53 +159,60 @@ export function AddStaffDialog() {
                         ))}
                     </FormSelect>
                 </div>
+                {fieldErrors.role && <p className="text-[10px] font-bold text-rose-500 mt-1 ml-1">{fieldErrors.role[0]}</p>}
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="designation" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Designation</Label>
+              <Label htmlFor="designation" className={`text-[10px] font-black uppercase tracking-widest ml-1 ${fieldErrors.designation ? 'text-rose-500' : 'text-slate-400'}`}>Designation</Label>
               <div className="relative group">
-                <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
+                <Briefcase className={`absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors ${fieldErrors.designation ? 'text-rose-500' : 'text-slate-300 group-focus-within:text-blue-600'}`} />
                 <Input 
                     id="designation" 
                     placeholder="e.g. Senior Teacher"
                     required 
-                    className="h-12 pl-12 rounded-xl border-2 border-slate-50 focus:ring-blue-600/10 font-bold"
+                    className={`h-12 pl-12 rounded-xl border-2 font-bold ${fieldErrors.designation ? 'border-rose-500/50 bg-rose-50/50 focus:ring-rose-500/20' : 'border-slate-50 focus:ring-blue-600/10'}`}
                     value={formData.designation}
                     onChange={(e) => setFormData({...formData, designation: e.target.value})}
                 />
               </div>
+              {fieldErrors.designation && <p className="text-[10px] font-bold text-rose-500 mt-1 ml-1">{fieldErrors.designation[0]}</p>}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="department" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Department</Label>
+              <Label htmlFor="department" className={`text-[10px] font-black uppercase tracking-widest ml-1 ${fieldErrors.department ? 'text-rose-500' : 'text-slate-400'}`}>Department</Label>
               <Input 
                 id="department" 
                 placeholder="e.g. Sciences"
                 required 
-                className="h-12 rounded-xl border-2 border-slate-50 focus:ring-blue-600/10 font-bold"
+                className={`h-12 rounded-xl border-2 font-bold ${fieldErrors.department ? 'border-rose-500/50 bg-rose-50/50 focus:ring-rose-500/20' : 'border-slate-50 focus:ring-blue-600/10'}`}
                 value={formData.department}
                 onChange={(e) => setFormData({...formData, department: e.target.value})}
               />
+              {fieldErrors.department && <p className="text-[10px] font-bold text-rose-500 mt-1 ml-1">{fieldErrors.department[0]}</p>}
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="staff_password" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Temporal Password</Label>
+            <Label htmlFor="staff_password" className={`text-[10px] font-black uppercase tracking-widest ml-1 ${fieldErrors.password ? 'text-rose-500' : 'text-slate-400'}`}>Temporal Password</Label>
             <div className="relative group">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
+              <Lock className={`absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors ${fieldErrors.password ? 'text-rose-500' : 'text-slate-300 group-focus-within:text-blue-600'}`} />
               <Input 
                   id="staff_password" 
                   type="password"
                   placeholder="••••••••"
-                  className="h-12 pl-12 rounded-xl border-2 border-slate-50 focus:ring-blue-600/10 font-bold"
+                  className={`h-12 pl-12 rounded-xl border-2 font-bold ${fieldErrors.password ? 'border-rose-500/50 bg-rose-50/50 focus:ring-rose-500/20' : 'border-slate-50 focus:ring-blue-600/10'}`}
                   value={formData.password}
                   onChange={(e) => setFormData({...formData, password: e.target.value})}
               />
             </div>
-            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter ml-1 italic">
-                Leave blank to use default (staff123)
-            </p>
+            {fieldErrors.password ? (
+                <p className="text-[10px] font-bold text-rose-500 mt-1 ml-1">{fieldErrors.password[0]}</p>
+            ) : (
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter ml-1 italic">
+                    Leave blank to use default (staff123)
+                </p>
+            )}
           </div>
 
           <Button type="submit" className="w-full h-14 rounded-2xl shadow-2xl shadow-blue-600/20" variant="premium" disabled={createStaffMutation.isPending}>

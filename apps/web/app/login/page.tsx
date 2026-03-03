@@ -11,15 +11,22 @@ import { toast } from 'react-hot-toast';
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const { login, isLoading } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFieldErrors({});
     try {
       await login({ email, password });
       toast.success('Access granted. Welcome to the institutional terminal.');
     } catch (error: any) {
-      toast.error(error.message || 'Authentication failed. Please verify credentials.');
+      if (error.response?.data?.fieldErrors) {
+        setFieldErrors(error.response.data.fieldErrors);
+        toast.error('Validation failed. Please check the highlighted fields.');
+      } else {
+        toast.error(error.response?.data?.message || error.message || 'Authentication failed. Please verify credentials.');
+      }
     }
   };
 
@@ -51,39 +58,46 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">Official Email</Label>
+              <Label htmlFor="email" className={`text-[10px] font-black uppercase tracking-[0.2em] ml-1 ${fieldErrors.email ? 'text-rose-500' : 'text-slate-500'}`}>Official Email</Label>
               <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+                <Mail className={`absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors ${fieldErrors.email ? 'text-rose-500' : 'text-slate-400 group-focus-within:text-blue-600'}`} />
                 <Input 
                   id="email" 
                   type="email" 
                   placeholder="admin@school.com" 
-                  className="h-14 pl-12 rounded-2xl border-2 border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-blue-600/10 transition-all font-bold text-slate-900"
+                  className={`h-14 pl-12 rounded-2xl border-2 transition-all font-bold text-slate-900 ${fieldErrors.email ? 'border-rose-500/50 bg-rose-50/50 focus:ring-rose-500/20' : 'border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-blue-600/10'}`}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>
+              {fieldErrors.email && (
+                <p className="text-[10px] font-bold text-rose-500 mt-1 ml-1">{fieldErrors.email[0]}</p>
+              )}
             </div>
 
             <div className="space-y-2">
               <div className="flex justify-between items-center ml-1">
-                <Label htmlFor="password" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Security Password</Label>
+                <Label htmlFor="password" className={`text-[10px] font-black uppercase tracking-[0.2em] ${fieldErrors.password ? 'text-rose-500' : 'text-slate-500'}`}>Security Password</Label>
                 <button type="button" className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline">Forgot?</button>
               </div>
               <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+                <Lock className={`absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors ${fieldErrors.password ? 'text-rose-500' : 'text-slate-400 group-focus-within:text-blue-600'}`} />
                 <Input 
                   id="password" 
                   type="password" 
                   placeholder="••••••••" 
-                  className="h-14 pl-12 rounded-2xl border-2 border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-blue-600/10 transition-all font-bold text-slate-900"
+                  className={`h-14 pl-12 rounded-2xl border-2 transition-all font-bold text-slate-900 ${fieldErrors.password ? 'border-rose-500/50 bg-rose-50/50 focus:ring-rose-500/20' : 'border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-blue-600/10'}`}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
               </div>
+              {fieldErrors.password && (
+                <p className="text-[10px] font-bold text-rose-500 mt-1 ml-1">{fieldErrors.password[0]}</p>
+              )}
             </div>
+
 
             <Button 
               type="submit" 
