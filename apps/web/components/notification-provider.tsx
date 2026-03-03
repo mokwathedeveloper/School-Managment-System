@@ -30,7 +30,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || typeof window === 'undefined') return;
 
     // 1. Initial fetch of notifications
     const fetchNotifications = async () => {
@@ -55,8 +55,6 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 
     const pusher = new Pusher(pusherKey, {
       cluster: pusherCluster,
-      // In a more secure app, you'd use user-specific channels and auth
-      // For now, we use user-{userId} channel
     });
 
     const channel = pusher.subscribe(`user-${user.id}`);
@@ -64,7 +62,6 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     channel.bind('notification:new', (newNotification: Notification) => {
       setNotifications(prev => [newNotification, ...prev].slice(0, 20));
       
-      // Visual feedback
       toast.custom((t) => (
         <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full bg-white shadow-2xl rounded-[1.5rem] pointer-events-auto flex ring-1 ring-black ring-opacity-5 p-6 border-l-8 border-blue-600`}>
           <div className="flex-1 w-0">
