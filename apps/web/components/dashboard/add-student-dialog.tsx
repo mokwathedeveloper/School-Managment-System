@@ -14,6 +14,7 @@ import { FormSelect } from '@/components/ui/form-select';
 export function AddStudentDialog() {
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -48,6 +49,7 @@ export function AddStudentDialog() {
       queryClient.invalidateQueries({ queryKey: ['students'] });
       toast.success('Student record has been successfully initialized.');
       setOpen(false);
+      setFieldErrors({});
       setFormData({ 
         first_name: '', 
         last_name: '', 
@@ -59,12 +61,18 @@ export function AddStudentDialog() {
       });
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to add student');
+      if (error.response?.data?.fieldErrors) {
+        setFieldErrors(error.response.data.fieldErrors);
+        toast.error('Validation failed. Please check the highlighted fields.');
+      } else {
+        toast.error(error.response?.data?.message || 'Failed to add student');
+      }
     }
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setFieldErrors({});
     createStudentMutation.mutate(formData);
   };
 
@@ -94,69 +102,73 @@ export function AddStudentDialog() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="first_name" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">First Name</Label>
+              <Label htmlFor="first_name" className={`text-[10px] font-black uppercase tracking-widest ml-1 ${fieldErrors.first_name ? 'text-rose-500' : 'text-slate-400'}`}>First Name</Label>
               <div className="relative group">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
+                <User className={`absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors ${fieldErrors.first_name ? 'text-rose-500' : 'text-slate-300 group-focus-within:text-blue-600'}`} />
                 <Input 
                     id="first_name" 
                     required 
-                    className="h-12 pl-12 rounded-xl border-2 border-slate-50 focus:ring-blue-600/10 font-bold"
+                    className={`h-12 pl-12 rounded-xl border-2 font-bold ${fieldErrors.first_name ? 'border-rose-500/50 bg-rose-50/50 focus:ring-rose-500/20' : 'border-slate-50 focus:ring-blue-600/10'}`}
                     value={formData.first_name}
                     onChange={(e) => setFormData({...formData, first_name: e.target.value})}
                 />
               </div>
+              {fieldErrors.first_name && <p className="text-[10px] font-bold text-rose-500 mt-1 ml-1">{fieldErrors.first_name[0]}</p>}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="last_name" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Last Name</Label>
+              <Label htmlFor="last_name" className={`text-[10px] font-black uppercase tracking-widest ml-1 ${fieldErrors.last_name ? 'text-rose-500' : 'text-slate-400'}`}>Last Name</Label>
               <Input 
                 id="last_name" 
                 required 
-                className="h-12 rounded-xl border-2 border-slate-50 focus:ring-blue-600/10 font-bold"
+                className={`h-12 rounded-xl border-2 font-bold ${fieldErrors.last_name ? 'border-rose-500/50 bg-rose-50/50 focus:ring-rose-500/20' : 'border-slate-50 focus:ring-blue-600/10'}`}
                 value={formData.last_name}
                 onChange={(e) => setFormData({...formData, last_name: e.target.value})}
               />
+              {fieldErrors.last_name && <p className="text-[10px] font-bold text-rose-500 mt-1 ml-1">{fieldErrors.last_name[0]}</p>}
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Parental Email</Label>
+            <Label htmlFor="email" className={`text-[10px] font-black uppercase tracking-widest ml-1 ${fieldErrors.email ? 'text-rose-500' : 'text-slate-400'}`}>Parental Email</Label>
             <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
+                <Mail className={`absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors ${fieldErrors.email ? 'text-rose-500' : 'text-slate-300 group-focus-within:text-blue-600'}`} />
                 <Input 
                     id="email" 
                     type="email" 
                     required 
                     placeholder="guardian@example.com"
-                    className="h-12 pl-12 rounded-xl border-2 border-slate-50 focus:ring-blue-600/10 font-bold"
+                    className={`h-12 pl-12 rounded-xl border-2 font-bold ${fieldErrors.email ? 'border-rose-500/50 bg-rose-50/50 focus:ring-rose-500/20' : 'border-slate-50 focus:ring-blue-600/10'}`}
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
                 />
             </div>
+            {fieldErrors.email && <p className="text-[10px] font-bold text-rose-500 mt-1 ml-1">{fieldErrors.email[0]}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="admission_no" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Admission Number</Label>
+            <Label htmlFor="admission_no" className={`text-[10px] font-black uppercase tracking-widest ml-1 ${fieldErrors.admission_no ? 'text-rose-500' : 'text-slate-400'}`}>Admission Number</Label>
             <div className="relative group">
-                <Fingerprint className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
+                <Fingerprint className={`absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors ${fieldErrors.admission_no ? 'text-rose-500' : 'text-slate-300 group-focus-within:text-blue-600'}`} />
                 <Input 
                     id="admission_no" 
                     required 
                     placeholder="e.g. SCH-2024-001"
-                    className="h-12 pl-12 rounded-xl border-2 border-slate-50 focus:ring-blue-600/10 font-mono font-bold"
+                    className={`h-12 pl-12 rounded-xl border-2 font-mono font-bold ${fieldErrors.admission_no ? 'border-rose-500/50 bg-rose-50/50 focus:ring-rose-500/20' : 'border-slate-50 focus:ring-blue-600/10'}`}
                     value={formData.admission_no}
                     onChange={(e) => setFormData({...formData, admission_no: e.target.value})}
                 />
             </div>
+            {fieldErrors.admission_no && <p className="text-[10px] font-bold text-rose-500 mt-1 ml-1">{fieldErrors.admission_no[0]}</p>}
           </div>
 
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
-                <Label htmlFor="parent_id" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Assign Guardian</Label>
+                <Label htmlFor="parent_id" className={`text-[10px] font-black uppercase tracking-widest ml-1 ${fieldErrors.parent_id ? 'text-rose-500' : 'text-slate-400'}`}>Assign Guardian</Label>
                 <div className="relative group">
-                    <Users className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors z-10" />
+                    <Users className={`absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors z-10 ${fieldErrors.parent_id ? 'text-rose-500' : 'text-slate-300 group-focus-within:text-blue-600'}`} />
                     <FormSelect 
                         id="parent_id"
-                        className="h-12 pl-12 rounded-xl border-2 border-slate-50 focus:ring-blue-600/10 font-bold"
+                        className={`h-12 pl-12 rounded-xl border-2 font-bold ${fieldErrors.parent_id ? 'border-rose-500/50 bg-rose-50/50 focus:ring-rose-500/20' : 'border-slate-50 focus:ring-blue-600/10'}`}
                         value={formData.parent_id}
                         onChange={(e) => setFormData({...formData, parent_id: e.target.value})}
                     >
@@ -166,14 +178,15 @@ export function AddStudentDialog() {
                         ))}
                     </FormSelect>
                 </div>
+                {fieldErrors.parent_id && <p className="text-[10px] font-bold text-rose-500 mt-1 ml-1">{fieldErrors.parent_id[0]}</p>}
             </div>
             <div className="space-y-2">
-                <Label htmlFor="class_id" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Assign Class</Label>
+                <Label htmlFor="class_id" className={`text-[10px] font-black uppercase tracking-widest ml-1 ${fieldErrors.class_id ? 'text-rose-500' : 'text-slate-400'}`}>Assign Class</Label>
                 <div className="relative group">
-                    <School className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors z-10" />
+                    <School className={`absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors z-10 ${fieldErrors.class_id ? 'text-rose-500' : 'text-slate-300 group-focus-within:text-blue-600'}`} />
                     <FormSelect 
                         id="class_id"
-                        className="h-12 pl-12 rounded-xl border-2 border-slate-50 focus:ring-blue-600/10 font-bold"
+                        className={`h-12 pl-12 rounded-xl border-2 font-bold ${fieldErrors.class_id ? 'border-rose-500/50 bg-rose-50/50 focus:ring-rose-500/20' : 'border-slate-50 focus:ring-blue-600/10'}`}
                         value={formData.class_id}
                         onChange={(e) => setFormData({...formData, class_id: e.target.value})}
                     >
@@ -183,25 +196,30 @@ export function AddStudentDialog() {
                         ))}
                     </FormSelect>
                 </div>
+                {fieldErrors.class_id && <p className="text-[10px] font-bold text-rose-500 mt-1 ml-1">{fieldErrors.class_id[0]}</p>}
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="student_password" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Temporal Password</Label>
+            <Label htmlFor="student_password" className={`text-[10px] font-black uppercase tracking-widest ml-1 ${fieldErrors.password ? 'text-rose-500' : 'text-slate-400'}`}>Temporal Password</Label>
             <div className="relative group">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
+              <Lock className={`absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors ${fieldErrors.password ? 'text-rose-500' : 'text-slate-300 group-focus-within:text-blue-600'}`} />
               <Input 
                   id="student_password" 
                   type="password"
                   placeholder="••••••••"
-                  className="h-12 pl-12 rounded-xl border-2 border-slate-50 focus:ring-blue-600/10 font-bold"
+                  className={`h-12 pl-12 rounded-xl border-2 font-bold ${fieldErrors.password ? 'border-rose-500/50 bg-rose-50/50 focus:ring-rose-500/20' : 'border-slate-50 focus:ring-blue-600/10'}`}
                   value={formData.password}
                   onChange={(e) => setFormData({...formData, password: e.target.value})}
               />
             </div>
-            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter ml-1 italic">
-                Leave blank to use default (student123)
-            </p>
+            {fieldErrors.password ? (
+                <p className="text-[10px] font-bold text-rose-500 mt-1 ml-1">{fieldErrors.password[0]}</p>
+            ) : (
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter ml-1 italic">
+                    Leave blank to use default (student123)
+                </p>
+            )}
           </div>
 
           <Button type="submit" className="w-full h-14 rounded-2xl shadow-2xl shadow-blue-600/20" variant="premium" disabled={createStudentMutation.isPending}>
