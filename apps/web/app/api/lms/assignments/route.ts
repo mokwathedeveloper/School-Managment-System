@@ -17,12 +17,12 @@ const createAssignmentSchema = z.object({
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession(req);
-    const tenantId = enforceTenant(session);
+    const tenantId = enforceTenant(session) as string;
 
     // If student, return assignments for their class
-    if (session.role === 'STUDENT') {
+    if (session!.role === 'STUDENT') {
         const student = await prisma.student.findUnique({
-            where: { user_id: session.userId }
+            where: { user_id: session!.userId }
         });
         if (!student?.class_id) return NextResponse.json([]);
         
@@ -46,10 +46,11 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const session = await getSession(req);
+    const tenantId = enforceTenant(session) as string;
     if (!session) throw new ApiError('Unauthorized', 401);
     
     // RBAC: Only staff can create assignments
-    if (session.role !== 'SUPER_ADMIN' && session.role !== 'ADMIN' && session.role !== 'STAFF' && session.role !== 'TEACHER') {
+    if (session!.role !== 'SUPER_ADMIN' && session!.role !== 'ADMIN' && session!.role !== 'STAFF' && session!.role !== 'TEACHER') {
         throw new ApiError('Forbidden: Only staff members can create assignments.', 403);
     }
 

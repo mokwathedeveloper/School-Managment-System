@@ -8,10 +8,10 @@ import { handleApiError, ApiError } from '@/lib/server/api-utils';
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession(req);
-    const tenantId = enforceTenant(session);
+    const tenantId = enforceTenant(session) as string;
 
     const result = await AnalyticsService.getDashboardStats(
-      session.role === 'SUPER_ADMIN' ? null : tenantId
+      session!.role === 'SUPER_ADMIN' ? null : tenantId
     );
     return NextResponse.json(result);
   } catch (error) {

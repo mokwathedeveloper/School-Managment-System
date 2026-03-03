@@ -14,7 +14,7 @@ const createBorrowSchema = z.object({
 export async function POST(req: NextRequest) {
   try {
     const session = await getSession(req);
-    const tenantId = enforceTenant(session);
+    const tenantId = enforceTenant(session) as string;
     
     const body = await req.json();
     const validated = createBorrowSchema.safeParse(body);

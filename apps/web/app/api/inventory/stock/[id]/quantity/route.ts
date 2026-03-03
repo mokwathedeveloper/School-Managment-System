@@ -15,7 +15,7 @@ export async function PATCH(
 ) {
   try {
     const session = await getSession(req);
-    const tenantId = enforceTenant(session);
+    const tenantId = enforceTenant(session) as string;
     
     const body = await req.json();
     const validated = updateQuantitySchema.safeParse(body);

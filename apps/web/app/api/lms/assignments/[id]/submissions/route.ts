@@ -10,10 +10,10 @@ export async function GET(
 ) {
   try {
     const session = await getSession(req);
-    const tenantId = enforceTenant(session);
+    const tenantId = enforceTenant(session) as string;
     
     // Check if staff
-    if (session.role !== 'SUPER_ADMIN' && session.role !== 'ADMIN' && session.role !== 'TEACHER' && session.role !== 'STAFF') {
+    if (session!.role !== 'SUPER_ADMIN' && session!.role !== 'ADMIN' && session!.role !== 'TEACHER' && session!.role !== 'STAFF') {
         throw new ApiError('Forbidden: Only staff can view submissions', 403);
     }
 

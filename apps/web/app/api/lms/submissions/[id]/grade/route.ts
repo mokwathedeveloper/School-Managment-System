@@ -17,10 +17,10 @@ export async function PATCH(
 ) {
   try {
     const session = await getSession(req);
-    const tenantId = enforceTenant(session);
+    const tenantId = enforceTenant(session) as string;
 
     // Only staff can grade
-    if (session.role !== 'SUPER_ADMIN' && session.role !== 'ADMIN' && session.role !== 'TEACHER' && session.role !== 'STAFF') {
+    if (session!.role !== 'SUPER_ADMIN' && session!.role !== 'ADMIN' && session!.role !== 'TEACHER' && session!.role !== 'STAFF') {
         throw new ApiError('Forbidden: Only staff can grade submissions', 403);
     }
 
@@ -33,7 +33,7 @@ export async function PATCH(
 
     // Find staff ID linked to this user
     const staff = await prisma.staff.findUnique({
-      where: { user_id: session.userId }
+      where: { user_id: session!.userId }
     });
 
     if (!staff) throw new ApiError('Staff profile not found', 404);

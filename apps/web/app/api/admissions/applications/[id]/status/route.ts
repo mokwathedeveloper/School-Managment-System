@@ -15,7 +15,7 @@ export async function PATCH(
 ) {
   try {
     const session = await getSession(req);
-    const tenantId = enforceTenant(session);
+    const tenantId = enforceTenant(session) as string;
     
     // RBAC: Only admin/staff can update admission status
     enforceRole(session, ROLE_GROUPS.STAFF);

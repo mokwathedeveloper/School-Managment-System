@@ -10,7 +10,7 @@ export async function PATCH(
 ) {
   try {
     const session = await getSession(req);
-    const tenantId = enforceTenant(session);
+    const tenantId = enforceTenant(session) as string;
     const result = await SecurityService.checkOut(tenantId, params.visitId);
     return NextResponse.json(result);
   } catch (error) { return handleApiError(error); }

@@ -7,9 +7,9 @@ import { handleApiError, ApiError } from '@/lib/server/api-utils';
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession(req);
-    const tenantId = enforceTenant(session);
+    const tenantId = enforceTenant(session) as string;
 
-    const result = await NotificationService.getByUser(session.userId, tenantId);
+    const result = await NotificationService.getByUser(session!.userId, tenantId);
     return NextResponse.json(result);
   } catch (error) {
     return handleApiError(error);
@@ -19,17 +19,18 @@ export async function GET(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   try {
     const session = await getSession(req);
+    const tenantId = enforceTenant(session) as string;
     if (!session) throw new ApiError('Unauthorized', 401);
 
     const { id, readAll } = await req.json();
 
     if (readAll) {
-      await NotificationService.markAllAsRead(session.userId, tenantId);
+      await NotificationService.markAllAsRead(session!.userId, tenantId);
       return NextResponse.json({ success: true });
     }
 
     if (!id) throw new ApiError('Notification ID is required', 400);
-    const result = await NotificationService.markAsRead(id, session.userId);
+    const result = await NotificationService.markAsRead(id, session!.userId);
     return NextResponse.json(result);
   } catch (error) {
     return handleApiError(error);

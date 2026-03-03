@@ -20,7 +20,7 @@ const createAlumnusSchema = z.object({
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession(req);
-    const tenantId = enforceTenant(session);
+    const tenantId = enforceTenant(session) as string;
     
     // In a real application, you might add pagination here
     const result = await AlumniService.findAll(tenantId);
@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const session = await getSession(req);
-    if (!session) throw new ApiError('Unauthorized', 401);
+    const tenantId = enforceTenant(session) as string;
     
     const body = await req.json();
     const validated = createAlumnusSchema.safeParse(body);

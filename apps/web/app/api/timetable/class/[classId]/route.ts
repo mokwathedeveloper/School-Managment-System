@@ -10,7 +10,7 @@ export async function GET(
 ) {
   try {
     const session = await getSession(req);
-    const tenantId = enforceTenant(session);
+    const tenantId = enforceTenant(session) as string;
 
     const result = await TimetableService.getByClass(tenantId, params.classId);
     return NextResponse.json(result);

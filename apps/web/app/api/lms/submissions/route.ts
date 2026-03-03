@@ -15,10 +15,10 @@ const submitAssignmentSchema = z.object({
 export async function POST(req: NextRequest) {
   try {
     const session = await getSession(req);
-    const tenantId = enforceTenant(session);
+    const tenantId = enforceTenant(session) as string;
 
     // Only students can submit
-    if (session.role !== 'STUDENT') {
+    if (session!.role !== 'STUDENT') {
         throw new ApiError('Forbidden: Only students can submit assignments', 403);
     }
 
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
 
     // Find student ID linked to this user
     const student = await prisma.student.findUnique({
-      where: { user_id: session.userId }
+      where: { user_id: session!.userId }
     });
 
     if (!student) throw new ApiError('Student profile not found', 404);

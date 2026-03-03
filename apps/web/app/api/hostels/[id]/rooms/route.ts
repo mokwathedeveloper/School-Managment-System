@@ -16,7 +16,7 @@ export async function GET(
 ) {
   try {
     const session = await getSession(req);
-    const tenantId = enforceTenant(session);
+    const tenantId = enforceTenant(session) as string;
 
     const result = await HostelsService.getRooms(tenantId, params.id);
     return NextResponse.json(result);
@@ -31,6 +31,7 @@ export async function POST(
 ) {
   try {
     const session = await getSession(req);
+    const tenantId = enforceTenant(session) as string;
     if (!session) throw new ApiError('Unauthorized', 401);
     
     // RBAC: Only Admin/Staff can manage hostel rooms
