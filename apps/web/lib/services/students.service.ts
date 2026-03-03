@@ -14,6 +14,20 @@ export const StudentsService = {
     parent_id?: string;
     password?: string;
   }) {
+    // 0. Pre-check email uniqueness
+    const existingUser = await prisma.user.findUnique({ where: { email: data.email } });
+    if (existingUser) {
+        throw new Error(`The email "${data.email}" is already registered in the system.`);
+    }
+
+    // 0.1 Pre-check admission number uniqueness within the school
+    const existingStudent = await prisma.student.findFirst({ 
+        where: { admission_no: data.admission_no, school_id: schoolId } 
+    });
+    if (existingStudent) {
+        throw new Error(`The admission number "${data.admission_no}" is already assigned to another student in this school.`);
+    }
+
     const passwordHash = await argon2.hash(data.password || 'student123'); 
     
     return prisma.$transaction(async (tx) => {
@@ -48,14 +62,16 @@ export const StudentsService = {
             }
         }
       });
+    }, {
+        timeout: 10000 // Increase to 10s for remote database latency
     });
   },
 
-  async findAll(schoolId: string, query: { search?: string; classId?: string; skip?: number; take?: number }) {
+  async findAll(schoolId: string | undefined, query: { search?: string; classId?: string; skip?: number; take?: number }) {
     const { search, classId, skip = 0, take = 10 } = query;
     
     const where: Prisma.StudentWhereInput = {
-      school_id: schoolId,
+      ...(schoolId ? { school_id: schoolId } : {}),
       ...(classId && { class_id: classId }),
       ...(search && {
         OR: [

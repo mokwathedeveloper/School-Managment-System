@@ -38,6 +38,12 @@ export const StaffService = {
   },
 
   async create(schoolId: string, data: any) {
+    // 0. Pre-check email uniqueness
+    const existing = await prisma.user.findUnique({ where: { email: data.email } });
+    if (existing) {
+        throw new Error(`The email "${data.email}" is already registered in the system.`);
+    }
+
     const passwordHash = await argon2.hash(data.password || 'staff123'); // Default staff password if not provided
 
     return prisma.$transaction(async (tx) => {
@@ -63,6 +69,8 @@ export const StaffService = {
         },
         include: { user: true }
       });
+    }, {
+        timeout: 10000 // Increase to 10s for remote database latency
     });
   },
 

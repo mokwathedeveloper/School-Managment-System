@@ -38,6 +38,18 @@ export const SuperAdminService = {
     adminEmail: string,
     temporalPassword: string
   }) {
+    // 0. Pre-check slug uniqueness for better error message
+    const existingSchool = await prisma.school.findUnique({ where: { slug: data.slug } });
+    if (existingSchool) {
+        throw new Error(`The URL slug "${data.slug}" is already in use. Please choose a different identifier.`);
+    }
+
+    // 0.1 Pre-check admin email uniqueness
+    const existingUser = await prisma.user.findUnique({ where: { email: data.adminEmail } });
+    if (existingUser) {
+        throw new Error(`The administrator email "${data.adminEmail}" is already registered in the system.`);
+    }
+
     const argon2 = await import('argon2');
     const passwordHash = await argon2.hash(data.temporalPassword);
 
