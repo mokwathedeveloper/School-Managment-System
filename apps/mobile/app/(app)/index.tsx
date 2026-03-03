@@ -10,7 +10,10 @@ import { useRouter } from 'expo-router';
 
 // Role Views
 import { AdminMobileView } from '../../components/dashboard/role-views/AdminMobileView';
+import { HeadTeacherMobileView } from '../../components/dashboard/role-views/HeadTeacherMobileView';
+import { DeputyHeadTeacherMobileView } from '../../components/dashboard/role-views/DeputyHeadTeacherMobileView';
 import { TeacherMobileView } from '../../components/dashboard/role-views/TeacherMobileView';
+import { ClassTeacherMobileView } from '../../components/dashboard/role-views/ClassTeacherMobileView';
 import { SpecialistMobileView } from '../../components/dashboard/role-views/SpecialistMobileView';
 import { StaffMobileView } from '../../components/dashboard/role-views/StaffMobileView';
 import { AccountantMobileView } from '../../components/dashboard/role-views/AccountantMobileView';
@@ -61,14 +64,17 @@ export default function DashboardScreen() {
     switch (user?.role) {
       case 'SUPER_ADMIN':
       case 'SCHOOL_ADMIN':
-      case 'HEAD_TEACHER':
-      case 'DEPUTY_HEAD_TEACHER':
         return <AdminMobileView stats={stats} router={router} />;
+      case 'HEAD_TEACHER':
+        return <HeadTeacherMobileView stats={stats} router={router} />;
+      case 'DEPUTY_HEAD_TEACHER':
+        return <DeputyHeadTeacherMobileView stats={stats} router={router} />;
       case 'ACCOUNTANT':
         return <AccountantMobileView stats={stats} />;
       case 'TEACHER':
-      case 'CLASS_TEACHER':
         return <TeacherMobileView stats={stats} router={router} />;
+      case 'CLASS_TEACHER':
+        return <ClassTeacherMobileView stats={stats} router={router} />;
       case 'LIBRARIAN':
       case 'NURSE':
       case 'MATRON':
@@ -167,105 +173,48 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   profileBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 14,
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#f1f5f9',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.02,
-    shadowRadius: 8,
+    width: 40, height: 40, borderRadius: 14, backgroundColor: '#fff', borderWidth: 1, borderColor: '#f1f5f9', alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.02, shadowRadius: 8,
   },
   avatarMini: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
-    backgroundColor: '#eff6ff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: 32, height: 32, borderRadius: 10, backgroundColor: '#eff6ff', alignItems: 'center', justifyContent: 'center',
   },
   avatarTextMini: {
-    fontSize: 12,
-    fontWeight: '900',
-    color: '#2563eb',
+    fontSize: 12, fontWeight: '900', color: '#2563eb',
   },
   welcomeSection: {
     marginBottom: 24,
   },
   nameLabel: {
-    fontSize: 28,
-    fontWeight: '900',
-    color: '#0f172a',
-    letterSpacing: -0.5,
+    fontSize: 28, fontWeight: '900', color: '#0f172a', letterSpacing: -0.5,
   },
   roleBadge: {
-    backgroundColor: '#e0e7ff',
-    alignSelf: 'flex-start',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-    marginTop: 8,
+    backgroundColor: '#e0e7ff', alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, marginTop: 8,
   },
   roleText: {
-    color: '#2563eb',
-    fontSize: 9,
-    fontWeight: '900',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
+    color: '#2563eb', fontSize: 9, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1,
   },
   section: {
     marginBottom: 32,
   },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: '900',
-    color: '#64748b',
-    textTransform: 'uppercase',
-    letterSpacing: 1.5,
-    marginBottom: 16,
+    fontSize: 13, fontWeight: '900', color: '#64748b', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 16,
   },
   pulseCard: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 24,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#f1f5f9',
+    backgroundColor: '#fff', padding: 20, borderRadius: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderWidth: 1, borderColor: '#f1f5f9',
   },
   pulseInfo: {
     gap: 4,
   },
   pulseLabel: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: '#94a3b8',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
+    fontSize: 10, fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 1,
   },
   pulseStatus: {
-    fontSize: 15,
-    fontWeight: '900',
-    color: '#0f172a',
+    fontSize: 15, fontWeight: '900', color: '#0f172a',
   },
   pulseRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
+    flexDirection: 'row', alignItems: 'center', gap: 12,
   },
   pulseIndicator: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#10b981',
-    shadowColor: '#10b981',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
-    shadowRadius: 4,
+    width: 8, height: 8, borderRadius: 4, backgroundColor: '#10b981', shadowColor: '#10b981', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.5, shadowRadius: 4,
   },
 });
