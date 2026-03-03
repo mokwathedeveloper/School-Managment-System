@@ -1,83 +1,60 @@
-# SchoolOS — The Ultimate Multi-Tenant School Management Ecosystem
+# SchoolOS — The Elite Multi-Tenant School Management Ecosystem
 
-SchoolOS is a high-performance, production-grade School Management System (SMS) designed specifically for private educational institutions in Africa. It transforms traditional school record-keeping into a dynamic, data-driven revenue and operations engine.
+SchoolOS is a high-performance, enterprise-grade School Management System (SMS) designed for institutional scale. It transforms educational administration into a secure, data-driven engine through strict tenant isolation and specialized role-based command interfaces.
 
-## 🎯 Ideal Customer Profile (ICP)
-Primary target: Mid-tier private schools (300–2000 students) in East Africa requiring robust financial reconciliation (M-Pesa), automated academic reporting, and multi-tenant scalability.
+## 🎯 Institutional Value Proposition
+Primary target: Modern private schools and educational groups requiring robust financial tracking (M-Pesa), elite security standards, and multi-tenant scalability across multiple regions or nodes.
 
 ## 🚀 Core Modules
-- **Admissions Pipeline:** Fully integrated lead tracking from public application to enrollment.
-- **Automated Finance:** Real-time M-Pesa reconciliation, bulk invoicing, and institutional expense tracking.
-- **Academic Core:** Multi-curriculum grading rubrics, automated report card generation, and LMS Lite features.
-- **Operations:** Clash-free timetabling, hostel/dormitory occupancy tracking, and transport fleet logistics.
-- **Security & Safety:** Digital visitor gate logs and a centralized student medical/health infirmary.
-- **Stakeholder Hubs:** Specialized portals for Parents, Staff, and a Platform-wide Super Admin Command Center.
+- **System Control Plane:** Global platform oversight for Super Admins, institutional provisioning, and cross-tenant analytics.
+- **Automated Finance:** Real-time M-Pesa STK reconciliation, bulk automated invoicing, and institutional expense tracking.
+- **Security-First Onboarding:** Mandatory temporal password workflows and enforced security initialization for all staff and scholars.
+- **Academic Hierarchy:** Modernized grade level and class stream organization with automated, downloadable academic transcripts.
+- **Operational Matrix:** Professional terminals for Attendance, Examinations, Transport logistics, Hostel occupancy, and Library management.
+- **Specialized Portals:** 15+ dedicated dashboards for every school tier, from Headteachers and Accountants to Nurses and Matrons.
 
-## 🏗️ Architecture Overview
-- **Frontend:** Next.js 14 (App Router) with Tailwind CSS and shadcn/ui.
-- **Backend:** NestJS (Modular Monolith) for secure, scalable domain logic.
-- **Database:** PostgreSQL with Prisma ORM, utilizing a high-performance multi-tenant schema.
-- **Multi-tenancy:** Strict data isolation via `school_id` with institutional-specific branding and configuration.
+## 🏗️ Technical Stack
+- **Web:** Next.js 14 (App Router) • Tailwind CSS • Framer Motion.
+- **Mobile:** Expo (React Native) for leadership and faculty dashboards.
+- **Database:** PostgreSQL via Supabase with Prisma ORM.
+- **Auth:** Custom JWT architecture with Edge-side Middleware guarding.
+- **Real-time:** Pusher/WebSockets for instant institutional notifications.
 
 ## 🛠️ Local Setup
-
-### Prerequisites
-- Node.js v18+
-- PostgreSQL
-- npm or turbo
 
 ### 1. Installation
 ```bash
 npm install
 ```
 
-### 2. Configuration
-Create a `.env` file in the root based on `.env.example`:
+### 2. Database Synchronization
 ```bash
-# Database
-DATABASE_URL="postgresql://user:password@localhost:5432/school_db"
-
-# Auth
-JWT_SECRET="your-secure-secret"
-
-# Finance
-MPESA_SHORTCODE="174379"
-```
-
-### 3. Database Migration & Seeding
-```bash
-cd apps/api
-npx prisma migrate dev
+cd apps/web
+npx prisma generate
+npx prisma migrate deploy
 npm run seed
 ```
 
-### 4. Start Development
+### 3. Execution
 ```bash
 npm run dev
 ```
+*Note: If port 3000 is busy, the app will automatically increment (e.g., http://localhost:3001).*
 
-## 🔐 Quick Access & Test Credentials
+## 🔐 Master Access & Security Flow
 
-Once the system is running, access the login portal at: **`http://localhost:3000/login`**
+All new accounts use a **Temporal Password** system. You must update your password upon the first login.
 
-The following accounts are available via the default seed script (`npx prisma db seed`):
-
-| Role | Email | Password |
+| Authority | Email | Default Password |
 | :--- | :--- | :--- |
-| **School Admin** | `admin@school.com` | `password123` |
-| **Parent** | `parent@test.com` | `password123` |
-| **Student** | `student@test.com` | `password123` |
+| **System Super Admin** | `super@schoolos.com` | `password123` |
+| **Institutional Admin** | `admin@schoolos.com` | `password123` |
+| **Faculty (Teacher)** | `teacher@schoolos.com` | `password123` |
 
-## 📂 Folder Structure
-- `apps/api`: NestJS backend source, Prisma schema, and seed scripts.
-- `apps/web`: Next.js frontend application, dashboards, and landing page.
-- `supabase`: Configuration for managed PostgreSQL infrastructure.
-
-## 🗺️ Roadmap
-- [ ] Mobile App for Teachers/Parents (Flutter/React Native)
-- [ ] AI-Powered Performance Forecasting
-- [ ] Integrated Virtual Classrooms (WebRTC)
-- [ ] Automated Bulk SMS/Email Campaigns
+## 📂 Project Architecture
+- `apps/web`: The primary Next.js ecosystem (API Routes, Dashboards, Landing Page).
+- `apps/mobile`: React Native / Expo mobile application.
+- `prisma`: The institutional schema and cross-tenant isolation rules.
 
 ---
-© 2024 SchoolOS. Engineered for Educational Excellence.
+© 2026 SchoolOS. Engineered for Educational Excellence.
