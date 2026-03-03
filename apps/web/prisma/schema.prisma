@@ -193,6 +193,7 @@ model User {
   phone       String?
   role        Role     @default(STUDENT)
   is_active   Boolean  @default(true)
+  password_changed Boolean @default(false)
   
   school_id   String?
   school      School?  @relation(fields: [school_id], references: [id])
