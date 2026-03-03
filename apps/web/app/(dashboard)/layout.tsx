@@ -28,7 +28,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         router.push('/setup/password');
       }
     }
-  }, [user, isLoading, router]);
+  }, [user, isLoading]); // router removed to prevent loop
 
   // Handle responsive sidebar state
   useEffect(() => {
