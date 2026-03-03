@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { 
-  CreditCard, 
   Wallet, 
   TrendingUp, 
   History,
@@ -10,6 +9,9 @@ import {
 } from 'lucide-react-native';
 
 export function AccountantMobileView({ stats }: { stats: any }) {
+  const collectionRate = stats?.finance?.collectionRate || 0;
+  const totalRevenue = stats?.finance?.totalRevenue || 0;
+
   return (
     <View>
         {/* Primary Operational Card */}
@@ -19,10 +21,10 @@ export function AccountantMobileView({ stats }: { stats: any }) {
                     <View style={styles.statusDot} />
                     <Text style={styles.statusText}>Finance Hub Active</Text>
                 </View>
-                <Wallet size={18} color="#fff" opacity={0.6} />
+                <Wallet size={18} color="#fff" />
             </View>
             <Text style={styles.cardValueWhite}>Total Net Revenue</Text>
-            <Text style={styles.cardValueLargeWhite}>KES {stats?.totalRevenue?.toLocaleString() || "0"}</Text>
+            <Text style={styles.cardValueLargeWhite}>KES {totalRevenue.toLocaleString()}</Text>
         </TouchableOpacity>
 
         {/* Quick Action */}
@@ -43,7 +45,7 @@ export function AccountantMobileView({ stats }: { stats: any }) {
                 <View style={styles.metricHeader}>
                     <Activity size={16} color="#2563eb" />
                 </View>
-                <Text style={styles.metricValue}>{stats?.finance?.collectionRate || 0}%</Text>
+                <Text style={styles.metricValue}>{collectionRate}%</Text>
                 <Text style={styles.metricLabel}>Collection</Text>
             </View>
             <View style={[styles.card, styles.metricCard]}>
@@ -74,7 +76,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#2563eb',
     padding: 24,
     marginBottom: 32,
-    overflow: 'hidden',
   },
   primaryCardHeader: {
     flexDirection: 'row',

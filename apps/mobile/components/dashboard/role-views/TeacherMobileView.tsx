@@ -6,27 +6,25 @@ import {
   BookOpen, 
   Award,
   Clock,
-  LayoutGrid
 } from 'lucide-react-native';
 
 export function TeacherMobileView({ stats, router }: { stats: any, router: any }) {
   const quickActions = [
-    { title: 'LMS', icon: BookOpen, color: '#2563eb', route: '/(app)/coursework' },
-    { title: 'Grades', icon: Award, color: '#8b5cf6', route: '/(app)/profile' },
-    { title: 'Schedule', icon: Calendar, color: '#10b981', route: '/(app)/index' },
-    { title: 'Presence', icon: Activity, color: '#f59e0b', route: '/(app)/index' },
+    { title: 'LMS', Icon: BookOpen, color: '#2563eb', route: '/(app)/coursework' },
+    { title: 'Grades', Icon: Award, color: '#8b5cf6', route: '/(app)/profile' },
+    { title: 'Schedule', Icon: Calendar, color: '#10b981', route: '/(app)/index' },
+    { title: 'Presence', Icon: Activity, color: '#f59e0b', route: '/(app)/index' },
   ];
 
   return (
     <View>
-        {/* Primary Operational Card */}
         <TouchableOpacity activeOpacity={0.9} style={[styles.card, styles.primaryCard]}>
             <View style={styles.primaryCardHeader}>
                 <View style={styles.statusChip}>
                     <View style={styles.statusDot} />
                     <Text style={styles.statusText}>Active Lesson</Text>
                 </View>
-                <Calendar size={18} color="#fff" opacity={0.6} />
+                <Calendar size={18} color="#fff" />
             </View>
             <Text style={styles.cardValueWhite}>Biology Unit 3: Ecology</Text>
             <View style={styles.cardFooterWhite}>
@@ -37,22 +35,23 @@ export function TeacherMobileView({ stats, router }: { stats: any, router: any }
             </View>
         </TouchableOpacity>
 
-        {/* Quick Action Grid */}
         <View style={styles.section}>
             <Text style={styles.sectionTitle}>Instructional Hub</Text>
             <View style={styles.actionGrid}>
-                {quickActions.map((action, i) => (
-                    <TouchableOpacity key={i} style={styles.actionItem} onPress={() => router.push(action.route as any)}>
-                        <View style={[styles.actionIcon, { backgroundColor: `${action.color}15` }]}>
-                            <action.icon size={22} color={action.color} strokeWidth={2.5} />
-                        </View>
-                        <Text style={styles.actionLabel}>{action.title}</Text>
-                    </TouchableOpacity>
-                ))}
+                {quickActions.map((action, i) => {
+                    const Icon = action.Icon;
+                    return (
+                        <TouchableOpacity key={i} style={styles.actionItem} onPress={() => router.push(action.route as any)}>
+                            <View style={[styles.actionIcon, { backgroundColor: `${action.color}15` }]}>
+                                <Icon size={22} color={action.color} strokeWidth={2.5} />
+                            </View>
+                            <Text style={styles.actionLabel}>{action.title}</Text>
+                        </TouchableOpacity>
+                    );
+                })}
             </View>
         </View>
 
-        {/* Performance Metrics */}
         <View style={styles.metricsRow}>
             <View style={[styles.card, styles.metricCard]}>
                 <View style={styles.metricHeader}>
@@ -91,7 +90,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#2563eb',
     padding: 24,
     marginBottom: 32,
-    overflow: 'hidden',
   },
   primaryCardHeader: {
     flexDirection: 'row',

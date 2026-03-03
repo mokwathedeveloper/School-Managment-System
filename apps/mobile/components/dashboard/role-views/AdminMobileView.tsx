@@ -6,50 +6,49 @@ import {
   TrendingUp, 
   Users, 
   CreditCard, 
-  ChevronRight,
-  Clock,
-  LayoutGrid
 } from 'lucide-react-native';
 
 export function AdminMobileView({ stats, router }: { stats: any, router: any }) {
   const quickActions = [
-    { title: 'Registry', icon: Users, color: '#2563eb', route: '/(app)/index' },
-    { title: 'Fees', icon: CreditCard, color: '#10b981', route: '/(app)/index' },
-    { title: 'Schedule', icon: Calendar, color: '#8b5cf6', route: '/(app)/index' },
-    { title: 'Metrics', icon: TrendingUp, color: '#f59e0b', route: '/(app)/index' },
+    { title: 'Registry', Icon: Users, color: '#2563eb', route: '/(app)/index' },
+    { title: 'Fees', Icon: CreditCard, color: '#10b981', route: '/(app)/index' },
+    { title: 'Schedule', Icon: Calendar, color: '#8b5cf6', route: '/(app)/index' },
+    { title: 'Metrics', Icon: TrendingUp, color: '#f59e0b', route: '/(app)/index' },
   ];
+
+  const totalRevenue = stats?.finance?.totalRevenue || 0;
 
   return (
     <View>
-        {/* Primary Operational Card */}
         <TouchableOpacity activeOpacity={0.9} style={[styles.card, styles.primaryCard]}>
             <View style={styles.primaryCardHeader}>
                 <View style={styles.statusChip}>
                     <View style={styles.statusDot} />
                     <Text style={styles.statusText}>Sync Active</Text>
                 </View>
-                <Activity size={18} color="#fff" opacity={0.6} />
+                <Activity size={18} color="#fff" />
             </View>
             <Text style={styles.cardValueWhite}>Institutional Inflow</Text>
-            <Text style={styles.cardValueLargeWhite}>KES {stats?.totalInvoiced?.toLocaleString() || "0"}</Text>
+            <Text style={styles.cardValueLargeWhite}>KES {totalRevenue.toLocaleString()}</Text>
         </TouchableOpacity>
 
-        {/* Quick Action Grid */}
         <View style={styles.section}>
             <Text style={styles.sectionTitle}>Command Center</Text>
             <View style={styles.actionGrid}>
-                {quickActions.map((action, i) => (
-                    <TouchableOpacity key={i} style={styles.actionItem}>
-                        <View style={[styles.actionIcon, { backgroundColor: `${action.color}15` }]}>
-                            <action.icon size={22} color={action.color} strokeWidth={2.5} />
-                        </View>
-                        <Text style={styles.actionLabel}>{action.title}</Text>
-                    </TouchableOpacity>
-                ))}
+                {quickActions.map((action, i) => {
+                    const Icon = action.Icon;
+                    return (
+                        <TouchableOpacity key={i} style={styles.actionItem} onPress={() => router.push(action.route as any)}>
+                            <View style={[styles.actionIcon, { backgroundColor: `${action.color}15` }]}>
+                                <Icon size={22} color={action.color} strokeWidth={2.5} />
+                            </View>
+                            <Text style={styles.actionLabel}>{action.title}</Text>
+                        </TouchableOpacity>
+                    );
+                })}
             </View>
         </View>
 
-        {/* Performance Metrics */}
         <View style={styles.metricsRow}>
             <View style={[styles.card, styles.metricCard]}>
                 <View style={styles.metricHeader}>
@@ -88,7 +87,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#2563eb',
     padding: 24,
     marginBottom: 32,
-    overflow: 'hidden',
   },
   primaryCardHeader: {
     flexDirection: 'row',

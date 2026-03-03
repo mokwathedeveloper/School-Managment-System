@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { 
   Briefcase, 
-  MessageSquare, 
   Activity,
   History,
   Bell
@@ -18,7 +17,7 @@ export function StaffMobileView({ stats }: { stats: any }) {
                     <View style={styles.statusDot} />
                     <Text style={styles.statusText}>Check-in Active</Text>
                 </View>
-                <Briefcase size={18} color="#fff" opacity={0.6} />
+                <Briefcase size={18} color="#fff" />
             </View>
             <Text style={styles.cardValueWhite}>Shift Manifest</Text>
             <Text style={styles.cardValueLargeWhite}>07:45 - 16:30</Text>
@@ -73,7 +72,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#2563eb',
     padding: 24,
     marginBottom: 32,
-    overflow: 'hidden',
   },
   primaryCardHeader: {
     flexDirection: 'row',

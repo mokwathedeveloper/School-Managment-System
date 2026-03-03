@@ -32,9 +32,9 @@ export function SpecialistMobileView({ user, stats }: { user: any, stats: any })
                     <View style={styles.statusDot} />
                     <Text style={styles.statusText}>Node Active</Text>
                 </View>
-                <Icon size={18} color="#fff" opacity={0.6} />
+                <Icon size={18} color="#fff" />
             </View>
-            <Text style={styles.cardValueWhite}>{user?.role?.replace('_', ' ')} Terminal</Text>
+            <Text style={styles.cardValueWhite}>{user?.role?.replace('_', ' ') || 'Specialist'} Terminal</Text>
             <Text style={styles.cardValueLargeWhite}>Operational</Text>
         </TouchableOpacity>
 
@@ -87,7 +87,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#2563eb',
     padding: 24,
     marginBottom: 32,
-    overflow: 'hidden',
   },
   primaryCardHeader: {
     flexDirection: 'row',
