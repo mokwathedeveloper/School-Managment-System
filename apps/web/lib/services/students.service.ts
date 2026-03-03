@@ -12,8 +12,9 @@ export const StudentsService = {
     gender?: string;
     class_id?: string;
     parent_id?: string;
+    password?: string;
   }) {
-    const passwordHash = await argon2.hash(process.env.DEFAULT_STUDENT_PASSWORD || 'password123'); 
+    const passwordHash = await argon2.hash(data.password || 'student123'); 
     
     return prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
@@ -122,6 +123,7 @@ export const StudentsService = {
               last_name: data.last_name,
               role: 'STUDENT',
               school_id: schoolId,
+              password_changed: false,
             },
           });
 

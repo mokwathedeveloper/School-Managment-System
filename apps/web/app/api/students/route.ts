@@ -13,6 +13,7 @@ const createStudentSchema = z.object({
   gender: z.string().optional(),
   class_id: z.string().optional(),
   parent_id: z.string().optional(),
+  password: z.string().min(6).optional(),
 });
 
 export async function GET(req: NextRequest) {
