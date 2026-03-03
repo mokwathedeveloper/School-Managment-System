@@ -6,7 +6,11 @@ export const GradeLevelsService = {
       where: { school_id: schoolId },
       orderBy: { level: 'asc' },
       include: {
-        classes: true,
+        classes: {
+          include: {
+            _count: { select: { students: true } }
+          }
+        },
         _count: { select: { classes: true } }
       }
     });

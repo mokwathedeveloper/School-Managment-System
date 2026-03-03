@@ -81,19 +81,11 @@ export const SuperAdminService = {
           name: `${currentYear}/${currentYear + 1}`,
           start_date: new Date(currentYear, 8, 1), // Sept 1st
           end_date: new Date(currentYear + 1, 6, 31), // July 31st
+          is_active: true
         }
       });
 
-      // 3. Create Default Terms
-      await tx.term.createMany({
-        data: [
-          { school_id: school.id, academic_year_id: academicYear.id, name: 'Term 1', start_date: new Date(currentYear, 8, 1), end_date: new Date(currentYear, 11, 20) },
-          { school_id: school.id, academic_year_id: academicYear.id, name: 'Term 2', start_date: new Date(currentYear + 1, 0, 5), end_date: new Date(currentYear + 1, 3, 10) },
-          { school_id: school.id, academic_year_id: academicYear.id, name: 'Term 3', start_date: new Date(currentYear + 1, 4, 1), end_date: new Date(currentYear + 1, 6, 31) },
-        ]
-      });
-
-      // 4. Create Standard Grade Levels
+      // Parallelize remaining setups to avoid transaction timeout
       const grades = [
         { name: 'Grade 1', level: 1 },
         { name: 'Grade 2', level: 2 },
@@ -109,11 +101,6 @@ export const SuperAdminService = {
         { name: 'Grade 12', level: 12 },
       ];
 
-      await tx.gradeLevel.createMany({
-        data: grades.map(g => ({ ...g, school_id: school.id }))
-      });
-
-      // 5. Create Core Subjects
       const subjects = [
         { name: 'Mathematics', code: 'MATH' },
         { name: 'English Language', code: 'ENG' },
@@ -123,11 +110,25 @@ export const SuperAdminService = {
         { name: 'Arts', code: 'ART' },
       ];
 
-      await tx.subject.createMany({
-        data: subjects.map(s => ({ ...s, school_id: school.id }))
-      });
+      await Promise.all([
+        tx.term.createMany({
+            data: [
+              { school_id: school.id, academic_year_id: academicYear.id, name: 'Term 1', start_date: new Date(currentYear, 8, 1), end_date: new Date(currentYear, 11, 20), is_active: true },
+              { school_id: school.id, academic_year_id: academicYear.id, name: 'Term 2', start_date: new Date(currentYear + 1, 0, 5), end_date: new Date(currentYear + 1, 3, 10) },
+              { school_id: school.id, academic_year_id: academicYear.id, name: 'Term 3', start_date: new Date(currentYear + 1, 4, 1), end_date: new Date(currentYear + 1, 6, 31) },
+            ]
+        }),
+        tx.gradeLevel.createMany({
+            data: grades.map(g => ({ ...g, school_id: school.id }))
+        }),
+        tx.subject.createMany({
+            data: subjects.map(s => ({ ...s, school_id: school.id }))
+        })
+      ]);
 
       return school;
+    }, {
+        timeout: 10000 // Extend timeout to 10 seconds for heavy onboarding
     });
   }
 };

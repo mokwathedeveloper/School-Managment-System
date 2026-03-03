@@ -18,6 +18,7 @@ async function main() {
       last_name: 'Administrator',
       password: passwordHash,
       role: Role.SUPER_ADMIN,
+      password_changed: true,
     },
   });
   console.log('✅ Super Admin created:', superAdmin.email);
@@ -48,6 +49,7 @@ async function main() {
       password: passwordHash,
       role: Role.SCHOOL_ADMIN,
       school_id: school.id,
+      password_changed: true,
     },
   });
   console.log('✅ School Admin created:', schoolAdmin.email);
@@ -115,6 +117,7 @@ async function main() {
               last_name: r.last,
               role: r.role,
               school_id: school.id,
+              password_changed: true,
             }
           });
       
@@ -145,6 +148,7 @@ async function main() {
           last_name: 'Stark',
           role: Role.PARENT,
           school_id: school.id,
+          password_changed: true,
         }
       });
     
@@ -163,6 +167,7 @@ async function main() {
           last_name: 'Stark',
           role: Role.STUDENT,
           school_id: school.id,
+          password_changed: true,
         }
       });
     
