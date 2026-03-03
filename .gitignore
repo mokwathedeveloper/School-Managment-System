@@ -33,8 +33,11 @@ logs/
 # Turbo
 .turbo/
 
-# OS metadata
+# os metadata
 Thumbs.db
+
+# TypeScript
+*.tsbuildinfo
 
 # Supabase temp
 supabase/.temp/
