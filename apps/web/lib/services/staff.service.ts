@@ -1,4 +1,3 @@
-
 import prisma from '../db/prisma';
 import { Staff, Prisma } from '@prisma/client';
 import * as argon2 from 'argon2';
@@ -38,10 +37,12 @@ export const StaffService = {
   },
 
   async create(schoolId: string, data: any) {
+    const email = data.email.toLowerCase();
+
     // 0. Pre-check email uniqueness
-    const existing = await prisma.user.findUnique({ where: { email: data.email } });
+    const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
-        throw new Error(`The email "${data.email}" is already registered in the system.`);
+        throw new Error(`The email "${email}" is already registered in the system.`);
     }
 
     const passwordHash = await argon2.hash(data.password || 'staff123'); // Default staff password if not provided
@@ -49,7 +50,7 @@ export const StaffService = {
     return prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
         data: {
-          email: data.email,
+          email,
           password: passwordHash,
           first_name: data.first_name,
           last_name: data.last_name,

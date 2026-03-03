@@ -14,10 +14,12 @@ export const StudentsService = {
     parent_id?: string;
     password?: string;
   }) {
+    const email = data.email.toLowerCase();
+
     // 0. Pre-check email uniqueness
-    const existingUser = await prisma.user.findUnique({ where: { email: data.email } });
+    const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
-        throw new Error(`The email "${data.email}" is already registered in the system.`);
+        throw new Error(`The email "${email}" is already registered in the system.`);
     }
 
     // 0.1 Pre-check admission number uniqueness within the school
@@ -33,7 +35,7 @@ export const StudentsService = {
     return prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
         data: {
-          email: data.email,
+          email,
           password: passwordHash,
           first_name: data.first_name,
           last_name: data.last_name,
@@ -130,10 +132,11 @@ export const StudentsService = {
 
     for (const data of students) {
       try {
+        const email = data.email.toLowerCase();
         await prisma.$transaction(async (tx) => {
           const user = await tx.user.create({
             data: {
-              email: data.email,
+              email,
               password: passwordHash,
               first_name: data.first_name,
               last_name: data.last_name,

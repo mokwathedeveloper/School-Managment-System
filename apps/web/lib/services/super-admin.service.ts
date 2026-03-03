@@ -45,9 +45,10 @@ export const SuperAdminService = {
     }
 
     // 0.1 Pre-check admin email uniqueness
-    const existingUser = await prisma.user.findUnique({ where: { email: data.adminEmail } });
+    const adminEmail = data.adminEmail.toLowerCase();
+    const existingUser = await prisma.user.findUnique({ where: { email: adminEmail } });
     if (existingUser) {
-        throw new Error(`The administrator email "${data.adminEmail}" is already registered in the system.`);
+        throw new Error(`The administrator email "${adminEmail}" is already registered in the system.`);
     }
 
     const argon2 = await import('argon2');
@@ -66,7 +67,7 @@ export const SuperAdminService = {
       // 2. Create the Admin User for this school
       const adminUser = await tx.user.create({
         data: {
-          email: data.adminEmail,
+          email: adminEmail,
           password: passwordHash,
           first_name: data.adminFirstName,
           last_name: data.adminLastName,

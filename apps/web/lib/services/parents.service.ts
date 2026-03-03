@@ -31,10 +31,12 @@ export const ParentsService = {
     phone?: string;
     password?: string;
   }) {
+    const email = data.email.toLowerCase();
+
     // 0. Pre-check email uniqueness
-    const existing = await prisma.user.findUnique({ where: { email: data.email } });
+    const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
-        throw new Error(`The email "${data.email}" is already registered in the system.`);
+        throw new Error(`The email "${email}" is already registered in the system.`);
     }
 
     const passwordHash = await argon2.hash(data.password || 'parent123');
@@ -42,7 +44,7 @@ export const ParentsService = {
     return prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
         data: {
-          email: data.email,
+          email,
           password: passwordHash,
           first_name: data.first_name,
           last_name: data.last_name,
