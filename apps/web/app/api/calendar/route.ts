@@ -17,7 +17,7 @@ const createEventSchema = z.object({
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession(req);
-    const tenantId = enforceTenant(session);
+    const tenantId = enforceTenant(session) as string;
     
     const { searchParams } = new URL(req.url);
     const start = searchParams.get('start');
@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const session = await getSession(req);
-    if (!session) throw new ApiError('Unauthorized', 401);
+    const tenantId = enforceTenant(session) as string;
     
     const body = await req.json();
     const validated = createEventSchema.safeParse(body);

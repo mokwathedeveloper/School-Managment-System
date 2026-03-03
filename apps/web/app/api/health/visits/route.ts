@@ -15,7 +15,7 @@ const createVisitSchema = z.object({
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession(req);
-    const tenantId = enforceTenant(session);
+    const tenantId = enforceTenant(session) as string;
     
     const result = await HealthService.getVisits(tenantId);
     return NextResponse.json(result);
@@ -27,6 +27,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const session = await getSession(req);
+    const tenantId = enforceTenant(session) as string;
     if (!session) throw new ApiError('Unauthorized', 401);
     
     // RBAC: Only staff/admin can record health visits
