@@ -29,7 +29,18 @@ export const SuperAdminService = {
     });
   },
 
-  async onboardSchool(data: { name: string, slug: string, email: string }) {
+  async onboardSchool(data: { 
+    name: string, 
+    slug: string, 
+    email: string,
+    adminFirstName: string,
+    adminLastName: string,
+    adminEmail: string,
+    temporalPassword: string
+  }) {
+    const argon2 = await import('argon2');
+    const passwordHash = await argon2.hash(data.temporalPassword);
+
     return prisma.$transaction(async (tx) => {
       // 1. Create the School
       const school = await tx.school.create({
@@ -40,7 +51,29 @@ export const SuperAdminService = {
         }
       });
 
-      // 2. Create Default Academic Year
+      // 2. Create the Admin User for this school
+      const adminUser = await tx.user.create({
+        data: {
+          email: data.adminEmail,
+          password: passwordHash,
+          first_name: data.adminFirstName,
+          last_name: data.adminLastName,
+          role: 'SCHOOL_ADMIN',
+          school_id: school.id,
+        }
+      });
+
+      // 2.5 Create corresponding Staff record for the admin
+      await tx.staff.create({
+        data: {
+          user_id: adminUser.id,
+          school_id: school.id,
+          designation: 'School Administrator',
+          department: 'Administration',
+        }
+      });
+
+      // 3. Create Default Academic Year
       const currentYear = new Date().getFullYear();
       const academicYear = await tx.academicYear.create({
         data: {

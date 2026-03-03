@@ -8,6 +8,10 @@ const onboardSchoolSchema = z.object({
   name: z.string().min(1, 'School name is required'),
   slug: z.string().min(1, 'Slug is required').regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with hyphens'),
   email: z.string().email('Invalid institutional email'),
+  adminFirstName: z.string().min(1, 'Admin first name is required'),
+  adminLastName: z.string().min(1, 'Admin last name is required'),
+  adminEmail: z.string().email('Invalid admin email'),
+  temporalPassword: z.string().min(6, 'Temporal password must be at least 6 characters'),
 });
 
 export async function GET(req: NextRequest) {
