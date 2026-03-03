@@ -12,9 +12,13 @@ import { ActivityFeed } from '@/components/dashboard/activity-feed';
 // Role-specific views
 import { SuperAdminView } from '@/components/dashboard/role-views/super-admin-view';
 import { AdminView } from '@/components/dashboard/role-views/admin-view';
+import { HeadTeacherView } from '@/components/dashboard/role-views/head-teacher-view';
+import { DeputyHeadTeacherView } from '@/components/dashboard/role-views/deputy-head-teacher-view';
 import { TeacherView } from '@/components/dashboard/role-views/teacher-view';
+import { ClassTeacherView } from '@/components/dashboard/role-views/class-teacher-view';
 import { LibrarianView } from '@/components/dashboard/role-views/librarian-view';
 import { NurseView } from '@/components/dashboard/role-views/nurse-view';
+import { MatronView } from '@/components/dashboard/role-views/matron-view';
 import { SecurityView } from '@/components/dashboard/role-views/security-view';
 import { DriverView } from '@/components/dashboard/role-views/driver-view';
 import { SubordinateView } from '@/components/dashboard/role-views/subordinate-view';
@@ -26,7 +30,6 @@ export default function DashboardPage() {
   const { data: stats, isLoading: loadingStats } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
-      // Specialized fetch based on role if needed, or consolidated dashboard stats
       const res = await api.get('/analytics/dashboard');
       return res.data;
     }
@@ -39,19 +42,23 @@ export default function DashboardPage() {
       case 'SUPER_ADMIN':
         return <SuperAdminView stats={stats} />;
       case 'SCHOOL_ADMIN':
-      case 'HEAD_TEACHER':
-      case 'DEPUTY_HEAD_TEACHER':
         return <AdminView stats={stats} />;
+      case 'HEAD_TEACHER':
+        return <HeadTeacherView stats={stats} />;
+      case 'DEPUTY_HEAD_TEACHER':
+        return <DeputyHeadTeacherView stats={stats} />;
       case 'ACCOUNTANT':
         return <AccountantView stats={stats} />;
       case 'TEACHER':
-      case 'CLASS_TEACHER':
         return <TeacherView stats={stats} />;
+      case 'CLASS_TEACHER':
+        return <ClassTeacherView stats={stats} />;
       case 'LIBRARIAN':
         return <LibrarianView stats={stats} />;
       case 'NURSE':
-      case 'MATRON':
         return <NurseView stats={stats} />;
+      case 'MATRON':
+        return <MatronView stats={stats} />;
       case 'SECURITY':
         return <SecurityView stats={stats} />;
       case 'DRIVER':
